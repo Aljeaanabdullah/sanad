@@ -68,6 +68,6 @@ class FakeDashboard implements DashboardService {
     if (employeeId != null && denyOthers) throw const DashboardError('not_allowed');
     final j = byEmployee[employeeId];
     if (j == null) throw const DashboardError('not_found');
-    return Dashboard.fromJson({...j, if (month != null) 'month': month});
+    return Dashboard.fromJson({...j, 'month': ?month});
   }
 }

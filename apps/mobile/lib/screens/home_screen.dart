@@ -201,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('${s.welcome}$comma $name', key: const Key('welcome'), style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
               if (job != null || dept != null)
-                Text([if (job != null) job, if (dept != null) dept].join(' · '), style: TextStyle(color: Theme.of(context).colorScheme.outline)),
+                Text([?job, ?dept].join(' · '), style: TextStyle(color: Theme.of(context).colorScheme.outline)),
               Text('${s.get('file_no_label')}: ${widget.profile.fileNumber}', style: TextStyle(color: Theme.of(context).colorScheme.outline)),
             ]),
           ),
