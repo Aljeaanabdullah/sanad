@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import * as Auth from './auth';
+import { ensureDeviceKey } from './deviceKey';
 import type { Profile } from './auth';
 import { supabase } from './supabase';
 
@@ -55,6 +56,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         setStep('blocked');
         return;
       }
+      // PRD 4.7: register this phone's signing key in the background (no prompt; tried again at the next punch).
+      ensureDeviceKey().catch(() => {});
       if (p.mustChangePassword) {
         setStep('change_password');
         return;

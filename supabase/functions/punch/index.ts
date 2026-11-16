@@ -159,7 +159,7 @@ Deno.serve(async (req) => {
 
   // The signature: made on the bound phone, by its key, after Face ID / fingerprint, for this nonce and these values.
   let signature: SignatureStatus | null = null;
-  if (biometricMode && rightDevice) {
+  if (biometricMode && device && rightDevice) {
     const sig = body.signature;
     if (!device.public_key) signature = "no_key";
     else if (!device.key_attested && !settings.allow_unattested_ios) signature = "unattested";

@@ -1,6 +1,8 @@
-// Punch flow (PRD 4.6, owner decision 2026-11-16): phone checks -> device Face ID / fingerprint ->
-// front-camera review photo -> the punch function decides (server time, site, bound phone) -> result.
-// VPN / mock location / root are reported, not blocked here: the server refuses and records the attempt.
+// Punch flow (PRD 4.6 / 4.7): phone checks -> front-camera review photo -> Face ID / fingerprint, which
+// unlocks the phone's key to sign the punch (location + photo + checks) -> the punch function decides
+// (server time, site, bound phone, signature) -> result.
+// Mock location / root are reported, not blocked here: the server refuses and records the attempt.
+// VPN is reported and recorded only (PRD 5.4, version 1.11).
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -8,6 +10,7 @@ import { BackHandler, View } from 'react-native';
 import { PunchSteps } from '../../components/home/PunchSteps';
 import { Button, Card, Gap, Header, Icon, Notice, Row, Screen, Skeleton, Txt } from '../../components/ui';
 import { deviceId } from '../../lib/device';
+import { signPunch } from '../../lib/deviceKey';
 import { hm, longDate } from '../../lib/dates';
 import { hasKey } from '../../lib/i18n';
 import {
@@ -25,6 +28,7 @@ import {
   type BiometricType,
   type GeoPoint,
   type PhoneReport,
+  type PunchBody,
   type PunchOutcome,
   type StepId,
 } from '../../lib/punch';
@@ -54,7 +58,8 @@ export default function PunchScreen() {
   const run = useRef(0);
   const camera = useRef<CameraView>(null);
   const checks = useRef<{ location: GeoPoint; report: PhoneReport; at: number } | null>(null);
-  const biometric = useRef<BiometricType | null>(null);
+  /** The review photo taken in the photo step, signed and sent after Face ID / fingerprint. */
+  const photoRef = useRef<string | null>(null);
   const askedCamera = useRef(false);
 
   useEffect(() => {
@@ -118,40 +123,48 @@ export default function PunchScreen() {
     return true;
   }, [fail]);
 
-  const runBiometric = useCallback(async (id: number): Promise<boolean> => {
+  /**
+   * Face ID / fingerprint. With a registered key (PRD 4.7) the prompt unlocks the key, which signs the punch;
+   * without one (not registered yet, older build) it is a plain Face ID check and the server decides.
+   * Returns the body to send, or null after showing the problem.
+   */
+  const runBiometric = useCallback(async (id: number, ch: { location: GeoPoint; report: PhoneReport }, photo: string): Promise<PunchBody | null> => {
     setStep('biometric');
     const info = await Phone.biometricInfo();
-    if (id !== run.current) return false;
+    if (id !== run.current) return null;
     if (!info.ready) {
       fail({ step: 'biometric', key: info.weak ? 'punch_biometric_weak' : 'biometric_not_enrolled', actions: ['retry'] });
-      return false;
+      return null;
+    }
+    const bio: BiometricType = info.type ?? 'fingerprint';
+    const body = buildPunchBody({ deviceId: await deviceId(), location: ch.location, report: ch.report, biometric: bio, photo });
+    const signed = await signPunch(body, t('biometric_prompt'), t('punch_cancel'));
+    if (id !== run.current) return null;
+    if (signed.kind === 'signed') return { ...body, signature: signed.signature };
+    if (signed.kind === 'failed') {
+      fail({ step: 'biometric', key: signed.error === 'no_internet' ? 'punch_error_no_internet' : biometricErrorKey(signed.error), actions: ['retry'] });
+      return null;
     }
     const r = await Phone.authenticate(t('biometric_prompt'), t('punch_cancel'));
-    if (id !== run.current) return false;
+    if (id !== run.current) return null;
     if (!r.ok) {
       fail({ step: 'biometric', key: biometricErrorKey(r.error), actions: ['retry'] });
-      return false;
+      return null;
     }
-    biometric.current = info.type ?? 'fingerprint';
-    return true;
+    return body;
   }, [fail, t]);
 
-  const start = useCallback(async (from: StepId = 'checks') => {
+  const start = useCallback(async (from: 'checks' | 'photo' = 'checks') => {
     const id = ++run.current;
     setProblem(null);
     setOutcome(null);
     setCameraReady(false);
-    let begin = from;
-    if (begin !== 'checks' && isStale(checks.current?.at ?? null)) begin = 'checks';
-    if (begin === 'checks') {
-      biometric.current = null;
+    photoRef.current = null;
+    if (from === 'checks' || isStale(checks.current?.at ?? null)) {
       if (!(await runChecks(id))) return;
     }
-    if (begin === 'checks' || begin === 'biometric') {
-      if (!(await runBiometric(id))) return;
-    }
     if (id === run.current && alive.current) setStep('photo');
-  }, [runChecks, runBiometric]);
+  }, [runChecks]);
 
   useEffect(() => {
     start('checks');
@@ -164,19 +177,22 @@ export default function PunchScreen() {
     requestCam();
   }, [step, camPerm, requestCam]);
 
-  const send = useCallback(async (photo: string) => {
+  /** Face ID / fingerprint (signs), then sends. Also the retry of a failed Face ID step (same photo). */
+  const signAndSend = useCallback(async () => {
     const id = run.current;
     const ch = checks.current;
-    const bio = biometric.current;
-    if (!ch || !bio) return start('checks');
-    // The employee may have waited on the camera: never send an old location or an old Face ID pass.
+    const photo = photoRef.current;
+    if (!ch || !photo) return start('checks');
+    // The employee may have waited on the camera: never send an old location.
     if (isStale(ch.at)) return start('checks');
+    setProblem(null);
+    const body = await runBiometric(id, ch, photo);
+    if (!body || id !== run.current || !alive.current) return;
     setStep('sending');
-    const body = buildPunchBody({ deviceId: await deviceId(), location: ch.location, report: ch.report, biometric: bio, photo });
     const result = await Phone.sendPunch(body);
     if (id !== run.current || !alive.current) return;
     setOutcome(result);
-  }, [start, fail]);
+  }, [start, runBiometric]);
 
   const capture = useCallback(async () => {
     if (!camera.current || busy.current) return;
@@ -194,14 +210,15 @@ export default function PunchScreen() {
         fail({ step: 'photo', key: 'punch_photo_failed', actions: ['retry'] });
         return;
       }
-      await send(photo);
+      photoRef.current = photo;
+      await signAndSend();
     } catch {
       fail({ step: 'photo', key: 'punch_photo_failed', actions: ['retry'] });
     } finally {
       busy.current = false;
       if (alive.current) setCapturing(false);
     }
-  }, [fail, send]);
+  }, [fail, signAndSend]);
 
   const act = (a: Action) => {
     if (a === 'settings') return Phone.openSettings();
@@ -212,7 +229,11 @@ export default function PunchScreen() {
       if (isStale(checks.current?.at ?? null)) start('checks');
       return;
     }
-    start(problem?.step === 'biometric' ? 'biometric' : 'checks');
+    if (problem?.step === 'biometric' && photoRef.current && !isStale(checks.current?.at ?? null)) {
+      signAndSend();
+      return;
+    }
+    start('checks');
   };
 
   // ---------------------------------------------------------------- view
