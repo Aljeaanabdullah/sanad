@@ -24,4 +24,5 @@ export async function createClient() {
 }
 
 /** Internal e-mail behind a file number. Users only ever type the file number. */
+// "jahez.local" is from the project's old name; every account signs in with it, so it stays.
 export const emailFor = (fileNumber: string | number) => `${fileNumber}@jahez.local`;

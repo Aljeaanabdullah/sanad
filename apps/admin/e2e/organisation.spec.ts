@@ -153,7 +153,7 @@ test("work patterns: create a 48-hour rotation, edit, delete; a pattern in use c
 });
 
 test("organisation screens switch to English", async ({ page, context }) => {
-  await context.addCookies([{ name: "jahez_lang", value: "en", url: "http://localhost:3000" }]);
+  await context.addCookies([{ name: "sanad_lang", value: "en", url: "http://localhost:3000" }]);
   await page.goto("/organisation/sites");
   await expect(page.getByRole("heading", { name: "Organisation" })).toBeVisible();
   await expect(page.locator("html")).toHaveAttribute("dir", "ltr");

@@ -2,8 +2,8 @@ import "server-only";
 import { cookies } from "next/headers";
 import { dictionaries, type Lang, type Theme } from "./i18n";
 
-export const LANG_COOKIE = "jahez_lang";
-export const THEME_COOKIE = "jahez_theme";
+export const LANG_COOKIE = "sanad_lang";
+export const THEME_COOKIE = "sanad_theme";
 
 /** Language and theme chosen by the user, remembered in cookies. Arabic + light by default. */
 export async function getPrefs() {

@@ -1,6 +1,6 @@
 """
 Independent reference for the "align-v1" face alignment (see apps/admin/src/lib/face/align.ts).
-Writes tools/face-model/align-fixtures.json, which the TypeScript and Dart tests both check.
+Writes tools/face-model/align-fixtures.json, which the TypeScript test checks.
 
     python tools/face-model/make_align_fixtures.py
 """

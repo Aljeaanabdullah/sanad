@@ -1,6 +1,6 @@
 // Sanad phase S1 (PRD 17-18): the employee dashboard as returned by the RPC `employee_dashboard`,
 // and "Ask Sanad": answers built ONLY from that one employee's dashboard data (no AI, no other employees).
-// Same rules and texts as the mobile app (apps/mobile/lib/sanad/ask.dart).
+// Same rules and texts as the mobile app (apps/mobile/src/sanad/dashboard.ts).
 
 export type DashboardData = {
   employee: {

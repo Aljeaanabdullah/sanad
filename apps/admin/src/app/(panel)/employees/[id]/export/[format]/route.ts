@@ -28,7 +28,7 @@ export async function GET(_req: Request, ctx: RouteContext<"/employees/[id]/expo
     new_data: { file_number: record.employee.file_number },
   });
 
-  const file = `jahez-employee-${record.employee.file_number}.${format}`;
+  const file = `sanad-employee-${record.employee.file_number}.${format}`;
   return new Response(new Uint8Array(body), {
     headers: {
       "Content-Type":

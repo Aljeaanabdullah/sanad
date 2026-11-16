@@ -1,4 +1,4 @@
-// Jahez — punch in / out (Phases 6–8). Every attempt is checked here, on the server, and recorded.
+// Sanad — punch in / out (Phases 6–8). Every attempt is checked here, on the server, and recorded.
 // Body: {
 //   "device_identifier": string,
 //   "location": { "lat": number, "lng": number, "accuracy": number },

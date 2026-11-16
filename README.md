@@ -1,7 +1,8 @@
-# Jahez — نظام تحضير الموظفين
+# سَنَد (SANAD) — نظام الموارد البشرية
 
-تحضير الموظفين بتصوير الوجه والتحقق من الموقع، مع وحدة طوارئ لإخلاء المباني.
+نظام موارد بشرية لشركة واحدة في الكويت: تسجيل الحضور والانصراف من الجوال (Face ID أو البصمة مع التحقق من الموقع)، والإجازات، والعقوبات، وكشف المكافأة الشهري الذي يجهزه وكلاء ذكاء اصطناعي، ولوحة للموظف، ووحدة طوارئ لإخلاء المباني.
 
+- الرابط المباشر للوحة التحكم: https://sanad-ten-alpha.vercel.app
 - المتطلبات: [docs/PRD.md](docs/PRD.md)
 - خطة التنفيذ: [docs/PLAN.md](docs/PLAN.md)
 
@@ -9,7 +10,7 @@
 
 | المجلد | المحتوى |
 |---|---|
-| `apps/mobile` | تطبيق الجوال (Flutter) لـ iOS وAndroid |
+| `apps/mobile` | تطبيق الجوال (Expo / React Native) لـ iOS وAndroid |
 | `apps/admin` | لوحة التحكم (Next.js) |
 | `supabase/` | إعدادات قاعدة البيانات والجداول والدوال |
 | `docs/` | الوثائق |
@@ -17,8 +18,7 @@
 ## المتطلبات على الجهاز
 
 - **Node.js** الإصدار 24 أو أحدث
-- **Flutter** الإصدار 3.47 (القناة المستقرة)
-- **Android Studio**: لتشغيل محاكي Android (يُحتاج من المرحلة 2)
+- **Android Studio**: لتشغيل محاكي Android، أو جوال Android عليه تطبيق Expo Go
 
 ## التشغيل
 
@@ -33,22 +33,22 @@ npm run dev
 ### تطبيق الجوال
 ```bash
 cd apps/mobile
-flutter pub get
-flutter run
+npm install
+npm run android
 ```
 
-## نموذج الوجه ومحاكي أندرويد
-
-- نموذج الوجه نفسه يعمل في الويب والجوال. طريقة بنائه واختباره في [tools/face-model/README.md](tools/face-model/README.md).
-- اختبار النموذج داخل المحاكي أو الجوال:
-
+اختبارات تطبيق الجوال:
 ```bash
-node tools/face-model/make_mobile_parity.mjs
 cd apps/mobile
-flutter test integration_test/face_model_test.dart -d emulator-5554
+npm run typecheck
+npm test
 ```
 
-- تشغيل التطبيق على المحاكي: `flutter run -d emulator-5554` (المحاكي اسمه jahez، وكاميرته الأمامية هي كاميرا اللابتوب).
+ملف تثبيت Android (APK) يُبنى تلقائياً في GitHub Actions، وتنزّله من قسم «Artifacts» في صفحة التشغيل.
+
+## نموذج الوجه
+
+لوحة التحكم تسجل وجه الموظف بنموذج يعمل داخل المتصفح. طريقة بنائه واختباره في [tools/face-model/README.md](tools/face-model/README.md).
 
 ## الإعدادات
 
@@ -84,5 +84,7 @@ npm run test:e2e  # اختبارات المتصفح (Playwright)، تحتاج ا
 
 مع كل Pull Request يشغّل GitHub الفحوصات التالية:
 - لوحة التحكم: فحص الكود، واختبارات قواعد الإدخال، والبناء.
-- تطبيق الجوال: فحص الكود والاختبارات.
+- تطبيق الجوال: فحص الأنواع (TypeScript)، والاختبارات، وبناء حزمة Android.
+- ملف تثبيت Android (APK) جاهز للتنزيل من «Artifacts».
+- اختبارات دالة التبصيم على الخادم.
 - البحث عن أي مفاتيح سرية داخل المستودع.

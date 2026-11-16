@@ -6,7 +6,7 @@ test.use({ storageState: authFile("admin") });
 test.describe.configure({ mode: "serial" });
 
 const FILE = "799950";
-const PASSWORD = "Jahez2026x";
+const PASSWORD = "Sanad2026x";
 const alert = (page: Page) => page.locator('p[role="alert"]');
 
 test.beforeEach(({ page }) => {
@@ -158,13 +158,13 @@ test("end of service: both files must be downloaded, then everything is deleted"
   await expect(deleteButton).toBeDisabled();
 
   const [xlsx] = await Promise.all([page.waitForEvent("download"), page.getByTestId("download-xlsx").click()]);
-  expect(xlsx.suggestedFilename()).toBe(`jahez-employee-${FILE}.xlsx`);
+  expect(xlsx.suggestedFilename()).toBe(`sanad-employee-${FILE}.xlsx`);
   const xlsxPath = `test-results/${xlsx.suggestedFilename()}`;
   await xlsx.saveAs(xlsxPath);
   expect(readFileSync(xlsxPath).subarray(0, 2).toString()).toBe("PK"); // Excel files are zip archives
 
   const [pdf] = await Promise.all([page.waitForEvent("download"), page.getByTestId("download-pdf").click()]);
-  expect(pdf.suggestedFilename()).toBe(`jahez-employee-${FILE}.pdf`);
+  expect(pdf.suggestedFilename()).toBe(`sanad-employee-${FILE}.pdf`);
   const pdfPath = `test-results/${pdf.suggestedFilename()}`;
   await pdf.saveAs(pdfPath);
   expect(readFileSync(pdfPath).subarray(0, 4).toString()).toBe("%PDF");
