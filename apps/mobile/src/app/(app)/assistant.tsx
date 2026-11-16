@@ -15,6 +15,7 @@ import { useSession } from '../../lib/session';
 import { useSettings } from '../../lib/settings';
 import { space } from '../../lib/theme';
 import { answerQuestion, MONTH_RE, type DashboardData } from '../../sanad/dashboard';
+import { readyAnswerFits } from '../../sanad/route';
 
 type Msg = {
   id: number;
@@ -61,7 +62,8 @@ export default function AssistantScreen() {
   const alive = useRef(true);
   useEffect(() => () => { alive.current = false; }, []);
 
-  const ask = (q: string) => {
+  /** `button`: a quick-question button (always the ready answer); typed text is routed by readyAnswerFits. */
+  const ask = (q: string, button = false) => {
     const text = q.trim();
     if (!text || waiting) return;
     const d = data.current;
@@ -74,12 +76,11 @@ export default function AssistantScreen() {
       return;
     }
     const a = answerQuestion(d, text, t.isAr);
-    if (a.topic !== 'unknown') {
-      put({ id: replyId, mine: false, text: a.text, leave: a.topic === 'leave' && d.viewer_is_self });
-      return;
-    }
-    // The assistant only sees the current period: for a past period keep the ready answer path.
+    const ready = () => put({ id: replyId, mine: false, text: a.text, leave: a.topic === 'leave' && d.viewer_is_self });
+    if (a.topic !== 'unknown' && (button || readyAnswerFits(text))) return ready();
+    // The assistant only sees the current period: for a past period use the ready answer when there is one.
     if (d.period.complete) {
+      if (a.topic !== 'unknown') return ready();
       put({ id: replyId, mine: false, text: t('asst_old_period') });
       return;
     }
@@ -140,7 +141,7 @@ export default function AssistantScreen() {
           <View accessibilityLabel={t('asst_suggestions')}>
             <Row wrap gap={space.sm}>
               {QUICK.map((k) => (
-                <Chip key={k} label={t(k)} onPress={() => ask(t(k))} />
+                <Chip key={k} label={t(k)} onPress={() => ask(t(k), true)} />
               ))}
             </Row>
           </View>
