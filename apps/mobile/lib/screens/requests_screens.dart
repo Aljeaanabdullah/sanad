@@ -5,6 +5,15 @@ import '../requests/requests_service.dart';
 
 String _statusText(Strings s, String status) => s.get('status_$status');
 
+/// "إجازة دورية" -> its text in the current language.
+String leaveTypeLabel(Strings s, String? type) => switch (type) {
+      'إجازة دورية' => s.get('leave_annual'),
+      'إجازة مرضية' => s.get('leave_sick'),
+      'إجازة طارئة' => s.get('leave_emergency'),
+      'إجازة بدون راتب' => s.get('leave_unpaid'),
+      _ => type ?? '—',
+    };
+
 Color _statusColor(BuildContext context, String status) {
   final c = Theme.of(context).colorScheme;
   return switch (status) {
@@ -22,15 +31,21 @@ String requestSummary(Strings s, MaterialLocalizations loc, RequestItem r, bool 
     final kind = r.punchType == 'check_in' ? s.punchIn : s.punchOut;
     return '$day · $kind ${loc.formatTimeOfDay(TimeOfDay.fromDateTime(r.time!))}';
   }
+  if (r.type == 'leave') {
+    final to = r.leaveTo == null ? '' : ' – ${loc.formatMediumDate(r.leaveTo!)}';
+    return '${leaveTypeLabel(s, r.leaveType)} · $day$to';
+  }
   return '$day · ${(isArabic ? r.siteAr : r.siteEn) ?? '—'}';
 }
 
 /// "My requests": the list, with a button for a new one (Phase 8).
 class MyRequestsScreen extends StatefulWidget {
-  const MyRequestsScreen({super.key, required this.strings, required this.isArabic, required this.service});
+  const MyRequestsScreen({super.key, required this.strings, required this.isArabic, required this.service, this.onLeaveRequest});
   final Strings strings;
   final bool isArabic;
   final RequestsService service;
+  /// Sanad: opens the leave request form (then this list reloads).
+  final Future<void> Function()? onLeaveRequest;
 
   @override
   State<MyRequestsScreen> createState() => _MyRequestsScreenState();
@@ -65,7 +80,19 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
     final loc = MaterialLocalizations.of(context);
     final items = _items;
     return Scaffold(
-      appBar: AppBar(title: Text(s.get('my_requests'))),
+      appBar: AppBar(title: Text(s.get('my_requests')), actions: [
+        if (widget.onLeaveRequest != null)
+          TextButton.icon(
+            key: const Key('newLeave'),
+            style: TextButton.styleFrom(foregroundColor: Theme.of(context).appBarTheme.foregroundColor),
+            icon: const Icon(Icons.flight_takeoff),
+            label: Text(s.get('leave_request')),
+            onPressed: () async {
+              await widget.onLeaveRequest!();
+              await _load();
+            },
+          ),
+      ]),
       floatingActionButton: FloatingActionButton.extended(
         key: const Key('newRequest'),
         icon: const Icon(Icons.add),
@@ -346,8 +373,11 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
           const SizedBox(height: 4),
           Text(_statusText(s, _status), key: const Key('requestStatus'), style: TextStyle(color: _statusColor(context, _status))),
           const SizedBox(height: 16),
-          _row(context, s.get('shift_day'), loc.formatFullDate(r.shiftDate)),
-          if (r.type == 'punch_correction')
+          _row(context, s.get(r.type == 'leave' ? 'leave_start' : 'shift_day'), loc.formatFullDate(r.shiftDate)),
+          if (r.type == 'leave') ...[
+            _row(context, s.get('leave_type'), leaveTypeLabel(s, r.leaveType)),
+            if (r.leaveTo != null) _row(context, s.get('leave_end'), loc.formatFullDate(r.leaveTo!)),
+          ] else if (r.type == 'punch_correction')
             _row(context, s.get('requested_time'),
                 '${r.punchType == 'check_in' ? s.punchIn : s.punchOut} — ${loc.formatTimeOfDay(TimeOfDay.fromDateTime(r.time!))}')
           else

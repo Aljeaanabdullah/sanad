@@ -59,7 +59,7 @@ export default async function RecordPage({ params, searchParams }: PageProps<"/r
       .order("punched_at", { ascending: false }),
     supabase
       .from("requests")
-      .select("id, request_type, status, shift_date, corrected_punch_type, corrected_time, sites(name_ar, name_en)")
+      .select("id, request_type, status, shift_date, corrected_punch_type, corrected_time, leave_type, leave_to, sites(name_ar, name_en)")
       .eq("employee_id", id)
       .order("created_at", { ascending: false })
       .limit(50),
@@ -203,7 +203,9 @@ export default async function RecordPage({ params, searchParams }: PageProps<"/r
                   <td>
                     {r.request_type === "punch_correction"
                       ? `${t.punchTypes[r.corrected_punch_type as "check_in" | "check_out"]} — ${time.format(new Date(r.corrected_time!))}`
-                      : name(r.sites as unknown as Named)}
+                      : r.request_type === "leave"
+                        ? `${t.leaveTypes[r.leave_type ?? ""] ?? r.leave_type} → ${day.format(new Date(`${r.leave_to}T00:00:00Z`))}`
+                        : name(r.sites as unknown as Named)}
                   </td>
                   <td>{t.statuses[r.status as keyof typeof t.statuses]}</td>
                 </tr>

@@ -130,6 +130,11 @@ Future<void> pumpApp(WidgetTester tester, FakeAuth auth,
   await tester.pumpAndSettle();
 }
 
+Future<void> openMore(WidgetTester tester) async {
+  await tester.tap(find.byKey(const Key('tabMore')));
+  await tester.pumpAndSettle();
+}
+
 Future<void> signIn(WidgetTester tester, String fileNumber, String password) async {
   await tester.enterText(find.byKey(const Key('fileNumber')), fileNumber);
   await tester.enterText(find.byKey(const Key('password')), password);
@@ -233,6 +238,8 @@ void main() {
     await pumpApp(tester, auth);
     expect(find.byKey(const Key('welcome')), findsOneWidget);
 
+    // Sign out lives in the "More" tab (Sanad design, PRD 18.2).
+    await openMore(tester);
     await tester.scrollUntilVisible(find.text('تسجيل الخروج'), 200);
     await tester.tap(find.text('تسجيل الخروج'));
     await tester.pumpAndSettle();
@@ -264,6 +271,7 @@ void main() {
 
   testWidgets('only HR sees the face enrollment button', (tester) async {
     await pumpApp(tester, FakeAuth(mustChange: false, device: DeviceStatus.ok)..signedIn = true);
+    await openMore(tester);
     expect(find.byKey(const Key('openEnroll')), findsNothing);
   });
 
@@ -273,6 +281,8 @@ void main() {
     enroll.targets[710101] = const EnrollTarget(id: 'b', fileNumber: 710101, nameAr: 'جاهز', nameEn: 'Ready', isActive: true, hasLogin: true, hasConsent: true, enrolled: true);
     await pumpApp(tester, FakeAuth(mustChange: false, device: DeviceStatus.ok, role: 'hr')..signedIn = true, enroll: enroll);
 
+    await openMore(tester);
+    expect(find.byKey(const Key('openEnroll')), findsOneWidget);
     await tester.tap(find.byKey(const Key('openEnroll')));
     await tester.pumpAndSettle();
     await tester.enterText(find.byKey(const Key('enrollFile')), '710100');
@@ -308,8 +318,10 @@ void main() {
         lateMinutes: 5,
       );
     await pumpApp(tester, FakeAuth(mustChange: false, device: DeviceStatus.ok)..signedIn = true, punch: punch);
-    // Checked in to the current shift, so the button offers out.
-    expect(find.text('تسجيل خروج'), findsWidgets);
+    // Checked in to the current shift, so the main button is punch out (the other one is off).
+    expect(find.descendant(of: find.byKey(const Key('punchButton')), matching: find.text('بصمة الانصراف')), findsOneWidget);
+    expect(tester.widget<FilledButton>(find.byKey(const Key('punchOtherButton'))).onPressed, isNull);
+    expect(find.byKey(const Key('checkInTime')), findsOneWidget);
     expect(find.text('أنت خارج نطاق موقع العمل.'), findsOneWidget);
     expect(find.textContaining('ورديتك'), findsOneWidget);
     expect(find.text('متأخر 5 دقيقة'), findsOneWidget);
@@ -329,7 +341,9 @@ void main() {
   testWidgets('home says when there is no upcoming shift', (tester) async {
     await pumpApp(tester, FakeAuth(mustChange: false, device: DeviceStatus.ok)..signedIn = true);
     expect(find.text('لا توجد وردية قريبة.'), findsOneWidget);
-    expect(find.text('تسجيل دخول'), findsWidgets);
+    expect(find.descendant(of: find.byKey(const Key('punchButton')), matching: find.text('بصمة الحضور')), findsOneWidget);
+    // No shift known: both buttons stay on, the server decides in or out.
+    expect(tester.widget<FilledButton>(find.byKey(const Key('punchOtherButton'))).onPressed, isNotNull);
   });
 
   testWidgets('with a VPN on, the punch stops before the camera with a clear reason', (tester) async {
