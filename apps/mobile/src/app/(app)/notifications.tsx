@@ -1,11 +1,11 @@
-// In-app notifications (PRD 18.2): decisions on my requests, late arrivals, recorded leave or
-// penalties, and the bonus list. Built by the RPC `my_notifications` from my own data.
+// In-app notifications (PRD 9 / 18.2): the same notifications the phone receives (public.notifications).
+// Unread ones are marked "New"; opening the list marks them all read (the marker stays until the list reloads).
 import { useFocusEffect, useRouter, type Href } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
 import { Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import { noticeView } from '../../components/dash/notice';
-import { Card, EmptyState, ErrorState, Header, Icon, Row, Screen, SkeletonCard, Txt, useDir } from '../../components/ui';
-import { myNotifications, type Notice } from '../../lib/api';
+import { Badge, Card, EmptyState, ErrorState, Header, Icon, Row, Screen, SkeletonCard, Txt, useDir } from '../../components/ui';
+import { markNotificationsRead, myNotifications, type Notice } from '../../lib/api';
 import { agoParts } from '../../lib/dates';
 import { useSettings } from '../../lib/settings';
 import { space } from '../../lib/theme';
@@ -26,6 +26,7 @@ export default function NotificationsScreen() {
       loaded.current = true;
       setItems(list);
       setFailed(false);
+      if (list.some((n) => n.readAt === null)) markNotificationsRead(null).catch(() => {});
     } catch {
       if (!loaded.current) setFailed(true);
     } finally {
@@ -58,27 +59,31 @@ export default function NotificationsScreen() {
             </>
           )
         ) : items.length === 0 ? (
-          <EmptyState icon="notifications-off-outline" title={t('notifications_none')} body={t('notif_empty_body')} />
+          <EmptyState icon="notifications-off-outline" title={t('notifications_none')} body={t('notif_empty_all')} />
         ) : (
           <Card padded={false}>
             {items.map((n, i) => {
               const v = noticeView(n, t);
               const ago = agoParts(n.at, now);
+              const unread = n.readAt === null;
               const body = (
                 <Row gap={space.md} align="flex-start" style={{ paddingVertical: space.md, paddingHorizontal: space.lg, minHeight: 64 }}>
                   <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: c.surfaceAlt, alignItems: 'center', justifyContent: 'center' }}>
                     <Icon name={v.icon} size={20} tone={v.tone} />
                   </View>
-                  <View style={{ flex: 1, gap: 2 }}>
-                    <Txt weight="bold">{v.title}</Txt>
+                  <View style={{ flex: 1, gap: 2 }} accessibilityLabel={unread ? `${t('notif_unread_a11y')}: ${v.title}` : undefined}>
+                    <Txt weight={unread ? 'bold' : 'medium'}>{v.title}</Txt>
                     {v.body ? <Txt variant="label" tone="muted">{v.body}</Txt> : null}
-                    <Txt variant="caption" tone="muted">{t(ago.key, { n: ago.n })}</Txt>
+                    <Row gap={space.sm}>
+                      {unread ? <Badge label={t('notif_unread')} tone="warn" /> : null}
+                      <Txt variant="caption" tone="muted">{t(ago.key, { n: ago.n })}</Txt>
+                    </Row>
                   </View>
                   {v.href ? <Icon name={d.forward} size={18} tone="muted" /> : null}
                 </Row>
               );
               const divider = i === items.length - 1 ? null : <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: c.line, marginHorizontal: space.lg }} />;
-              const key = `${n.kind}-${n.at.getTime()}-${i}`;
+              const key = n.id ?? `${n.kind}-${n.at.getTime()}-${i}`;
               if (!v.href) return <View key={key}>{body}{divider}</View>;
               return (
                 <Pressable

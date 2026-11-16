@@ -83,7 +83,15 @@
           "supportsRTL": false
         }
       ],
-      "expo-asset"
+      "expo-asset",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/android-icon-monochrome.png",
+          "color": "#C9A24B",
+          "defaultChannel": "sanad"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": false

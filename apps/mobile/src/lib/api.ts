@@ -88,16 +88,47 @@ export async function loadDashboard(employeeId?: string | null, month?: string |
   return data as DashboardData;
 }
 
-export type Notice = { kind: string; at: Date; data: Record<string, unknown> };
+/** One row of public.notifications (Phase 9: also the push outbox). Texts are stored in both languages. */
+export type Notice = {
+  kind: string;
+  at: Date;
+  data: Record<string, unknown>;
+  id?: string;
+  readAt?: Date | null;
+  title?: { ar: string; en: string };
+  body?: { ar: string | null; en: string | null };
+};
+
+type NoticeRow = {
+  id: string; kind: string; at: string; data: Record<string, unknown> | null; read_at: string | null;
+  title_ar: string; title_en: string; body_ar: string | null; body_en: string | null;
+};
 
 export async function myNotifications(): Promise<Notice[]> {
-  const { data, error } = await supabase.rpc('my_notifications', { p_limit: 40 });
+  const { data, error } = await supabase.rpc('my_notifications', { p_limit: 60 });
   if (error) throw error;
-  return ((data ?? []) as { kind: string; at: string; data: Record<string, unknown> }[]).map((r) => ({
+  return ((data ?? []) as NoticeRow[]).map((r) => ({
+    id: r.id,
     kind: r.kind,
     at: new Date(r.at),
     data: r.data ?? {},
+    readAt: r.read_at ? new Date(r.read_at) : null,
+    title: { ar: r.title_ar, en: r.title_en },
+    body: { ar: r.body_ar, en: r.body_en },
   }));
+}
+
+/** Marks mine as read: these ids, or all of them (null). */
+export async function markNotificationsRead(ids: string[] | null): Promise<number> {
+  const { data, error } = await supabase.rpc('mark_notifications_read', { p_ids: ids });
+  if (error) throw error;
+  return Number(data ?? 0);
+}
+
+export async function unreadNotificationCount(): Promise<number> {
+  const { data, error } = await supabase.rpc('unread_notification_count');
+  if (error) throw error;
+  return Number(data ?? 0);
 }
 
 // ------------------------------------------------------------------ attendance history

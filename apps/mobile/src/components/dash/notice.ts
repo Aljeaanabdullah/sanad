@@ -1,7 +1,9 @@
 // One in-app notification (RPC `my_notifications`) -> icon, tone, title and body text.
-// Pure so it can be tested; the kinds and data fields match the SQL (request_decided, late,
-// leave_recorded, penalty_recorded, bonus_list).
+// Pure so it can be tested. The first kinds (request_decided, late, leave_recorded, penalty_recorded,
+// bonus_list) are worded here from their data; the Phase 9 kinds use the text the server stored in both
+// languages (the same text the push notification showed). Where a tap goes: routeFor (lib/notify).
 import type { Notice } from '../../lib/api';
+import { NOTIFICATION_KINDS, routeFor } from '../../lib/notify';
 import { typeLabel } from '../../lib/calendarView';
 import { mediumDate, monthYear, parseYmd } from '../../lib/dates';
 import type { T } from '../../lib/i18n';
@@ -37,7 +39,7 @@ export function noticeView(n: Notice, t: T): NoticeView {
         tone: approved ? 'ok' : 'danger',
         title: `${title}: ${what}`,
         body: [range(d.date, d.to), str(d.note)].filter(Boolean).join('\n'),
-        href: '/requests',
+        href: routeFor(n.kind, d),
       };
     }
     case 'late':
@@ -78,7 +80,33 @@ export function noticeView(n: Notice, t: T): NoticeView {
         href: valid ? `/dashboard?month=${m}` : '/dashboard',
       };
     }
-    default:
-      return { icon: 'notifications-outline', tone: 'muted', title: t('notifications'), body: '', href: null };
+    default: {
+      const look = LOOK[n.kind];
+      const title = (lang === 'en' ? n.title?.en : n.title?.ar) || n.title?.ar || t('notifications');
+      const body = (lang === 'en' ? n.body?.en : n.body?.ar) || n.body?.ar || '';
+      const known = (NOTIFICATION_KINDS as readonly string[]).includes(n.kind);
+      const href = known ? routeFor(n.kind, d) : null;
+      return {
+        icon: look?.icon ?? 'notifications-outline',
+        tone: look?.tone ?? 'muted',
+        title,
+        body,
+        // The list itself is not a destination.
+        href: href === '/notifications' ? null : href,
+      };
+    }
   }
 }
+
+const LOOK: Record<string, { icon: IconName; tone: NoticeView['tone'] }> = {
+  shift_reminder: { icon: 'alarm-outline', tone: 'primary' },
+  late_warning: { icon: 'time-outline', tone: 'accent' },
+  checkout_reminder: { icon: 'log-out-outline', tone: 'primary' },
+  missing_checkout: { icon: 'alert-circle-outline', tone: 'danger' },
+  sup_not_in: { icon: 'people-outline', tone: 'accent' },
+  sup_absent: { icon: 'person-remove-outline', tone: 'danger' },
+  sup_missing_checkout: { icon: 'exit-outline', tone: 'accent' },
+  sup_failed_verification: { icon: 'shield-outline', tone: 'danger' },
+  request_to_approve: { icon: 'document-text-outline', tone: 'primary' },
+  emergency_alert: { icon: 'warning-outline', tone: 'danger' },
+};
