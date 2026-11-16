@@ -74,6 +74,23 @@ def safe(text):
     return text.replace("<", "‹").replace(">", "›")
 
 
+MODEL = "anthropic/claude-haiku-5-5"
+
+
+def db_log(auth, question, answer, status):
+    """Write to public.assistant_log via log_assistant_question, as the employee. Fire and forget."""
+    def run():
+        try:
+            http_json(SUPA + "/rest/v1/rpc/log_assistant_question",
+                      data={"p_question": question[:MAX_Q], "p_answer": answer, "p_status": status,
+                            "p_model": MODEL if answer else None},
+                      headers={"apikey": SUPA_KEY, "Authorization": auth, "Content-Type": "application/json"},
+                      timeout=5)
+        except Exception:
+            pass
+    threading.Thread(target=run, daemon=True).start()
+
+
 def log(entry):
     entry["ts"] = datetime.datetime.now(KW).isoformat(timespec="seconds")
     with _db_lock, open(os.path.join(DATA, "log.jsonl"), "a") as f:
@@ -118,6 +135,8 @@ class H(BaseHTTPRequestHandler):
         except Exception:
             return self.fail(400, "bad")
         if not q or len(q) > MAX_Q:
+            if q:
+                db_log(auth, q, None, "bad")
             return self.fail(400, "bad")
 
         sh = {"apikey": SUPA_KEY, "Authorization": auth, "Content-Type": "application/json"}
@@ -131,10 +150,12 @@ class H(BaseHTTPRequestHandler):
         if code in (401, 403) or (isinstance(dash, dict) and dash.get("code") == "42501"):
             return self.fail(403, "notemp")
         if code != 200 or not isinstance(dash, dict):
+            db_log(auth, q, None, "nodata")
             return self.fail(502, "nodata")
 
         ok, left = take_quota(uid)
         if not ok:
+            db_log(auth, q, None, "limit")
             return self.fail(429, "limit")
 
         today = datetime.datetime.now(KW).date().isoformat()
@@ -151,7 +172,9 @@ class H(BaseHTTPRequestHandler):
         log({"user_id": uid, "file_number": fn, "question": q, "answer": answer, "status": code,
              "ms": int((time.time() - t0) * 1000)})
         if not answer:
+            db_log(auth, q, None, "busy" if code in (429, 503, 599) else "error")
             return self.fail(503, "busy")
+        db_log(auth, q, answer.strip()[:4000], "answered")
         self.reply(200, {"answer": answer.strip(), "remaining_today": left,
                          "note": "رد آلي من مساعد سند. للتأكيد راجع الموارد البشرية."})
 
