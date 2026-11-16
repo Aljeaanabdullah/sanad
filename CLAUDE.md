@@ -1,6 +1,6 @@
-# Jahez
+# Sanad (formerly Jahez)
 
-Employee attendance app for one company in Kuwait: punch in/out by face (with liveness) + GPS geofence, plus an emergency evacuation module.
+HR app for one company in Kuwait: punch in/out by face (with liveness) + GPS geofence, leaves, penalties, monthly bonus lists (prepared by AI agents on OpenClaw), an employee dashboard, and an emergency evacuation module. Data lives in Supabase (Notion is no longer used). Bonus tables and agent RPCs are used by the agents: coordinate before changing them.
 
 - Requirements: [docs/PRD.md](docs/PRD.md)
 - Phases and checks: [docs/PLAN.md](docs/PLAN.md)
@@ -26,4 +26,4 @@ Employee attendance app for one company in Kuwait: punch in/out by face (with li
 - Read location only at punch time and during an active emergency. No background tracking.
 - Face data needs recorded consent first. Face embeddings are readable by no client role; enrollment photos (bucket `face-enrollment-photos`) are viewable by the admin only. Punch photos auto-delete after 3 months. Termination = export full record (Excel + PDF), then delete everything except the audit log (owner decision).
 - Every table has RLS for the 4 roles (employee, supervisor, HR, admin). No secrets in the repo; use `.env.example`.
-- Prefer free services. Design: blues + white, light/dark theme, RTL-correct.
+- Prefer free services. Design: Sanad identity, navy + gold (owner decision 2026-11-16), light/dark theme, RTL-correct.
