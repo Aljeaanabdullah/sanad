@@ -3,8 +3,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { alignment, sampleChip, CHIP, descriptorDistance } from "./align";
 
-// Fixtures computed independently in Python (tools/face-model/make_align_fixtures.py);
-// the Dart version in the mobile app is checked against the same file.
+// Fixtures computed independently in Python (tools/face-model/make_align_fixtures.py).
 const fixtures = JSON.parse(
   readFileSync(path.resolve(__dirname, "../../../../../tools/face-model/align-fixtures.json"), "utf8"),
 );

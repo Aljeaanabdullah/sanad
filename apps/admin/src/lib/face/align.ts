@@ -1,8 +1,7 @@
-// Face alignment shared by web and mobile ("align-v1").
-// Same rule in apps/mobile/lib/face/align.dart; both are checked against
+// Face alignment for web face enrollment ("align-v1"). Checked against
 // tools/face-model/align-fixtures.json (computed independently in Python).
 //
-// Only eye centres and mouth corners are used, because both face detectors provide them.
+// Only eye centres and mouth corners are used.
 // The face is rotated so the eyes are level and scaled so that the eye-to-mouth distance is
 // 55 px, with the point between the eyes at (75, 45): close to dlib's own 150x150 face chip,
 // which the model was trained on.

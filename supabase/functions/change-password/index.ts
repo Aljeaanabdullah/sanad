@@ -1,4 +1,4 @@
-// Jahez — change the signed-in user's password and clear "must change password".
+// Sanad — change the signed-in user's password and clear "must change password".
 // Called by the web panel and the mobile app. Body: { "new_password": "..." }
 // Rules (PRD, owner decision): at least 8 characters, with letters and digits,
 // and not the user's own file number.

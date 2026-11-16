@@ -3,6 +3,7 @@ import * as Device from 'expo-device';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
+// Name kept from the project's old name: renaming it would give every phone a new id (and a new binding).
 const KEY = 'jahez_device_id';
 
 /**

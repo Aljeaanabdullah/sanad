@@ -26,16 +26,16 @@ test("capture organisation screens", async ({ page, context }) => {
   await page.screenshot({ path: "test-results/screens/site-detail.png", fullPage: true });
 
   await context.addCookies([
-    { name: "jahez_theme", value: "dark", url: "http://localhost:3000" },
-    { name: "jahez_lang", value: "en", url: "http://localhost:3000" },
+    { name: "sanad_theme", value: "dark", url: "http://localhost:3000" },
+    { name: "sanad_lang", value: "en", url: "http://localhost:3000" },
   ]);
   await page.goto("/organisation/work-patterns/new");
   await page.screenshot({ path: "test-results/screens/new-pattern-dark-en.png", fullPage: true });
 
   await page.setViewportSize({ width: 390, height: 844 });
   await context.addCookies([
-    { name: "jahez_theme", value: "light", url: "http://localhost:3000" },
-    { name: "jahez_lang", value: "ar", url: "http://localhost:3000" },
+    { name: "sanad_theme", value: "light", url: "http://localhost:3000" },
+    { name: "sanad_lang", value: "ar", url: "http://localhost:3000" },
   ]);
   await page.goto("/organisation/departments");
   await page.screenshot({ path: "test-results/screens/departments-phone.png", fullPage: true });

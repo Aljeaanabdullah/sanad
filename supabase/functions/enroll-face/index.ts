@@ -1,4 +1,4 @@
-// Jahez — enroll (or re-enroll) an employee's face. Called by HR from the web panel and the app.
+// Sanad — enroll (or re-enroll) an employee's face. Called by HR from the web panel and the app.
 // Body: {
 //   "employee_id": uuid,
 //   "source": "web" | "mobile",
