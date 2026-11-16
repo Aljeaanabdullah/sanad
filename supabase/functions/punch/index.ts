@@ -8,6 +8,11 @@
 //   "model_version": "dlib-resnet-v1/align-v1",
 //   "photo": string                     // JPEG, base64, kept for review
 // }
+// Sanad (PRD 4.6, owner decision 2026-11-16): a second way to verify, for the Expo app:
+//   "verification": "device_biometric",
+//   "report": { "vpn", "mock_location", "rooted", "biometric": { "passed": bool, "type": string } }
+//   no "descriptor" / "model_version". The phone's Face ID / fingerprint proves the owner of the bound
+//   phone; the review photo is still required and kept. The face-descriptor path above is unchanged.
 // The server decides in/out from the shift windows (rules engine, Phase 7), uses its own clock,
 // and returns the result with a reason.
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
@@ -32,9 +37,16 @@ export const LOCK_MINUTES = 5;
 const MAX_PHOTO_BYTES = 600 * 1024;
 
 type Body = {
+  verification?: unknown;
   device_identifier?: unknown;
   location?: { lat?: unknown; lng?: unknown; accuracy?: unknown };
-  report?: { vpn?: unknown; mock_location?: unknown; rooted?: unknown; liveness?: { challenge?: unknown; passed?: unknown } };
+  report?: {
+    vpn?: unknown;
+    mock_location?: unknown;
+    rooted?: unknown;
+    liveness?: { challenge?: unknown; passed?: unknown };
+    biometric?: { passed?: unknown; type?: unknown };
+  };
   descriptor?: unknown;
   model_version?: unknown;
   photo?: unknown;
@@ -96,10 +108,13 @@ Deno.serve(async (req) => {
   const lat = num(body.location?.lat);
   const lng = num(body.location?.lng);
   const accuracy = num(body.location?.accuracy);
+  const biometricMode = body.verification === "device_biometric";
+  if (body.verification !== undefined && !biometricMode) return json(400, { error: "invalid_body" });
   const descriptor = body.descriptor;
   const validDescriptor =
     Array.isArray(descriptor) && descriptor.length === 128 && descriptor.every((v) => num(v) !== null);
-  if (lat === null || lng === null || accuracy === null || !validDescriptor || typeof body.device_identifier !== "string") {
+  if (lat === null || lng === null || accuracy === null || (!biometricMode && !validDescriptor) ||
+      typeof body.device_identifier !== "string") {
     return json(400, { error: "invalid_body" });
   }
   const photo = decodeJpeg(body.photo);
@@ -122,9 +137,10 @@ Deno.serve(async (req) => {
   else if (body.report?.vpn === true) reason = "vpn";
   else if (body.report?.mock_location === true) reason = "mock_location";
   else if (body.report?.rooted === true) reason = "rooted";
-  else if (body.report?.liveness?.passed !== true) reason = "liveness_failed";
+  else if (biometricMode && body.report?.biometric?.passed !== true) reason = "biometric_failed";
+  else if (!biometricMode && body.report?.liveness?.passed !== true) reason = "liveness_failed";
   else if (accuracy > MAX_ACCURACY_M) reason = "weak_gps";
-  else if (body.model_version !== MODEL_VERSION) reason = "wrong_model_version";
+  else if (!biometricMode && body.model_version !== MODEL_VERSION) reason = "wrong_model_version";
 
   // In or out, and for which shift: decided by the rules engine from the shift windows.
   const { data: slots, error: slotError } = await db.rpc("punch_slot", { p_employee: me.id, p_at: now.toISOString() });
@@ -150,7 +166,7 @@ Deno.serve(async (req) => {
     }
   }
 
-  if (!reason) {
+  if (!reason && !biometricMode) {
     const { data: dist, error } = await db.rpc("face_distance", {
       p_employee_id: me.id,
       p_embedding: `[${(descriptor as number[]).join(",")}]`,
@@ -184,7 +200,12 @@ Deno.serve(async (req) => {
     face_score: faceDistance,
     liveness_passed: body.report?.liveness?.passed === true,
     photo_path: uploadError ? null : photoPath,
-    client_report: { ...(body.report ?? {}), device_identifier: body.device_identifier, by_mission: byMission },
+    client_report: {
+      ...(body.report ?? {}),
+      device_identifier: body.device_identifier,
+      by_mission: byMission,
+      verification: biometricMode ? "device_biometric" : "face_descriptor",
+    },
   }).select("id").single();
   if (insertError || !saved) return json(500, { error: "save_failed" });
 
