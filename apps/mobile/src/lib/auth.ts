@@ -57,7 +57,16 @@ export async function signIn(fileNumber: string, password: string): Promise<Prof
   return profile;
 }
 
-export async function changePassword(newPassword: string): Promise<void> {
+/**
+ * Saves the new password, then signs in again with it (the server ends the old session).
+ * Returns false when the password was saved but signing in again failed: the caller must then send
+ * the user to the login screen, because the old session no longer works on the server.
+ */
+export async function changePassword(newPassword: string): Promise<boolean> {
+  // Read the e-mail from the session saved on the phone BEFORE the change: afterwards the server
+  // has ended this session and asking it for the user fails.
+  const { data: local } = await supabase.auth.getSession();
+  const email = local.session?.user?.email ?? null;
   const { error } = await supabase.functions.invoke('change-password', { body: { new_password: newPassword } });
   if (error) {
     let code = 'generic';
@@ -69,9 +78,9 @@ export async function changePassword(newPassword: string): Promise<void> {
     throw new AuthFailure(code);
   }
   // Changing the password ends the old session: sign in again with the new one (same as the web panel).
-  const { data } = await supabase.auth.getUser();
-  const email = data.user?.email;
-  if (email) await supabase.auth.signInWithPassword({ email, password: newPassword });
+  if (!email) return false;
+  const { error: again } = await supabase.auth.signInWithPassword({ email, password: newPassword });
+  return !again;
 }
 
 export async function bindThisDevice(): Promise<DeviceStatus> {
@@ -91,7 +100,10 @@ export async function hasConsent(employeeId: string): Promise<boolean> {
 
 export async function giveConsent(employeeId: string): Promise<void> {
   const { error } = await supabase.from('consents').insert({ employee_id: employeeId, consent_version: CONSENT_VERSION });
-  if (error) throw new AuthFailure('generic');
+  if (!error) return;
+  // Refused by row security / an expired token means this phone's session no longer works on the server.
+  if (error.code === '42501' || error.code?.startsWith('PGRST3')) throw new AuthFailure('not_signed_in');
+  throw new AuthFailure('generic');
 }
 
 export async function signOut(): Promise<void> {

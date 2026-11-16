@@ -9,14 +9,12 @@
     "auth_other_lang": "English",
     "auth_switch_lang": "تغيير اللغة إلى الإنجليزية",
     "auth_setup_later": "يمكنك تغيير ذلك لاحقاً من الإعدادات.",
-
     "auth_login_hint": "ادخل برقم ملفك الوظيفي وكلمة المرور التي أعطاك إياها مدير النظام.",
     "auth_file_number_helper": "6 أرقام",
     "auth_show_password": "إظهار كلمة المرور",
     "auth_hide_password": "إخفاء كلمة المرور",
     "auth_forgot": "نسيت كلمة المرور؟ اطلب من مدير النظام كلمة مرور جديدة.",
     "error_missing_password": "اكتب كلمة المرور.",
-
     "auth_file_label": "رقم الملف {n}",
     "auth_rules_title": "شروط كلمة المرور",
     "auth_rule_length": "8 أحرف على الأقل",
@@ -31,18 +29,18 @@
     "auth_sign_out_confirm": "هل تريد تسجيل الخروج؟",
     "error_not_signed_in": "انتهت الجلسة. سجّل الخروج ثم ادخل مرة أخرى.",
     "error_update_failed": "تعذّر حفظ كلمة المرور. حاول مرة أخرى.",
-
     "auth_what_to_do": "ماذا أفعل الآن؟",
     "auth_blocked_other_title": "حسابك مرتبط بجوال آخر",
     "auth_blocked_other_step": "اطلب من مدير النظام فك ربط جوالك القديم، ثم سجّل الدخول من هذا الجوال مرة أخرى.",
     "auth_blocked_taken_title": "هذا الجوال لموظف آخر",
     "auth_blocked_taken_step": "سجّل الدخول من جوالك أنت. إذا كان هذا الجوال لك فعلاً، تواصل مع مدير النظام.",
-
     "auth_consent_heading": "قبل أول بصمة",
     "auth_consent_note": "تُحفظ موافقتك مع تاريخها.",
     "auth_consent_decline": "لا أوافق",
     "auth_consent_decline_confirm": "بدون موافقتك لا يمكنك تسجيل الحضور من التطبيق. هل تريد تسجيل الخروج؟",
-    "auth_consent_failed": "تعذّر حفظ موافقتك. تأكد من الاتصال بالإنترنت وحاول مرة أخرى."
+    "auth_consent_failed": "تعذّر حفظ موافقتك. تأكد من الاتصال بالإنترنت وحاول مرة أخرى.",
+    "auth_password_saved_relogin": "تم تغيير كلمة المرور. سجّل دخولك بكلمة المرور الجديدة.",
+    "auth_consent_relogin": "انتهى تسجيل دخولك. سجّل دخولك مرة ثانية ثم وافق."
   },
   "en": {
     "auth_wordmark": "سَنَد",
@@ -54,14 +52,12 @@
     "auth_other_lang": "العربية",
     "auth_switch_lang": "Switch language to Arabic",
     "auth_setup_later": "You can change these later in Settings.",
-
     "auth_login_hint": "Use your file number and the password the system admin gave you.",
     "auth_file_number_helper": "6 digits",
     "auth_show_password": "Show password",
     "auth_hide_password": "Hide password",
     "auth_forgot": "Forgot your password? Ask the system admin for a new one.",
     "error_missing_password": "Enter your password.",
-
     "auth_file_label": "File number {n}",
     "auth_rules_title": "Password rules",
     "auth_rule_length": "At least 8 characters",
@@ -76,17 +72,17 @@
     "auth_sign_out_confirm": "Sign out now?",
     "error_not_signed_in": "Your session ended. Sign out and sign in again.",
     "error_update_failed": "Could not save the password. Try again.",
-
     "auth_what_to_do": "What to do now",
     "auth_blocked_other_title": "Your account is bound to another phone",
     "auth_blocked_other_step": "Ask the system admin to unbind your old phone, then sign in again on this phone.",
     "auth_blocked_taken_title": "This phone belongs to another employee",
     "auth_blocked_taken_step": "Sign in on your own phone. If this phone really is yours, contact the system admin.",
-
     "auth_consent_heading": "Before your first punch",
     "auth_consent_note": "Your consent is saved with its date.",
     "auth_consent_decline": "I do not agree",
     "auth_consent_decline_confirm": "Without your consent you cannot punch from the app. Sign out?",
-    "auth_consent_failed": "Could not save your consent. Check your internet connection and try again."
+    "auth_consent_failed": "Could not save your consent. Check your internet connection and try again.",
+    "auth_password_saved_relogin": "Password changed. Please sign in with your new password.",
+    "auth_consent_relogin": "Your sign-in has expired. Please sign in again, then accept."
   }
 }
