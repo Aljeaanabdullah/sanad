@@ -15,8 +15,10 @@ export function dm(v: string | Date): string {
   return `${d.getDate()}/${d.getMonth() + 1}`;
 }
 
+/** "HH:MM" of an instant in Kuwait time (UTC+3, no daylight saving), whatever the phone's time zone. */
 export function hm(d: Date): string {
-  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  const k = new Date(d.getTime() + 3 * 3600_000);
+  return `${String(k.getUTCHours()).padStart(2, '0')}:${String(k.getUTCMinutes()).padStart(2, '0')}`;
 }
 
 export function locale(lang: 'ar' | 'en') {
