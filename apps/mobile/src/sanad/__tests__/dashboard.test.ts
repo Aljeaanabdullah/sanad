@@ -139,3 +139,27 @@ describe('Sanad dashboard', () => {
     expect(a.text).toContain('not eligible');
   });
 });
+
+// Regression: every ready-question button in the app must get a ready answer (not "I didn't understand").
+describe('quick question buttons', () => {
+  const { makeT } = require('../../lib/i18n');
+  const expected: Record<string, string> = {
+    dash_q_bonus: 'bonus',
+    dash_q_deduction: 'penalty',
+    dash_q_late: 'late',
+    assistant_q_leave: 'leave',
+    asst_q_absence: 'absence',
+  };
+  for (const lang of ['ar', 'en'] as const) {
+    for (const [key, topic] of Object.entries(expected)) {
+      it(`${lang} ${key} → ${topic}`, () => {
+        expect(topicOf(makeT(lang)(key))).toBe(topic);
+      });
+    }
+  }
+  it('common ways to ask about absence', () => {
+    for (const q of ['كم يوم غبت؟', 'كم مرة غبت هالشهر', 'أيام الغياب', 'كم يوم غايب', 'How many days was I absent?', 'days I missed']) {
+      expect(topicOf(q)).toBe('absence');
+    }
+  });
+});

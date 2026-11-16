@@ -105,3 +105,11 @@ describe("Sanad dashboard", () => {
     expect(answerQuestion(dash(), "ليش علي خصم؟", true).text).toContain("ما عليك أي عقوبة");
   });
 });
+
+describe("absence questions", () => {
+  it("understands common ways to ask about absence", () => {
+    for (const q of ["كم يوم غبت؟", "كم مرة غبت هالشهر", "أيام الغياب", "How many days was I absent?"]) {
+      expect(topicOf(q)).toBe("absence");
+    }
+  });
+});
