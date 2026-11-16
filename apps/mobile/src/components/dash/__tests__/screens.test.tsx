@@ -66,6 +66,11 @@ jest.mock('../../../lib/api', () => {
   };
 });
 jest.mock('../../../lib/supabase', () => ({ supabase: {} }));
+const mockAsk = jest.fn();
+jest.mock('../../../lib/askAi', () => ({
+  ...jest.requireActual('../../../lib/askAi'),
+  askSanadAI: (...a: unknown[]) => mockAsk(...a),
+}));
 
 function wrap(ui: ReactNode, lang: 'ar' | 'en' = 'ar') {
   return (
@@ -120,6 +125,49 @@ it('assistant answers locally and offers a leave request for leave questions', a
   expect(screen.getByText(/مجموع إجازاتك 2 يوم/)).toBeTruthy();
   await fireEvent.press(screen.getByText('طلب إجازة'));
   expect(mockPush).toHaveBeenCalledWith('/leave');
+});
+
+async function typeAndSend(text: string) {
+  await fireEvent.changeText(screen.getByLabelText('اكتب رسالتك هنا…'), text);
+  await fireEvent.press(screen.getByLabelText('إرسال'));
+}
+
+it('assistant keeps known questions on the phone (no AI call)', async () => {
+  mockAsk.mockReset();
+  const Assistant = require('../../../app/(app)/assistant').default;
+  await render(wrap(<Assistant />));
+  await settle();
+  await fireEvent.press(screen.getByText('كم إجازاتي؟'));
+  expect(mockAsk).not.toHaveBeenCalled();
+});
+
+it('assistant sends an unknown question to the AI and shows the automated-reply note', async () => {
+  mockAsk.mockReset();
+  let resolve: (v: unknown) => void = () => {};
+  mockAsk.mockReturnValue(new Promise((r) => { resolve = r; }));
+  const Assistant = require('../../../app/(app)/assistant').default;
+  await render(wrap(<Assistant />));
+  await settle();
+  await typeAndSend('شلون أقدر أحسّن وضعي هالشهر؟');
+  expect(mockAsk).toHaveBeenCalledWith('شلون أقدر أحسّن وضعي هالشهر؟');
+  expect(screen.getByText('سند يكتب…')).toBeTruthy();
+  await act(async () => { resolve({ kind: 'answer', answer: 'التزم بالدوام بدون تأخير لين 20 نوفمبر.', remaining: 19 }); });
+  expect(screen.getByText('التزم بالدوام بدون تأخير لين 20 نوفمبر.')).toBeTruthy();
+  expect(screen.getByText('رد آلي من مساعد سند. للتأكيد راجع الموارد البشرية.')).toBeTruthy();
+  expect(screen.getByText('باقي لك 19 سؤال اليوم.')).toBeTruthy();
+  expect(screen.queryByText('سند يكتب…')).toBeNull();
+});
+
+it('assistant shows the relay message when the AI refuses (daily limit)', async () => {
+  mockAsk.mockReset();
+  mockAsk.mockResolvedValue({ kind: 'error', key: 'limit', message: 'وصلت الحد اليومي للأسئلة. تقدر تسأل مرة ثانية باچر.' });
+  const Assistant = require('../../../app/(app)/assistant').default;
+  await render(wrap(<Assistant />));
+  await settle();
+  await typeAndSend('سؤال عام');
+  await settle();
+  expect(screen.getByText('وصلت الحد اليومي للأسئلة. تقدر تسأل مرة ثانية باچر.')).toBeTruthy();
+  expect(screen.queryByText('رد آلي من مساعد سند. للتأكيد راجع الموارد البشرية.')).toBeNull();
 });
 
 it('notifications list renders texts and relative times', async () => {

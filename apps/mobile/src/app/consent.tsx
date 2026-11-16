@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { Alert, View } from 'react-native';
 import { Button, Card, Header, Icon, Notice, Row, Screen, Txt, useSnackbar } from '../components/ui';
+import { AuthFailure } from '../lib/auth';
 import { useSession } from '../lib/session';
 import { useSettings } from '../lib/settings';
 import { space } from '../lib/theme';
@@ -23,7 +24,13 @@ export default function ConsentScreen() {
     try {
       await consentGiven();
       // The guard now opens the app.
-    } catch {
+    } catch (e) {
+      if (e instanceof AuthFailure && e.code === 'not_signed_in') {
+        // The sign-in expired (e.g. after a password change): sign in again, then consent.
+        snack(t('auth_consent_relogin'), 'info');
+        await signOut().catch(() => {});
+        return;
+      }
       setFailed(true);
     } finally {
       setBusy(false);

@@ -1,19 +1,31 @@
-// "Ask Sanad" (PRD 18.1-18.2): the question box as a chat. Answers are built on the phone from the
-// signed-in employee's own dashboard only (answerQuestion), no AI and no other employee's data.
+// "Ask Sanad" (PRD 18.1-18.2, version 1.12): the question box as a chat. Known questions (bonus, late,
+// absence, leave, penalties) are answered on the phone from the signed-in employee's own dashboard
+// (answerQuestion), instantly. Any other question goes to the «مساعد سند» agent through the relay
+// (askSanadAI), which reads the employee's own current-period data only; no AI key is in the app.
 // Optional param `month` (YYYY-MM) answers about that bonus period instead of the current one.
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChatBubble, ChatInput } from '../../components/dash/Chat';
-import { Button, Chip, Header, Row, Screen } from '../../components/ui';
+import { Button, Chip, Header, Row, Screen, Txt } from '../../components/ui';
+import { askErrorKey, askSanadAI } from '../../lib/askAi';
 import { loadDashboard } from '../../lib/api';
 import { useSession } from '../../lib/session';
 import { useSettings } from '../../lib/settings';
 import { space } from '../../lib/theme';
 import { answerQuestion, MONTH_RE, type DashboardData } from '../../sanad/dashboard';
 
-type Msg = { id: number; mine: boolean; text: string; leave?: boolean };
+type Msg = {
+  id: number;
+  mine: boolean;
+  text: string;
+  leave?: boolean;
+  /** Waiting for the AI assistant. */
+  pending?: boolean;
+  /** Answered by the AI assistant: show the automated-reply note (and how many questions are left today). */
+  ai?: { remaining: number | null };
+};
 
 const QUICK = ['dash_q_bonus', 'dash_q_deduction', 'dash_q_late', 'assistant_q_leave', 'asst_q_absence'];
 
@@ -45,20 +57,43 @@ export default function AssistantScreen() {
     setMsgs((m) => (m.length === 1 ? [{ id: 0, mine: false, text: t('asst_hello', { name: firstName }) }] : m));
   }, [t, firstName]);
 
+  const [waiting, setWaiting] = useState(false);
+  const alive = useRef(true);
+  useEffect(() => () => { alive.current = false; }, []);
+
   const ask = (q: string) => {
     const text = q.trim();
-    if (!text) return;
+    if (!text || waiting) return;
     const d = data.current;
-    let reply: Msg;
-    if (!d) {
-      reply = { id: nextId.current + 1, mine: false, text: t(failed.current ? 'dash_error_generic' : 'assistant_loading') };
-      if (failed.current) fetchData();
-    } else {
-      const a = answerQuestion(d, text, t.isAr);
-      reply = { id: nextId.current + 1, mine: false, text: a.text, leave: a.topic === 'leave' && d.viewer_is_self };
-    }
-    setMsgs((m) => [...m, { id: nextId.current, mine: true, text }, reply]);
+    const replyId = nextId.current + 1;
     nextId.current += 2;
+    const put = (reply: Msg) => setMsgs((m) => [...m, { id: replyId - 1, mine: true, text }, reply]);
+    if (!d) {
+      put({ id: replyId, mine: false, text: t(failed.current ? 'dash_error_generic' : 'assistant_loading') });
+      if (failed.current) fetchData();
+      return;
+    }
+    const a = answerQuestion(d, text, t.isAr);
+    if (a.topic !== 'unknown') {
+      put({ id: replyId, mine: false, text: a.text, leave: a.topic === 'leave' && d.viewer_is_self });
+      return;
+    }
+    // The assistant only sees the current period: for a past period keep the ready answer path.
+    if (d.period.complete) {
+      put({ id: replyId, mine: false, text: t('asst_old_period') });
+      return;
+    }
+    put({ id: replyId, mine: false, text: t('asst_typing'), pending: true });
+    setWaiting(true);
+    askSanadAI(text).then((r) => {
+      if (!alive.current) return;
+      setWaiting(false);
+      const reply: Msg =
+        r.kind === 'answer'
+          ? { id: replyId, mine: false, text: r.answer, ai: { remaining: r.remaining } }
+          : { id: replyId, mine: false, text: t.isAr && r.message ? r.message : t(askErrorKey(r.key)) };
+      setMsgs((m) => m.map((x) => (x.id === replyId ? reply : x)));
+    });
   };
 
   return (
@@ -78,6 +113,14 @@ export default function AssistantScreen() {
               <ChatBubble mine={item.mine} text={item.text} testID={item.mine ? undefined : `assistant-reply-${item.id}`}>
                 {item.leave ? (
                   <Button label={t('leave_request')} icon="airplane-outline" kind="secondary" onPress={() => router.push('/leave')} />
+                ) : null}
+                {item.ai ? (
+                  <View style={{ gap: 2 }}>
+                    <Txt variant="caption" tone="muted" testID={`assistant-ai-note-${item.id}`}>{t('asst_ai_note')}</Txt>
+                    {item.ai.remaining != null ? (
+                      <Txt variant="caption" tone="muted">{t('asst_ai_remaining', { n: item.ai.remaining })}</Txt>
+                    ) : null}
+                  </View>
                 ) : null}
               </ChatBubble>
             </View>

@@ -1,0 +1,5 @@
+# Commit 5614248 (phase S4) copied the relay with the Supabase *publishable* key inline. That key is
+# public by design (it ships in the mobile app; data is protected by RLS) — not a secret. The relay
+# now reads it from /etc/sanad-ask.env (see infra/sanad-ask/sanad-ask.env.example).
+5614248a52d4b6e5d6a22faa3d5549b6a6135b07:infra/sanad-ask/relay.py:generic-api-key:15
+6ada77113d67e16e0f3263ae3df4f12d991381e0:infra/sanad-ask/relay.py:generic-api-key:15

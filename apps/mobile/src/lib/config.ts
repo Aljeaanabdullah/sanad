@@ -8,3 +8,9 @@ export const SUPABASE_PUBLISHABLE_KEY =
 export const emailFor = (fileNumber: string | number) => `${fileNumber}@jahez.local`;
 
 export const CONSENT_VERSION = 'v1';
+
+/**
+ * «اسأل سند» relay on the company server (PRD 18.1, version 1.12). It checks the employee's own
+ * session and talks to the OpenClaw agent; no AI key is ever in the app.
+ */
+export const ASK_URL = process.env.EXPO_PUBLIC_SANAD_ASK_URL ?? 'https://open.abdullahaljeaan.com/sanad-ask';

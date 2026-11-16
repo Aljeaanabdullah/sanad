@@ -75,7 +75,7 @@ function normalize(q: string) {
 const TOPICS: [string, string[]][] = [
   ["penalty", ["خصم", "عقوب", "انذار", "لفت نظر", "ايقاف", "جزاء", "deduct", "penalt", "warning", "suspen"]],
   ["late", ["تاخير", "تاخر", "متاخر", "late"]],
-  ["absence", ["غياب", "غايب", "غائب", "absen", "absent"]],
+  ["absence", ["غياب", "غايب", "غائب", "غبت", "غاب", "absen", "absent", "missed"]],
   ["leave", ["اجاز", "leave", "vacation"]],
   ["bonus", ["مكافا", "مكافئ", "بونص", "استحق", "مستحق", "bonus", "eligib", "reward"]],
 ];

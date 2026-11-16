@@ -1,0 +1,18 @@
+[Unit]
+Description=Sanad app assistant relay (اسأل سند -> OpenClaw sanad_assistant)
+After=network-online.target openclaw.service
+
+[Service]
+User=openclaw
+Group=openclaw
+EnvironmentFile=/etc/sanad-ask.env
+ExecStart=/usr/bin/python3 -I /opt/sanad-ask/relay.py
+Restart=on-failure
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/sanad-ask
+PrivateTmp=true
+MemoryMax=150M
+
+[Install]
+WantedBy=multi-user.target

@@ -38,7 +38,13 @@ export default function ChangePasswordScreen() {
     setFailure(null);
     setBusy(true);
     try {
-      await changePassword(password);
+      const signedIn = await changePassword(password);
+      if (!signedIn) {
+        // Saved, but the old session is gone: sign in again with the new password.
+        snack(t('auth_password_saved_relogin'), 'ok');
+        await signOut();
+        return;
+      }
       snack(t('auth_password_saved'), 'ok');
       await passwordChanged();
     } catch (e) {
