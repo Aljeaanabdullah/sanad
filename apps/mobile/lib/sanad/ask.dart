@@ -61,10 +61,11 @@ AskAnswer answerQuestion(Dashboard d, String question, {required bool arabic}) {
 
   String bonus() {
     final official = d.hasOfficial
-        ? t(d.isLocked ? 'حسب الكشف المعتمد' : 'حسب مسودة الكشف (لم يُقفل بعد)',
-            d.isLocked ? 'according to the locked list' : 'according to the draft list (not locked yet)')
-        : t('تقديرياً حسب بياناتك حتى الآن (الكشف لم يصدر بعد)',
-            'estimated from your data so far (the list is not out yet)');
+        ? t(d.isLocked ? 'حسب الكشف المعتمد' : 'حسب مسودة الكشف، وهي قيد مراجعة المدير وقد تتغير قبل الاعتماد',
+            d.isLocked ? 'according to the locked list' : 'according to the draft list, which the manager is still reviewing and may change')
+        : d.periodComplete
+            ? t('تقديرياً حسب بياناتك (الكشف لم يصدر بعد)', 'estimated from your data (the list is not out yet)')
+            : t('تقديرياً حتى اليوم، والفترة ما خلصت وقد تتغير النتيجة', 'estimated up to today; the period is not over and this may change');
     if (d.eligible == null) {
       return t('$who$period: $official، ${d.reason}.', '$who$period: $official, ${d.reason}.');
     }

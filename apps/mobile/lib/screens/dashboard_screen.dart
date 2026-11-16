@@ -20,8 +20,11 @@ String bonusLabel(Strings s, Dashboard d) => switch (d.eligible) {
       false => s.get('dash_not_eligible'),
     };
 
-String bonusSource(Strings s, Dashboard d) =>
-    d.hasOfficial ? s.get(d.isLocked ? 'dash_locked' : 'dash_draft') : s.get('dash_estimate');
+/// Only a locked list is official. A draft is "under manager review"; an estimate before
+/// the period ends is "estimate up to today".
+String bonusSource(Strings s, Dashboard d) => d.hasOfficial
+    ? s.get(d.isLocked ? 'dash_locked' : 'dash_draft')
+    : s.get(d.periodComplete ? 'dash_estimate' : 'dash_estimate_today');
 
 /// Small stat tile used on the home screen and the dashboard.
 class StatTile extends StatelessWidget {
@@ -328,7 +331,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: _bonusColor(context, d.eligible))),
                             const SizedBox(height: 4),
                             Text(d.reason, key: const Key('bonusReason')),
-                            if (!d.hasOfficial) ...[
+                            if (!d.isLocked) ...[
                               const SizedBox(height: 8),
                               Text(s.get('dash_estimate_note'), style: TextStyle(color: colors.outline, fontSize: 12)),
                             ],

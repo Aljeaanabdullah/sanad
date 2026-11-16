@@ -121,8 +121,10 @@ export function answerQuestion(d: DashboardData, question: string, arabic: boole
       b.source === "locked"
         ? t("حسب الكشف المعتمد", "according to the locked list")
         : b.source === "draft"
-          ? t("حسب مسودة الكشف (لم يُقفل بعد)", "according to the draft list (not locked yet)")
-          : t("تقديرياً حسب بياناتك حتى الآن (الكشف لم يصدر بعد)", "estimated from your data so far (the list is not out yet)");
+          ? t("حسب مسودة الكشف، وهي قيد مراجعة المدير وقد تتغير قبل الاعتماد", "according to the draft list, which the manager is still reviewing and may change")
+          : d.period.complete
+            ? t("تقديرياً حسب بياناتك (الكشف لم يصدر بعد)", "estimated from your data (the list is not out yet)")
+            : t("تقديرياً حتى اليوم، والفترة ما خلصت وقد تتغير النتيجة", "estimated up to today; the period is not over and this may change");
     if (b.eligible == null) return t(`${who}${period}: ${official}، ${b.reason}.`, `${who}${period}: ${official}, ${b.reason}.`);
     if (b.eligible)
       return t(

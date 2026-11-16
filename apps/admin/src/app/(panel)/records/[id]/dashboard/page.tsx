@@ -4,7 +4,7 @@ import { requireStaff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getPrefs } from "@/lib/prefs";
 import { dashT } from "@/lib/i18n-dash";
-import { bonusOf, hasOfficial, MONTH_RE, shiftMonth, type DashboardData } from "@/lib/sanad-dashboard";
+import { bonusOf, MONTH_RE, shiftMonth, type DashboardData } from "@/lib/sanad-dashboard";
 import { Alert, Badge, Card, Table } from "@/components/ui";
 import { AskBox } from "./ask-box";
 
@@ -110,7 +110,9 @@ export default async function EmployeeDashboardPage({ params, searchParams }: Pa
       <Card className="border-accent">
         <div className="mb-2 flex items-center gap-2">
           <h2 className="font-bold">{t.bonus}</h2>
-          <span className="rounded-full bg-primary-soft px-2.5 py-0.5 text-xs">{t.sources[b.source]}</span>
+          <span className="rounded-full bg-primary-soft px-2.5 py-0.5 text-xs">
+            {b.source === "estimate" && !d.period.complete ? t.sources.estimateToday : t.sources[b.source]}
+          </span>
         </div>
         <p data-testid="bonus-status" className={`text-2xl font-bold ${statusClass}`}>
           {statusText}
@@ -118,7 +120,7 @@ export default async function EmployeeDashboardPage({ params, searchParams }: Pa
         <p data-testid="bonus-reason" className="mt-1">
           {b.reason}
         </p>
-        {!hasOfficial(d) && <p className="mt-2 text-xs text-muted">{t.estimateNote}</p>}
+        {b.source !== "locked" && <p className="mt-2 text-xs text-muted">{t.estimateNote}</p>}
         {d.estimate.notes.map((n) => (
           <p key={n} className="mt-2 text-sm text-muted">
             ⓘ {n}
