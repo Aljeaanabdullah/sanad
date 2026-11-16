@@ -1,0 +1,28 @@
+{
+  "ar": {
+    "notif_unread": "جديد",
+    "notif_unread_a11y": "غير مقروء",
+    "notif_empty_all": "هنا تظهر تذكيرات الورديات وقرارات طلباتك والإجازات والعقوبات وكشف المكافأة.",
+    "push_card_title": "فعّل الإشعارات",
+    "push_card_body": "نذكّرك قبل بداية ورديتك وقبل إغلاق نافذة الخروج، ونبلغك بقرارات طلباتك والإجازات وكشف المكافأة. ما نرسل إعلانات.",
+    "push_card_enable": "تفعيل",
+    "push_card_later": "ليس الآن",
+    "push_card_blocked": "الإشعارات مقفلة لسند في إعدادات الجوال. افتح الإعدادات وفعّلها حتى توصلك التذكيرات.",
+    "push_card_settings": "فتح الإعدادات",
+    "push_enabled": "تم تفعيل الإشعارات",
+    "push_denied": "ما راح توصلك تذكيرات. تقدر تفعّلها لاحقاً من إعدادات الجوال."
+  },
+  "en": {
+    "notif_unread": "New",
+    "notif_unread_a11y": "Unread",
+    "notif_empty_all": "Shift reminders, decisions on your requests, leave, penalties and the bonus list show here.",
+    "push_card_title": "Turn on notifications",
+    "push_card_body": "We remind you before your shift starts and before the check-out window closes, and tell you about your requests, leave and the bonus list. No ads.",
+    "push_card_enable": "Turn on",
+    "push_card_later": "Not now",
+    "push_card_blocked": "Notifications for Sanad are off in your phone settings. Open Settings and turn them on to get reminders.",
+    "push_card_settings": "Open Settings",
+    "push_enabled": "Notifications are on",
+    "push_denied": "You won't get reminders. You can turn them on later in your phone settings."
+  }
+}

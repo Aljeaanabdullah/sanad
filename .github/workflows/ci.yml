@@ -65,6 +65,22 @@ jobs:
           java-version: 17
       - uses: gradle/actions/setup-gradle@v4
       - run: npm ci
+      # Firebase for push notifications (PRD 9): google-services.json comes from the GOOGLE_SERVICES_JSON
+      # secret (raw JSON or base64) and is never committed. Without the secret the APK still builds;
+      # the phone just cannot register for push. app.config.ts adds the file only when it exists.
+      - name: Firebase config (google-services.json)
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -z "$GOOGLE_SERVICES_JSON" ]; then
+            echo "GOOGLE_SERVICES_JSON is not set: building without push."
+            exit 0
+          fi
+          printf '%s' "$GOOGLE_SERVICES_JSON" > google-services.json
+          if ! node -e "JSON.parse(require('fs').readFileSync('google-services.json','utf8'))" 2>/dev/null; then
+            printf '%s' "$GOOGLE_SERVICES_JSON" | base64 -d > google-services.json
+          fi
+          node -e "const j=JSON.parse(require('fs').readFileSync('google-services.json','utf8')); const ok=(j.client||[]).some(c=>c.client_info?.android_client_info?.package_name==='com.sanad.hr'); if(!ok){console.error('google-services.json has no com.sanad.hr app');process.exit(1)} console.log('google-services.json written for com.sanad.hr')"
       # Native Android project from app.json (not kept in git), then a release APK.
       # Signed with the debug key for testing on phones; a store build will use EAS / a real key.
       - run: npx expo prebuild --platform android --no-install
@@ -77,7 +93,7 @@ jobs:
           retention-days: 30
 
   functions:
-    name: Edge functions (punch, device-key)
+    name: Edge functions (punch, device-key, send-push)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -87,6 +103,9 @@ jobs:
       # Runs the real punch and device-key functions against an in-memory fake database (PRD 4.6 / 4.7 rules),
       # and the Android Key Attestation check against test chains and a real Google sample chain.
       - run: node --import ./supabase/functions/punch/test/register.mjs --test 'supabase/functions/punch/test/*.test.mjs'
+      # send-push (PRD 9) against a fake database and a fake fetch: signed service-account JWT, FCM HTTP v1
+      # message per language, emergency channel, unregistered tokens removed, retries, no key = not_configured.
+      - run: node --import ./supabase/functions/send-push/test/register.mjs --test 'supabase/functions/send-push/test/*.test.mjs'
 
   secrets:
     name: No secrets in repo
