@@ -11,6 +11,7 @@ const toneColor = {
   danger: "#d32f2f",
   safe: "#2e7d32",
 } as const;
+const pointColor = { ok: "#2e7d32", warn: "#e6a100" } as const;
 
 function ClickToPick({ onPick }: { onPick?: MapCanvasProps["onPick"] }) {
   useMapEvents({
@@ -32,7 +33,7 @@ function FollowValue({ value }: { value: MapCanvasProps["value"] }) {
   return null;
 }
 
-export default function LeafletMapCanvas({ value, context = [], fallbackCenter, onPick }: MapCanvasProps) {
+export default function LeafletMapCanvas({ value, context = [], fallbackCenter, onPick, points = [], heightClass = "h-80" }: MapCanvasProps) {
   const center = value ?? context[0] ?? fallbackCenter;
   const zoom = value || context.length ? 17 : 12;
 
@@ -43,7 +44,7 @@ export default function LeafletMapCanvas({ value, context = [], fallbackCenter, 
       center={[center.lat, center.lng]}
       zoom={zoom}
       scrollWheelZoom
-      className="h-80 w-full rounded-xl border border-line"
+      className={`${heightClass} w-full rounded-xl border border-line`}
       style={{ cursor: onPick ? "crosshair" : undefined }}
     >
       <TileLayer
@@ -60,6 +61,16 @@ export default function LeafletMapCanvas({ value, context = [], fallbackCenter, 
         >
           {c.label && <Tooltip>{c.label}</Tooltip>}
         </Circle>
+      ))}
+      {points.map((p, i) => (
+        <CircleMarker
+          key={`p${i}`}
+          center={[p.lat, p.lng]}
+          radius={5}
+          pathOptions={{ color: "#ffffff", weight: 1.5, fillColor: pointColor[p.tone], fillOpacity: 1 }}
+        >
+          {p.label && <Tooltip>{p.label}</Tooltip>}
+        </CircleMarker>
       ))}
       {value && (
         <>
