@@ -128,3 +128,39 @@ test('real Google sample chain: passes chain, root, key and nonce checks; refuse
   assert.deepEqual(await verifyAndroidAttestation({ ...base, challenge: 'abc' }), { ok: false, error: 'attestation_no_biometric' });
   assert.equal((await verifyAndroidAttestation({ ...base, challenge: 'abd' })).error, 'attestation_challenge');
 });
+
+test('attack: the attested key of another (real) phone signs a forged leaf -> refused', async () => {
+  // A genuine chain for a key that does NOT need biometrics (any app on the attacker's phone)...
+  const realKey = await newKey();
+  const { chain: real, rootSpki } = await makeChain({ deviceKey: realKey, challenge: NONCE, description: { authType: 0, noAuth: true } });
+  // ...whose private key (usable for signing) signs a fake leaf claiming everything we check for.
+  const fakeKey = await newKey();
+  const { makeCert, keyDescription } = await import('./attestation-fixtures.mjs');
+  const forged = await makeCert({
+    subject: fakeKey, issuer: realKey, cn: 'Forged', issuerCn: 'Android Keystore Key', serial: 99,
+    extensions: [{ oid: '1.3.6.1.4.1.11129.2.1.17', value: keyDescription({ challenge: NONCE }) }],
+  });
+  const r = await verifyAndroidAttestation({
+    chain: [b64(forged), ...real], publicKey: await spkiOf(fakeKey), challenge: NONCE,
+    packageName: 'com.sanad.hr', signingDigests: [DIGEST], roots: [rootSpki],
+  });
+  assert.equal(r.ok, false);
+  assert.equal(r.error, 'attestation_bad_chain');
+});
+
+test('an issuer that is not a CA, or names that do not chain, is refused', async () => {
+  const deviceKey = await newKey();
+  const root = await newKey();
+  const { makeCert, keyDescription, CA_EXTENSIONS } = await import('./attestation-fixtures.mjs');
+  const rootCert = await makeCert({ subject: root, issuer: root, cn: 'Test Root', serial: 1, extensions: CA_EXTENSIONS });
+  const inter = await newKey();
+  const notCa = await makeCert({ subject: inter, issuer: root, cn: 'Inter', issuerCn: 'Test Root', serial: 2 });
+  const leafExt = [{ oid: '1.3.6.1.4.1.11129.2.1.17', value: keyDescription({ challenge: NONCE }) }];
+  const leaf = await makeCert({ subject: deviceKey, issuer: inter, cn: 'Leaf', issuerCn: 'Inter', serial: 3, extensions: leafExt });
+  const base = { publicKey: await spkiOf(deviceKey), challenge: NONCE, packageName: 'com.sanad.hr', signingDigests: [], roots: [b64(await spkiOf(root))] };
+  assert.equal((await verifyAndroidAttestation({ ...base, chain: [leaf, notCa, rootCert].map(b64) })).error, 'attestation_bad_chain');
+  const ca = await makeCert({ subject: inter, issuer: root, cn: 'Inter', issuerCn: 'Test Root', serial: 2, extensions: CA_EXTENSIONS });
+  const wrongName = await makeCert({ subject: deviceKey, issuer: inter, cn: 'Leaf', issuerCn: 'Someone Else', serial: 3, extensions: leafExt });
+  assert.equal((await verifyAndroidAttestation({ ...base, chain: [wrongName, ca, rootCert].map(b64) })).error, 'attestation_bad_chain');
+  assert.equal((await verifyAndroidAttestation({ ...base, chain: [leaf, ca, rootCert].map(b64) })).ok, true);
+});

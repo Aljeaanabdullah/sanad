@@ -95,7 +95,36 @@ export type AttestationOptions = {
   revokedSerials?: Set<string> | null;
 };
 
-type Cert = { tbs: Uint8Array; sigAlg: string; signature: Uint8Array; serial: string; spki: Uint8Array; extensions: Map<string, Uint8Array> };
+type Cert = {
+  tbs: Uint8Array;
+  sigAlg: string;
+  signature: Uint8Array;
+  serial: string;
+  issuer: Uint8Array;
+  subject: Uint8Array;
+  spki: Uint8Array;
+  extensions: Map<string, Uint8Array>;
+};
+
+const BASIC_CONSTRAINTS_OID = "2.5.29.19";
+const KEY_USAGE_OID = "2.5.29.15";
+
+/** basicConstraints cA (false when the extension is missing). */
+function isCa(c: Cert): boolean {
+  const v = c.extensions.get(BASIC_CONSTRAINTS_OID);
+  if (!v) return false;
+  const first = children(expect(parse(v), UNIVERSAL, T.SEQUENCE, "basic constraints"))[0];
+  return is(first, UNIVERSAL, T.BOOLEAN) && bool(first);
+}
+
+/** keyUsage allows signing certificates (no keyUsage extension = no restriction, RFC 5280). */
+function maySignCerts(c: Cert): boolean {
+  const v = c.extensions.get(KEY_USAGE_OID);
+  if (!v) return true;
+  const n = expect(parse(v), UNIVERSAL, T.BIT_STRING, "key usage");
+  // Bit 5 (keyCertSign) is 0x04 in the first byte after the "unused bits" byte.
+  return n.value.length >= 2 && (n.value[1] & 0x04) !== 0;
+}
 
 export function serialHex(b: Uint8Array): string {
   return hex(b).replace(/^0+(?=.)/, "");
@@ -111,7 +140,10 @@ export function parseCertificate(der: Uint8Array): Cert {
   let i = 0;
   if (is(f[0], CONTEXT, 0)) i++; // version
   const serial = serialHex(expect(f[i++], UNIVERSAL, T.INTEGER, "serial").value);
-  i += 4; // signature, issuer, validity, subject
+  i++; // signature algorithm
+  const issuer = expect(f[i++], UNIVERSAL, T.SEQUENCE, "issuer").raw;
+  i++; // validity
+  const subject = expect(f[i++], UNIVERSAL, T.SEQUENCE, "subject").raw;
   const spki = expect(f[i++], UNIVERSAL, T.SEQUENCE, "subjectPublicKeyInfo").raw;
   const extensions = new Map<string, Uint8Array>();
   for (; i < f.length; i++) {
@@ -124,7 +156,7 @@ export function parseCertificate(der: Uint8Array): Cert {
       extensions.set(id, value);
     }
   }
-  return { tbs: tbsNode.raw, sigAlg, signature, serial, spki, extensions };
+  return { tbs: tbsNode.raw, sigAlg, signature, serial, issuer, subject, spki, extensions };
 }
 
 const HASH: Record<string, { kind: "rsa" | "ec"; hash: string }> = {
@@ -210,9 +242,19 @@ export async function verifyAndroidAttestation(o: AttestationOptions): Promise<A
   }
 
   // 1. Each certificate is signed by the next; the last one is a trusted root signed by itself.
-  for (let i = 0; i < certs.length; i++) {
-    const issuer = i + 1 < certs.length ? certs[i + 1] : certs[i];
-    if (!(await signedBy(certs[i], issuer.spki))) return { ok: false, error: "attestation_bad_chain", detail: `cert ${i}` };
+  //    Every issuer must be a CA allowed to sign certificates, and only the leaf may carry a key description.
+  //    Without this, the attested key of any real phone (a leaf, not a CA) could sign a forged "leaf"
+  //    claiming whatever we want to see.
+  try {
+    for (let i = 0; i < certs.length; i++) {
+      const issuer = i + 1 < certs.length ? certs[i + 1] : certs[i];
+      if (!equal(certs[i].issuer, issuer.subject)) return { ok: false, error: "attestation_bad_chain", detail: `name ${i}` };
+      if (i > 0 && (!isCa(certs[i]) || !maySignCerts(certs[i]))) return { ok: false, error: "attestation_bad_chain", detail: `not a CA ${i}` };
+      if (i > 0 && certs[i].extensions.has(KEY_DESCRIPTION_OID)) return { ok: false, error: "attestation_bad_chain", detail: `key description ${i}` };
+      if (!(await signedBy(certs[i], issuer.spki))) return { ok: false, error: "attestation_bad_chain", detail: `cert ${i}` };
+    }
+  } catch (e) {
+    return { ok: false, error: "attestation_parse", detail: (e as Error).message };
   }
   const roots = (o.roots ?? GOOGLE_ROOT_KEYS).map(b64decode);
   if (!roots.some((r) => equal(r, certs[certs.length - 1].spki))) return { ok: false, error: "attestation_untrusted_root" };

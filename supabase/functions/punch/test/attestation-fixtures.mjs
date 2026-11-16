@@ -66,6 +66,12 @@ export async function signDer(privateKey, data) {
 const ECDSA_SHA256 = '1.2.840.10045.4.3.2';
 const name = (cn) => der.seq(der.set(der.seq(der.oid('2.5.4.3'), der.utf8(cn))));
 
+/** basicConstraints cA=TRUE + keyUsage keyCertSign, as on Google's root and intermediate certificates. */
+export const CA_EXTENSIONS = [
+  { oid: '2.5.29.19', value: der.seq(der.bool(true)) },
+  { oid: '2.5.29.15', value: tlv([0x03], Uint8Array.of(1, 0x06)) },
+];
+
 export async function makeCert({ subject, issuer, cn, issuerCn, serial, extensions = [] }) {
   const alg = der.seq(der.oid(ECDSA_SHA256));
   const parts = [
@@ -109,8 +115,8 @@ export function keyDescription({
 export async function makeChain({ deviceKey, challenge, description = {}, root, leafSerial = 0x1234 } = {}) {
   root ??= await newKey();
   const inter = await newKey();
-  const rootCert = await makeCert({ subject: root, issuer: root, cn: 'Test Root', serial: 1 });
-  const interCert = await makeCert({ subject: inter, issuer: root, cn: 'Test Intermediate', issuerCn: 'Test Root', serial: 2 });
+  const rootCert = await makeCert({ subject: root, issuer: root, cn: 'Test Root', serial: 1, extensions: CA_EXTENSIONS });
+  const interCert = await makeCert({ subject: inter, issuer: root, cn: 'Test Intermediate', issuerCn: 'Test Root', serial: 2, extensions: CA_EXTENSIONS });
   const leafCert = await makeCert({
     subject: deviceKey,
     issuer: inter,
@@ -119,5 +125,5 @@ export async function makeChain({ deviceKey, challenge, description = {}, root, 
     serial: leafSerial,
     extensions: [{ oid: '1.3.6.1.4.1.11129.2.1.17', value: keyDescription({ challenge, ...description }) }],
   });
-  return { chain: [leafCert, interCert, rootCert].map(b64), rootSpki: b64(await spkiOf(root)), root };
+  return { chain: [leafCert, interCert, rootCert].map(b64), rootSpki: b64(await spkiOf(root)), root, inter };
 }
