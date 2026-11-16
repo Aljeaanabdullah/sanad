@@ -158,6 +158,23 @@ it('assistant sends an unknown question to the AI and shows the automated-reply 
   expect(screen.queryByText('سند يكتب…')).toBeNull();
 });
 
+it('a typed what-if question with keywords goes to the AI, but the same topic from a button stays ready', async () => {
+  mockAsk.mockReset();
+  mockAsk.mockResolvedValue({ kind: 'answer', answer: 'الإجازة المعتمدة 3 أيام ما تتعدى 10 أيام، فما تأثر.', remaining: 18 });
+  const Assistant = require('../../../app/(app)/assistant').default;
+  await render(wrap(<Assistant />));
+  await settle();
+  await typeAndSend('اذا اخذت اجازه الاسبوع الياي ٣ ايام بأثر على مكافأتي؟');
+  await settle();
+  expect(mockAsk).toHaveBeenCalledWith('اذا اخذت اجازه الاسبوع الياي ٣ ايام بأثر على مكافأتي؟');
+  expect(screen.getByText('الإجازة المعتمدة 3 أيام ما تتعدى 10 أيام، فما تأثر.')).toBeTruthy();
+  mockAsk.mockClear();
+  await fireEvent.press(screen.getByText('ليش ما أخذت مكافأة؟'));
+  expect(mockAsk).not.toHaveBeenCalled();
+  await typeAndSend('كم يوم غبت؟');
+  expect(mockAsk).not.toHaveBeenCalled();
+});
+
 it('assistant shows the relay message when the AI refuses (daily limit)', async () => {
   mockAsk.mockReset();
   mockAsk.mockResolvedValue({ kind: 'error', key: 'limit', message: 'وصلت الحد اليومي للأسئلة. تقدر تسأل مرة ثانية باچر.' });

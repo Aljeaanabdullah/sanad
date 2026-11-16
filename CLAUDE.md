@@ -14,7 +14,7 @@ HR app for one company in Kuwait: punch in/out by face (with liveness) + GPS geo
 - Maps: OpenStreetMap now (Leaflet on the web; react-native-maps or a WebView map on the phone) behind one map interface, to switch to Google Maps later. Test on Android first (dev machine is Windows).
 
 ## How to work
-1. Phases follow docs/PLAN.md. Independent phases may run in parallel, each in its own session, worktree and branch, never two writers on the same files (owner decision 2026-11-17). A phase that depends on another starts after that one is merged (e.g. 11 emergency after 9 notifications). Nothing outside a phase's scope.
+1. Phases follow docs/PLAN.md. Independent phases may run in parallel, each in its own session, worktree and branch, never two writers on the same files (owner decision 2026-11-17). A piece that depends on another phase is wired after that phase is merged (e.g. 11 emergency is built now; its push alerts are connected after 9 notifications is merged). Nothing outside a phase's scope.
 2. Plan before you build, and get the user's OK.
 3. Each phase on its own branch `phase-XX-name`. Open a PR; merge to `main` and tag `v0.XX` only after the user's explicit approval.
 4. After each phase: run every "فحص Claude" check and report results honestly (failures included), explain the changes in simple words, commit and push, then tick the phase in the PLAN.md tracking table.
