@@ -77,6 +77,12 @@
           "isIosBackgroundLocationEnabled": false
         }
       ],
+      [
+        "expo-localization",
+        {
+          "supportsRTL": false
+        }
+      ],
       "expo-asset"
     ],
     "experiments": {

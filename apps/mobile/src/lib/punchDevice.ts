@@ -22,6 +22,8 @@ import {
 import { supabase } from './supabase';
 
 const LOCATION_TIMEOUT_MS = 20_000;
+/** The send step blocks Back, so it must always end. */
+const SEND_TIMEOUT_MS = 30_000;
 
 export async function network(): Promise<{ online: boolean; vpn: boolean }> {
   try {
@@ -34,13 +36,14 @@ export async function network(): Promise<{ online: boolean; vpn: boolean }> {
   }
 }
 
-export type Permission = 'granted' | 'ask' | 'blocked';
+export type Permission = 'granted' | 'ask' | 'blocked' | 'approximate';
 
 /** Foreground location permission; asks once when it can. */
 export async function locationPermission(ask: boolean): Promise<Permission> {
   let p = await Location.getForegroundPermissionsAsync();
   if (!p.granted && p.canAskAgain && ask) p = await Location.requestForegroundPermissionsAsync();
-  if (p.granted) return 'granted';
+  // "Approximate" (Android) / "Precise: off" (iOS) is too coarse for a site check: the server would refuse every punch.
+  if (p.granted) return p.android?.accuracy === 'coarse' || p.ios?.accuracy === 'reduced' ? 'approximate' : 'granted';
   return p.canAskAgain ? 'ask' : 'blocked';
 }
 
@@ -76,23 +79,33 @@ export async function rooted(): Promise<boolean> {
   }
 }
 
-export async function biometricInfo(): Promise<{ ready: boolean; type: BiometricType | null }> {
+/** `weak`: only a Class-2 biometric is set up (e.g. camera face unlock that a photo can fool) — not accepted. */
+export async function biometricInfo(): Promise<{ ready: boolean; weak: boolean; type: BiometricType | null }> {
   try {
-    const [hardware, enrolled, types] = await Promise.all([
+    const [hardware, enrolled, types, level] = await Promise.all([
       LocalAuthentication.hasHardwareAsync(),
       LocalAuthentication.isEnrolledAsync(),
       LocalAuthentication.supportedAuthenticationTypesAsync(),
+      LocalAuthentication.getEnrolledLevelAsync(),
     ]);
-    return { ready: hardware && enrolled, type: biometricTypeOf(types as number[]) };
+    const strong = level >= LocalAuthentication.SecurityLevel.BIOMETRIC_STRONG;
+    return { ready: hardware && enrolled && strong, weak: hardware && enrolled && !strong, type: biometricTypeOf(types as number[]) };
   } catch {
-    return { ready: false, type: null };
+    return { ready: false, weak: false, type: null };
   }
 }
 
 /** Face ID / fingerprint only: the phone passcode cannot replace it. */
 export async function authenticate(promptMessage: string, cancelLabel: string): Promise<{ ok: true } | { ok: false; error: string }> {
   try {
-    const r = await LocalAuthentication.authenticateAsync({ promptMessage, cancelLabel, disableDeviceFallback: true });
+    const r = await LocalAuthentication.authenticateAsync({
+      promptMessage,
+      cancelLabel,
+      disableDeviceFallback: true,
+      // Android: Class-3 only (fingerprint / secure face); iOS: no "Enter Password" button.
+      biometricsSecurityLevel: 'strong',
+      fallbackLabel: '',
+    });
     return r.success ? { ok: true } : { ok: false, error: r.error };
   } catch {
     return { ok: false, error: 'unknown' };
@@ -112,7 +125,7 @@ export async function shrinkPhoto(uri: string): Promise<string | null> {
 /** Sends the punch. Never throws: network and HTTP failures come back as `kind: 'error'`. */
 export async function sendPunch(body: PunchBody): Promise<PunchOutcome> {
   try {
-    const { data, error } = await supabase.functions.invoke('punch', { body });
+    const { data, error } = await supabase.functions.invoke('punch', { body, timeout: SEND_TIMEOUT_MS });
     if (!error) return parsePunchResult(data);
     if (error instanceof FunctionsHttpError) {
       const res = error.context as Response | undefined;

@@ -47,6 +47,8 @@ export default function PunchScreen() {
   const [outcome, setOutcome] = useState<PunchOutcome | null>(null);
   const [cameraReady, setCameraReady] = useState(false);
   const [capturing, setCapturing] = useState(false);
+  // Set synchronously so a double tap on the shutter can never send two punches.
+  const busy = useRef(false);
 
   const alive = useRef(true);
   const run = useRef(0);
@@ -84,6 +86,10 @@ export default function PunchScreen() {
     }
     const perm = await Phone.locationPermission(true).catch(() => 'ask' as const);
     if (id !== run.current) return false;
+    if (perm === 'approximate') {
+      fail({ step: 'checks', key: 'punch_location_precise', note: 'punch_location_why', actions: ['settings', 'retry'] });
+      return false;
+    }
     if (perm !== 'granted') {
       fail(
         perm === 'ask'
@@ -117,7 +123,7 @@ export default function PunchScreen() {
     const info = await Phone.biometricInfo();
     if (id !== run.current) return false;
     if (!info.ready) {
-      fail({ step: 'biometric', key: 'biometric_not_enrolled', actions: ['retry'] });
+      fail({ step: 'biometric', key: info.weak ? 'punch_biometric_weak' : 'biometric_not_enrolled', actions: ['retry'] });
       return false;
     }
     const r = await Phone.authenticate(t('biometric_prompt'), t('punch_cancel'));
@@ -163,19 +169,9 @@ export default function PunchScreen() {
     const ch = checks.current;
     const bio = biometric.current;
     if (!ch || !bio) return start('checks');
+    // The employee may have waited on the camera: never send an old location or an old Face ID pass.
+    if (isStale(ch.at)) return start('checks');
     setStep('sending');
-    // The employee may have waited on the camera: never send an old location.
-    if (isStale(ch.at)) {
-      try {
-        const loc = await Phone.readLocation();
-        ch.location = { lat: loc.lat, lng: loc.lng, accuracy: loc.accuracy };
-        ch.report = { ...ch.report, mockLocation: ch.report.mockLocation || loc.mocked };
-        ch.at = Date.now();
-      } catch {
-        if (id === run.current) fail({ step: 'sending', key: 'punch_reason_no_location', actions: ['retry'] });
-        return;
-      }
-    }
     const body = buildPunchBody({ deviceId: await deviceId(), location: ch.location, report: ch.report, biometric: bio, photo });
     const result = await Phone.sendPunch(body);
     if (id !== run.current || !alive.current) return;
@@ -183,7 +179,8 @@ export default function PunchScreen() {
   }, [start, fail]);
 
   const capture = useCallback(async () => {
-    if (!camera.current || capturing) return;
+    if (!camera.current || busy.current) return;
+    busy.current = true;
     setCapturing(true);
     try {
       const pic = await camera.current.takePictureAsync({ quality: 0.7, exif: false });
@@ -201,9 +198,10 @@ export default function PunchScreen() {
     } catch {
       fail({ step: 'photo', key: 'punch_photo_failed', actions: ['retry'] });
     } finally {
+      busy.current = false;
       if (alive.current) setCapturing(false);
     }
-  }, [capturing, fail, send]);
+  }, [fail, send]);
 
   const act = (a: Action) => {
     if (a === 'settings') return Phone.openSettings();

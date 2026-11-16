@@ -12,21 +12,27 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { I18nManager } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { SnackbarProvider } from '../components/ui';
 import { SessionProvider, useSession } from '../lib/session';
 import { SettingsProvider, useSettings } from '../lib/settings';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
+// Direction is handled by the layouts (Arabic = right to left) so the system must not mirror again.
+// Native RTL is also off in app.json (expo-localization supportsRTL: false); this covers old installs.
+I18nManager.allowRTL(false);
+I18nManager.forceRTL(false);
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({ Tajawal_400Regular, Tajawal_500Medium, Tajawal_700Bold, Tajawal_800ExtraBold });
+  const [loaded, fontError] = useFonts({ Tajawal_400Regular, Tajawal_500Medium, Tajawal_700Bold, Tajawal_800ExtraBold });
   return (
     <SafeAreaProvider>
       <SettingsProvider>
         <SessionProvider>
           <SnackbarProvider>
-            <Gate fontsLoaded={fontsLoaded} />
+            {/* A font that fails to load falls back to the system font instead of keeping the splash up. */}
+            <Gate fontsLoaded={loaded || !!fontError} />
           </SnackbarProvider>
         </SessionProvider>
       </SettingsProvider>

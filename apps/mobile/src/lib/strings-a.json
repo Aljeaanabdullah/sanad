@@ -56,7 +56,9 @@
     "punch_back_home": "الرجوع للرئيسية",
     "punch_server_time": "الوقت حسب ساعة النظام",
     "punch_sending_wait": "لا تقفل التطبيق حتى يكتمل الإرسال.",
-    "punch_cancel": "إلغاء"
+    "punch_cancel": "إلغاء",
+    "punch_location_precise": "الموقع مضبوط على \"تقريبي\". فعّل \"الموقع الدقيق\" لسند من الإعدادات، لأن التبصيم يحتاج موقعك الدقيق داخل موقع العمل.",
+    "punch_biometric_weak": "جهازك ما فيه إلا فتح بالوجه من الكاميرا، وهذا ما يكفي للتبصيم. فعّل بصمة الإصبع (أو Face ID) من إعدادات الجهاز ثم حاول مرة ثانية."
   },
   "en": {
     "home_hello": "Hello, {name}",
@@ -115,6 +117,8 @@
     "punch_back_home": "Back to home",
     "punch_server_time": "Time from the system clock",
     "punch_sending_wait": "Keep the app open until it is sent.",
-    "punch_cancel": "Cancel"
+    "punch_cancel": "Cancel",
+    "punch_location_precise": "Location is set to \"approximate\". Turn on \"precise location\" for Sanad in Settings: punching needs your exact position at the work site.",
+    "punch_biometric_weak": "This phone only has camera face unlock, which is not secure enough to punch. Set up a fingerprint (or Face ID) in the phone's settings, then try again."
   }
 }

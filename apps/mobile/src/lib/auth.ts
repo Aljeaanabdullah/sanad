@@ -1,4 +1,4 @@
-import { FunctionsHttpError } from '@supabase/supabase-js';
+import { FunctionsHttpError, isAuthRetryableFetchError } from '@supabase/supabase-js';
 import { CONSENT_VERSION, emailFor } from './config';
 import { deviceId, model, platform } from './device';
 import { supabase } from './supabase';
@@ -24,13 +24,16 @@ export class AuthFailure extends Error {
 }
 
 export async function currentProfile(): Promise<Profile | null> {
-  const { data: auth } = await supabase.auth.getUser();
+  const { data: auth, error: authError } = await supabase.auth.getUser();
+  if (authError && isAuthRetryableFetchError(authError)) throw new AuthFailure('no_internet');
   if (!auth.user) return null;
-  const { data: row } = await supabase
+  const { data: row, error } = await supabase
     .from('employees')
     .select('id, file_number, full_name_ar, full_name_en, role, must_change_password, is_active')
     .eq('user_id', auth.user.id)
     .maybeSingle();
+  // A failed request is not a missing account: keep the session and let the caller retry.
+  if (error) throw new AuthFailure('no_internet');
   if (!row || row.is_active !== true) {
     await supabase.auth.signOut();
     return null;
@@ -48,7 +51,7 @@ export async function currentProfile(): Promise<Profile | null> {
 export async function signIn(fileNumber: string, password: string): Promise<Profile> {
   if (!/^\d{6}$/.test(fileNumber)) throw new AuthFailure('invalid_file_number');
   const { error } = await supabase.auth.signInWithPassword({ email: emailFor(fileNumber), password });
-  if (error) throw new AuthFailure(error.message?.toLowerCase().includes('fetch') ? 'no_internet' : 'invalid_credentials');
+  if (error) throw new AuthFailure(isAuthRetryableFetchError(error) ? 'no_internet' : error.status && error.status >= 500 ? 'generic' : 'invalid_credentials');
   const profile = await currentProfile();
   if (!profile) throw new AuthFailure('account_disabled');
   return profile;
