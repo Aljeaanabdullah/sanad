@@ -5,6 +5,7 @@ After=network-online.target openclaw.service
 [Service]
 User=openclaw
 Group=openclaw
+EnvironmentFile=/etc/sanad-ask.env
 ExecStart=/usr/bin/python3 -I /opt/sanad-ask/relay.py
 Restart=on-failure
 NoNewPrivileges=true

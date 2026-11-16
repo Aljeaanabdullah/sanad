@@ -12,7 +12,7 @@ import json, os, sqlite3, threading, time, urllib.request, urllib.error, datetim
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 SUPA = "https://etaetoflotynlmgrehuu.supabase.co"
-SUPA_KEY = "sb_publishable_5R1YPcMEQ0HQ-kdJ0DsLeA_vg49wCA4"  # public key
+SUPA_KEY = os.environ["SANAD_SUPABASE_PUBLISHABLE_KEY"]  # public key, set in /etc/sanad-ask.env
 GATEWAY = "http://127.0.0.1:18789/v1/chat/completions"
 AGENT = "openclaw/sanad_assistant"
 CONFIG = "/home/openclaw/.openclaw/openclaw.json"
