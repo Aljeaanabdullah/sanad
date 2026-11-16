@@ -185,7 +185,7 @@ class SupabaseRequestsService implements RequestsService {
     'correction_too_old', 'time_in_future', 'no_shift_that_day', 'time_outside_shift', 'check_in_first',
     'duplicate_request', 'mission_date_out_of_range', 'site_not_found', 'site_already_enabled', 'reason_required',
     'cannot_cancel', 'not_allowed', 'note_too_long',
-    'leave_dates_invalid', 'leave_dates_out_of_range', 'leave_overlaps', 'invalid_request',
+    'leave_dates_invalid', 'leave_dates_out_of_range', 'leave_overlaps', 'leave_period_locked', 'invalid_request',
   ];
 
   Future<T> _call<T>(Future<T> Function() f) async {

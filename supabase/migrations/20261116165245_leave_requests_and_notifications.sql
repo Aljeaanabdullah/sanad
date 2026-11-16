@@ -3,7 +3,10 @@
 -- Leave request: same approval path as Phase 8 (employee -> supervisor -> HR, nobody approves their own).
 --   shift_date = first day, leave_to = last day. On the FINAL approval one row is added to public.leaves
 --   (source 'طلب من التطبيق', created_by 'sanad-app'), so it counts in the bonus rules like any leave.
---   Rejected / cancelled requests write nothing. Coordinated with the bonus agents project.
+--   Rejected / cancelled requests write nothing. Coordinated with the bonus agents project:
+--     * the final approval also writes an agent_log row (agent 'تطبيق سند') so the manager's history shows it;
+--     * if the leave covers today, employment_status becomes 'في إجازة' (as the leaves agent does);
+--     * a leave that falls in a period whose bonus list is already locked is refused (contact HR).
 -- Notifications: read only, built from the employee's own rows. Push notifications stay in Phase 9.
 
 alter table public.requests
@@ -60,6 +63,14 @@ begin
                and r.status in ('pending_supervisor', 'pending_hr', 'approved')
                and r.shift_date <= p_to and r.leave_to >= p_from) then
     raise exception 'leave_overlaps' using errcode = '23505';
+  end if;
+  -- A day in a period whose bonus list is locked (period = 21st .. 20th of the list month).
+  if exists (select 1
+             from generate_series(p_from, p_to, interval '1 day') g(d)
+             join public.bonus_lists b
+               on b.month = to_char(case when extract(day from g.d) > 20 then g.d + interval '1 month' else g.d end, 'YYYY-MM')
+             where b.employee_id = v_me and b.kind = 'شهري' and b.status = 'مقفل') then
+    raise exception 'leave_period_locked' using errcode = '22023';
   end if;
 
   insert into public.requests (employee_id, request_type, shift_date, leave_type, leave_to, reason)
@@ -123,6 +134,19 @@ begin
     elsif r.request_type = 'leave' then
       insert into public.leaves (employee_id, leave_type, from_date, to_date, source, note, created_by, is_demo)
       select r.employee_id, r.leave_type, r.shift_date, r.leave_to, 'طلب من التطبيق', r.reason, 'sanad-app', e.is_demo
+      from public.employees e where e.id = r.employee_id;
+      -- Same as the leaves agent: a leave that covers today puts the employee "on leave".
+      if private.kuwait_today() between r.shift_date and r.leave_to then
+        update public.employees set employment_status = 'في إجازة'
+        where id = r.employee_id and employment_status = 'على رأس العمل';
+      end if;
+      -- Traceability for the manager agent and the manager's history (agent_log, "السجل").
+      insert into public.agent_log (action, agent, result, reason, file_number, employee_id, is_demo)
+      select 'تسجيل ' || r.leave_type || ' – ' || e.full_name_ar || ' (' || e.file_number || ') من التطبيق',
+             'تطبيق سند',
+             r.leave_type || ' من ' || r.shift_date || ' إلى ' || r.leave_to || ' (' || (r.leave_to - r.shift_date + 1) || ' يوم)',
+             'طلب من التطبيق؛ موافقة المشرف والموارد البشرية',
+             e.file_number, e.id, e.is_demo
       from public.employees e where e.id = r.employee_id;
     end if;
   end if;
