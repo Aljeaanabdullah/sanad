@@ -30,6 +30,23 @@ async function count(table: string, column: string, value: string): Promise<numb
   return n ?? 0;
 }
 
+// ------------------------------------------------------------------ punch security (S3, PRD 4.7)
+
+export async function updatePunchSecurity(_prev: FormState, formData: FormData): Promise<FormState> {
+  const supabase = await db();
+  const { error } = await supabase
+    .from("punch_security_settings")
+    .update({
+      require_device_signature: formData.get("require_device_signature") === "on",
+      allow_face_descriptor: formData.get("allow_face_descriptor") === "on",
+      allow_unattested_ios: formData.get("allow_unattested_ios") === "on",
+    })
+    .eq("id", true);
+  if (error) return { error: "generic" };
+  revalidatePath(`${BASE}/punch-security`);
+  return { ok: true };
+}
+
 // ------------------------------------------------------------------ departments
 
 export async function createDepartment(_prev: FormState, formData: FormData): Promise<FormState> {

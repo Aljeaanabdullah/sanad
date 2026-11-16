@@ -1,0 +1,20 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'com.sanad.hr'
+version = '0.1.0'
+
+android {
+  namespace "expo.modules.sanaddevicekey"
+  defaultConfig {
+    versionCode 1
+    versionName "0.1.0"
+  }
+}
+
+dependencies {
+  // Same version as expo-local-authentication, so Gradle resolves one copy.
+  implementation "androidx.biometric:biometric:1.2.0-alpha04"
+}

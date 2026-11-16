@@ -77,15 +77,16 @@ jobs:
           retention-days: 30
 
   functions:
-    name: Edge functions (punch)
+    name: Edge functions (punch, device-key)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      # Runs the real punch function against an in-memory fake database (PRD 4.6 rules).
-      - run: node --import ./supabase/functions/punch/test/register.mjs --test supabase/functions/punch/test/punch.test.mjs
+      # Runs the real punch and device-key functions against an in-memory fake database (PRD 4.6 / 4.7 rules),
+      # and the Android Key Attestation check against test chains and a real Google sample chain.
+      - run: node --import ./supabase/functions/punch/test/register.mjs --test 'supabase/functions/punch/test/*.test.mjs'
 
   secrets:
     name: No secrets in repo

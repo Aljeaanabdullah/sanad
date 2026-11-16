@@ -23,6 +23,7 @@ import {
   resultMinutes,
   SERVER_PHOTO_MAX_BYTES,
   shiftCard,
+  signingPayload,
   stepStates,
   stripDataUrl,
   type ShiftLike,
@@ -230,13 +231,20 @@ describe('biometric', () => {
     expect(biometricErrorKey('lockout')).toBe('punch_biometric_lockout');
     expect(biometricErrorKey('authentication_failed')).toBe('punch_reason_biometric_failed');
     expect(biometricErrorKey(undefined)).toBe('punch_reason_biometric_failed');
-    for (const k of ['biometric_cancelled', 'biometric_not_enrolled', 'punch_biometric_lockout', 'punch_reason_biometric_failed', 'punch_reason_timeout']) expect(hasKey(k)).toBe(true);
+    expect(biometricErrorKey('key_invalidated')).toBe('punch_key_invalidated');
+    for (const k of ['biometric_cancelled', 'biometric_not_enrolled', 'punch_biometric_lockout', 'punch_reason_biometric_failed', 'punch_reason_timeout', 'punch_key_invalidated']) expect(hasKey(k)).toBe(true);
+  });
+
+  it('has a text for every new server refusal (PRD 4.7)', () => {
+    for (const r of ['device_key_missing', 'signature_missing', 'signature_invalid', 'challenge_expired', 'method_disabled']) expect(hasKey(`punch_reason_${r}`)).toBe(true);
   });
 });
 
 describe('checks', () => {
   it('lists report problems in the server order', () => {
-    expect(reportProblems({ vpn: true, mockLocation: true, rooted: true })).toEqual(['vpn', 'mock_location', 'rooted']);
+    expect(reportProblems({ vpn: true, mockLocation: true, rooted: true })).toEqual(['mock_location', 'rooted']);
+    // VPN alone is recorded by the server, not refused: no warning.
+    expect(reportProblems({ vpn: true, mockLocation: false, rooted: false })).toEqual([]);
     expect(reportProblems({ vpn: false, mockLocation: false, rooted: false })).toEqual([]);
   });
 
@@ -247,8 +255,8 @@ describe('checks', () => {
   });
 
   it('marks steps before the current one done', () => {
-    expect(stepStates('photo')).toEqual({ checks: 'done', biometric: 'done', photo: 'current', sending: 'pending' });
-    expect(stepStates('biometric', true)).toEqual({ checks: 'done', biometric: 'failed', photo: 'pending', sending: 'pending' });
+    expect(stepStates('photo')).toEqual({ checks: 'done', photo: 'current', biometric: 'pending', sending: 'pending' });
+    expect(stepStates('biometric', true)).toEqual({ checks: 'done', photo: 'done', biometric: 'failed', sending: 'pending' });
     expect(stepStates('finished')).toEqual({ checks: 'done', biometric: 'done', photo: 'done', sending: 'done' });
   });
 });
@@ -330,5 +338,25 @@ describe('home', () => {
     expect(bonusLabels({ eligible: false, source: 'draft' }, true)).toEqual({ badge: 'dash_not_eligible', tone: 'danger', source: 'dash_draft' });
     expect(bonusLabels({ eligible: null, source: 'estimate' }, false)).toEqual({ badge: 'dash_pending', tone: 'warn', source: 'dash_estimate_today' });
     expect(bonusLabels({ eligible: true, source: 'estimate' }, true).source).toBe('dash_estimate');
+  });
+});
+
+describe('signingPayload (PRD 4.7)', () => {
+  const body = buildPunchBody({
+    deviceId: 'dev-1',
+    location: { lat: 29.37, lng: 47.97, accuracy: 12.5 },
+    report: { vpn: true, mockLocation: false, rooted: false },
+    biometric: 'face',
+    photo: '/9j/abc',
+  });
+  it('is the same text the server checks (same sample as the server test)', () => {
+    expect(signingPayload(body, 'abc', 'SGFzaA==')).toBe('sanad-punch-v1\nabc\n29.37\n47.97\n12.5\nSGFzaA==\n1\n0\n0');
+  });
+  it('uses the accuracy that is actually sent (unknown accuracy included)', () => {
+    const weak = buildPunchBody({ deviceId: 'd', location: { lat: 1, lng: 2, accuracy: Number.NaN }, report: { vpn: false, mockLocation: false, rooted: false }, biometric: 'face', photo: '/9j/' });
+    expect(signingPayload(weak, 'n', 'h').split('\n')[4]).toBe(String(weak.location.accuracy));
+  });
+  it('the signature is optional in the body (old builds / no key yet)', () => {
+    expect(body.signature).toBeUndefined();
   });
 });

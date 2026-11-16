@@ -1,4 +1,4 @@
-// The vertical step list of the punch flow: checks -> Face ID / fingerprint -> photo -> sending.
+// The vertical step list of the punch flow: checks -> photo -> Face ID / fingerprint (signs) -> sending.
 import { StyleSheet, View } from 'react-native';
 import { useSettings } from '../../lib/settings';
 import { space } from '../../lib/theme';

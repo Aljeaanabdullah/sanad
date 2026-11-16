@@ -1,4 +1,5 @@
-// Punch flow logic (PRD 4.6: device Face ID / fingerprint + a review photo). Pure functions only:
+// Punch flow logic (PRD 4.6: device Face ID / fingerprint + a review photo; PRD 4.7: the punch is signed by
+// the phone's key, which Face ID / fingerprint unlocks). Pure functions only:
 // no native modules, no network, so they are unit-tested. Native calls live in punchDevice.ts.
 // The server (supabase/functions/punch) has the last word on every punch; this file only builds the
 // request, reads the answer, and picks the texts to show.
@@ -34,6 +35,8 @@ export type PunchBody = {
     biometric: { passed: true; type: BiometricType };
   };
   photo: string;
+  /** PRD 4.7: the nonce from the server and the phone key's signature (base64 DER) over signingPayload(). */
+  signature?: { nonce: string; value: string };
 };
 
 export function buildPunchBody(p: { deviceId: string; location: GeoPoint; report: PhoneReport; biometric: BiometricType; photo: string }): PunchBody {
@@ -53,6 +56,25 @@ export function buildPunchBody(p: { deviceId: string; location: GeoPoint; report
     },
     photo: stripDataUrl(p.photo),
   };
+}
+
+/**
+ * The exact text the phone key signs for a punch. Must match the server
+ * (supabase/functions/_shared/device-key.ts punchSigningPayload); both have a test on the same sample.
+ * [photoSha256] is the SHA-256 (base64) of the photo's base64 text as sent.
+ */
+export function signingPayload(body: PunchBody, nonce: string, photoSha256: string): string {
+  return [
+    'sanad-punch-v1',
+    nonce,
+    String(body.location.lat),
+    String(body.location.lng),
+    String(body.location.accuracy),
+    photoSha256,
+    body.report.vpn ? '1' : '0',
+    body.report.mock_location ? '1' : '0',
+    body.report.rooted ? '1' : '0',
+  ].join('\n');
 }
 
 /** The server wants bare base64, not a data: URL. */
@@ -222,15 +244,19 @@ export function biometricErrorKey(error: string | undefined): string {
       return 'punch_biometric_lockout';
     case 'timeout':
       return 'punch_reason_timeout';
+    case 'key_invalidated':
+      return 'punch_key_invalidated';
     default:
       return 'punch_reason_biometric_failed';
   }
 }
 
-/** Phone report problems found in the checks step, in the server's order (first one is the likely reason). */
-export function reportProblems(r: PhoneReport): ('vpn' | 'mock_location' | 'rooted')[] {
-  const out: ('vpn' | 'mock_location' | 'rooted')[] = [];
-  if (r.vpn) out.push('vpn');
+/**
+ * Phone report problems found in the checks step that the server refuses, in its order (first one is the
+ * likely reason). VPN is not one of them any more: it is only recorded (PRD 5.4, version 1.11).
+ */
+export function reportProblems(r: PhoneReport): ('mock_location' | 'rooted')[] {
+  const out: ('mock_location' | 'rooted')[] = [];
   if (r.mockLocation) out.push('mock_location');
   if (r.rooted) out.push('rooted');
   return out;
@@ -242,8 +268,9 @@ export function isStale(at: number | null, now = Date.now(), maxAge = CHECKS_MAX
 
 // ------------------------------------------------------------------ steps
 
-export type StepId = 'checks' | 'biometric' | 'photo' | 'sending';
-export const STEPS: StepId[] = ['checks', 'biometric', 'photo', 'sending'];
+// The photo comes before Face ID / fingerprint: the signature covers the photo (PRD 4.7).
+export type StepId = 'checks' | 'photo' | 'biometric' | 'sending';
+export const STEPS: StepId[] = ['checks', 'photo', 'biometric', 'sending'];
 export type StepState = 'pending' | 'current' | 'done' | 'failed';
 
 /** State of every step when [current] is running (or has [failed]). */

@@ -16,6 +16,7 @@ export default async function OrganisationLayout({ children }: { children: React
     ["/organisation/sites", o.tabs.sites],
     ["/organisation/work-patterns", o.tabs.workPatterns],
     ["/organisation/holidays", o.tabs.holidays],
+    ["/organisation/punch-security", o.tabs.punchSecurity],
   ] as const;
 
   return (

@@ -3,7 +3,21 @@ import type { Lang } from "./i18n";
 // Texts for the organisation screens (Phase 3).
 const ar = {
   title: "الهيكل التنظيمي",
-  tabs: { departments: "الأقسام", sites: "المواقع", workPatterns: "أنماط العمل", holidays: "العطل الرسمية" },
+  tabs: { departments: "الأقسام", sites: "المواقع", workPatterns: "أنماط العمل", holidays: "العطل الرسمية", punchSecurity: "حماية التبصيم" },
+  // punch security (S3, PRD 4.7)
+  punchSecurity: {
+    intro: "توقيع البصمة يثبت إن البصمة انعملت من الجوال المرتبط نفسه وبوجه أو بصمة صاحبه. شغّل الشرط بعد ما تتأكد إن الجوالات سجّلت مفاتيحها.",
+    requireSignature: "رفض أي بصمة بدون توقيع صحيح من الجوال",
+    requireSignatureHint: "وهو مطفأ: التوقيع يُفحص ويُسجّل، وما يُرفض أحد بسببه.",
+    allowFace: "قبول الطريقة القديمة (مطابقة الوجه)",
+    allowFaceHint: "التطبيق الجديد ما يستخدمها. أطفئها لما يصير كل الموظفين على التطبيق الجديد.",
+    allowIos: "قبول مفاتيح iPhone بدون شهادة",
+    allowIosHint: "iPhone ما يعطي شهادة للمفتاح حتى نضيف App Attest.",
+    keys: "الجوالات المرتبطة",
+    attested: "موثّق",
+    unattested: "غير موثّق",
+    noKey: "بدون مفتاح",
+  },
   nameAr: "الاسم بالعربي",
   nameEn: "الاسم بالإنجليزي",
   add: "إضافة",
@@ -93,7 +107,20 @@ const ar = {
 
 const en: typeof ar = {
   title: "Organisation",
-  tabs: { departments: "Departments", sites: "Sites", workPatterns: "Work patterns", holidays: "Public holidays" },
+  tabs: { departments: "Departments", sites: "Sites", workPatterns: "Work patterns", holidays: "Public holidays", punchSecurity: "Punch security" },
+  punchSecurity: {
+    intro: "The punch signature proves a punch was made on the bound phone itself, by its owner's face or fingerprint. Turn the requirement on once the phones have registered their keys.",
+    requireSignature: "Refuse any punch without a valid signature from the phone",
+    requireSignatureHint: "While off, signatures are checked and recorded, and nobody is refused for them.",
+    allowFace: "Accept the old method (face match)",
+    allowFaceHint: "The new app does not use it. Turn it off once every employee is on the new app.",
+    allowIos: "Accept iPhone keys without attestation",
+    allowIosHint: "iPhone gives no attestation for the key until App Attest is added.",
+    keys: "Bound phones",
+    attested: "Attested",
+    unattested: "Not attested",
+    noKey: "No key",
+  },
   nameAr: "Name in Arabic",
   nameEn: "Name in English",
   add: "Add",

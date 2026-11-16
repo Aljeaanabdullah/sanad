@@ -32,7 +32,7 @@ export default async function EmployeePage({ params }: PageProps<"/employees/[id
       supabase.from("work_patterns").select("id, name_ar, name_en").order("shift_start"),
       supabase.from("sites").select("id, name_ar, name_en, is_active").order("created_at"),
       supabase.from("employee_sites").select("site_id").eq("employee_id", id),
-      supabase.from("devices").select("platform, model, bound_at").eq("employee_id", id).maybeSingle(),
+      supabase.from("devices").select("platform, model, bound_at, key_attested, key_registered_at, key_attestation").eq("employee_id", id).maybeSingle(),
     ]);
   const enabledIds = new Set((enabled ?? []).map((r) => r.site_id));
 
@@ -168,6 +168,19 @@ export default async function EmployeePage({ params }: PageProps<"/employees/[id
               <span className="text-muted">
                 {e.boundAt}: {date.format(new Date(device.bound_at))}
               </span>
+            </p>
+            {/* S3 (PRD 4.7): the phone's signing key. */}
+            <p className="flex flex-wrap items-center gap-2 text-sm" data-testid="device-key">
+              <span>{e.deviceKey}:</span>
+              <Badge tone={device.key_registered_at && device.key_attested ? "ok" : "off"}>
+                {!device.key_registered_at ? e.keyNone : device.key_attested ? e.keyAttested : e.keyUnattested}
+              </Badge>
+              {device.key_registered_at && (
+                <span className="text-muted">{date.format(new Date(device.key_registered_at))}</span>
+              )}
+              {(device.key_attestation as { security_level?: string } | null)?.security_level === "strongbox" && (
+                <span className="text-muted" dir="ltr">StrongBox</span>
+              )}
             </p>
             <DeleteButton action={unbindDevice.bind(null, id)} label={e.unbind} confirmText={e.unbindConfirm} errors={e.errors} />
           </div>

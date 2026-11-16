@@ -58,7 +58,13 @@
     "punch_sending_wait": "لا تقفل التطبيق حتى يكتمل الإرسال.",
     "punch_cancel": "إلغاء",
     "punch_location_precise": "الموقع مضبوط على \"تقريبي\". فعّل \"الموقع الدقيق\" لسند من الإعدادات، لأن التبصيم يحتاج موقعك الدقيق داخل موقع العمل.",
-    "punch_biometric_weak": "جهازك ما فيه إلا فتح بالوجه من الكاميرا، وهذا ما يكفي للتبصيم. فعّل بصمة الإصبع (أو Face ID) من إعدادات الجهاز ثم حاول مرة ثانية."
+    "punch_biometric_weak": "جهازك ما فيه إلا فتح بالوجه من الكاميرا، وهذا ما يكفي للتبصيم. فعّل بصمة الإصبع (أو Face ID) من إعدادات الجهاز ثم حاول مرة ثانية.",
+    "punch_reason_device_key_missing": "جوالك ما سجّل مفتاح التبصيم بعد. تأكد إن Face ID أو البصمة مفعّلة في الجوال، ثم افتح التطبيق من جديد.",
+    "punch_reason_signature_missing": "ما وصل توقيع البصمة من جوالك. إذا أضفت وجهاً أو بصمة جديدة للجوال، اطلب من مدير النظام فك ربط الجهاز ثم ادخل من جديد.",
+    "punch_reason_signature_invalid": "توقيع البصمة غير صحيح. اطلب من مدير النظام فك ربط الجهاز ثم ادخل من جديد.",
+    "punch_reason_challenge_expired": "انتهت مهلة المحاولة. حاول مرة ثانية.",
+    "punch_reason_method_disabled": "طريقة التبصيم هذي موقوفة. حدّث التطبيق.",
+    "punch_key_invalidated": "تغيّرت بصمات أو وجوه الجوال، فبطل مفتاح التبصيم. اطلب من مدير النظام فك ربط الجهاز ثم ادخل من جديد."
   },
   "en": {
     "home_hello": "Hello, {name}",
@@ -119,6 +125,12 @@
     "punch_sending_wait": "Keep the app open until it is sent.",
     "punch_cancel": "Cancel",
     "punch_location_precise": "Location is set to \"approximate\". Turn on \"precise location\" for Sanad in Settings: punching needs your exact position at the work site.",
-    "punch_biometric_weak": "This phone only has camera face unlock, which is not secure enough to punch. Set up a fingerprint (or Face ID) in the phone's settings, then try again."
+    "punch_biometric_weak": "This phone only has camera face unlock, which is not secure enough to punch. Set up a fingerprint (or Face ID) in the phone's settings, then try again.",
+    "punch_reason_device_key_missing": "Your phone has not registered its punch key yet. Make sure Face ID or fingerprint is set up, then open the app again.",
+    "punch_reason_signature_missing": "The punch signature from your phone did not arrive. If you added a new face or fingerprint to the phone, ask the system admin to unbind it, then sign in again.",
+    "punch_reason_signature_invalid": "The punch signature is not valid. Ask the system admin to unbind your phone, then sign in again.",
+    "punch_reason_challenge_expired": "This attempt timed out. Please try again.",
+    "punch_reason_method_disabled": "This punch method is switched off. Please update the app.",
+    "punch_key_invalidated": "The faces or fingerprints on this phone changed, so the punch key no longer works. Ask the system admin to unbind your phone, then sign in again."
   }
 }

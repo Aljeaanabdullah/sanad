@@ -13,10 +13,16 @@
 //   "report": { "vpn", "mock_location", "rooted", "biometric": { "passed": bool, "type": string } }
 //   no "descriptor" / "model_version". The phone's Face ID / fingerprint proves the owner of the bound
 //   phone; the review photo is still required and kept. The face-descriptor path above is unchanged.
+// Sanad S3 (PRD 4.7): the device-biometric punch is signed by the phone's key (Face ID / fingerprint unlocks it):
+//   "signature": { "nonce": string,   // rpc device_challenge('punch'), valid 60 s, used once
+//                  "value": string }  // base64 DER ECDSA P-256 / SHA-256 over punchSigningPayload(...)
+//   Checked and recorded always; refused only when punch_security_settings.require_device_signature is on.
+//   VPN is recorded, not refused (PRD 5.4, version 1.11). The face-descriptor path can be switched off.
 // The server decides in/out from the shift windows (rules engine, Phase 7), uses its own clock,
 // and returns the result with a reason.
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { punchSigningPayload, sha256b64, verifyDeviceSignature } from "../_shared/device-key.ts";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -36,6 +42,18 @@ export const LOCK_AFTER = 5;
 export const LOCK_MINUTES = 5;
 const MAX_PHOTO_BYTES = 600 * 1024;
 
+/** Result of the signature check, recorded with every device-biometric attempt. */
+export type SignatureStatus = "ok" | "no_key" | "unattested" | "missing" | "expired" | "invalid";
+/** Refusal reason for each failed signature status (only when the owner turned the requirement on). */
+export const SIGNATURE_REASON: Record<Exclude<SignatureStatus, "ok">, string> = {
+  no_key: "device_key_missing",
+  unattested: "device_key_missing",
+  missing: "signature_missing",
+  expired: "challenge_expired",
+  invalid: "signature_invalid",
+};
+const DEFAULT_SETTINGS = { require_device_signature: false, allow_face_descriptor: true, allow_unattested_ios: true };
+
 type Body = {
   verification?: unknown;
   device_identifier?: unknown;
@@ -50,6 +68,7 @@ type Body = {
   descriptor?: unknown;
   model_version?: unknown;
   photo?: unknown;
+  signature?: { nonce?: unknown; value?: unknown };
 };
 
 const num = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? v : null);
@@ -128,13 +147,47 @@ Deno.serve(async (req) => {
   let faceDistance: number | null = null;
 
   const { data: device } = await db
-    .from("devices").select("id, device_identifier").eq("employee_id", me.id).maybeSingle();
+    .from("devices").select("id, device_identifier, public_key, key_attested").eq("employee_id", me.id).maybeSingle();
   const { count: consents } = await db
     .from("consents").select("id", { count: "exact", head: true }).eq("employee_id", me.id);
+  const { data: settingsRow } = await db
+    .from("punch_security_settings")
+    .select("require_device_signature, allow_face_descriptor, allow_unattested_ios")
+    .maybeSingle();
+  const settings = { ...DEFAULT_SETTINGS, ...(settingsRow ?? {}) };
+  const rightDevice = !!device && device.device_identifier === body.device_identifier;
+
+  // The signature: made on the bound phone, by its key, after Face ID / fingerprint, for this nonce and these values.
+  let signature: SignatureStatus | null = null;
+  if (biometricMode && device && rightDevice) {
+    const sig = body.signature;
+    if (!device.public_key) signature = "no_key";
+    else if (!device.key_attested && !settings.allow_unattested_ios) signature = "unattested";
+    else if (typeof sig?.nonce !== "string" || typeof sig?.value !== "string" || sig.nonce.length > 200) signature = "missing";
+    else {
+      const { data: used } = await db.rpc("consume_device_challenge", { p_employee: me.id, p_purpose: "punch", p_nonce: sig.nonce });
+      if (used !== "ok") signature = "expired";
+      else {
+        const payload = punchSigningPayload({
+          nonce: sig.nonce,
+          lat,
+          lng,
+          accuracy,
+          photoSha256: await sha256b64(body.photo as string),
+          vpn: body.report?.vpn === true,
+          mockLocation: body.report?.mock_location === true,
+          rooted: body.report?.rooted === true,
+        });
+        signature = (await verifyDeviceSignature(device.public_key, payload, sig.value)) ? "ok" : "invalid";
+      }
+    }
+  }
 
   if (!consents) reason = "no_consent";
-  else if (!device || device.device_identifier !== body.device_identifier) reason = "wrong_device";
-  else if (body.report?.vpn === true) reason = "vpn";
+  else if (!rightDevice) reason = "wrong_device";
+  else if (!biometricMode && !settings.allow_face_descriptor) reason = "method_disabled";
+  else if (signature && signature !== "ok" && settings.require_device_signature) reason = SIGNATURE_REASON[signature];
+  // VPN is recorded in client_report, not refused (PRD 5.4, version 1.11).
   else if (body.report?.mock_location === true) reason = "mock_location";
   else if (body.report?.rooted === true) reason = "rooted";
   else if (biometricMode && body.report?.biometric?.passed !== true) reason = "biometric_failed";
@@ -202,9 +255,10 @@ Deno.serve(async (req) => {
     photo_path: uploadError ? null : photoPath,
     client_report: {
       ...(body.report ?? {}),
-      device_identifier: body.device_identifier,
+      // The device id is not stored: the employee can read this report (S3).
       by_mission: byMission,
       verification: biometricMode ? "device_biometric" : "face_descriptor",
+      ...(biometricMode ? { signature: signature ?? "not_checked", key_attested: device?.key_attested === true } : {}),
     },
   }).select("id").single();
   if (insertError || !saved) return json(500, { error: "save_failed" });
