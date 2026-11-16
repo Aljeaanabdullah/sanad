@@ -7,9 +7,11 @@ import '../l10n.dart';
 import '../punch/phone_checks.dart';
 import '../punch/punch_service.dart';
 import '../requests/requests_service.dart';
+import '../sanad/dashboard_service.dart';
 import '../settings.dart';
 import 'enroll_search_screen.dart';
 import 'approvals_screen.dart';
+import 'dashboard_screen.dart';
 import 'month_record_screen.dart';
 import 'punch_screen.dart';
 import 'requests_screens.dart';
@@ -27,6 +29,7 @@ class HomeScreen extends StatefulWidget {
     required this.punch,
     required this.checks,
     required this.requests,
+    this.dashboard,
   });
 
   final Strings strings;
@@ -38,6 +41,7 @@ class HomeScreen extends StatefulWidget {
   final PunchService punch;
   final PhoneChecks checks;
   final RequestsService requests;
+  final DashboardService? dashboard;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -46,6 +50,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<PunchEntry>? _today;
   ShiftInfo? _shift;
+  final _dashKey = GlobalKey<DashboardSummaryCardState>();
 
   @override
   void initState() {
@@ -54,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _load() async {
+    _dashKey.currentState?.reload();
     ShiftInfo? shift;
     try {
       shift = await widget.punch.currentShift();
@@ -158,6 +164,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: _today == null ? null : _punch,
               ),
             ),
+            if (widget.dashboard != null) ...[
+              const SizedBox(height: 16),
+              DashboardSummaryCard(
+                key: _dashKey,
+                strings: s,
+                service: widget.dashboard!,
+                onOpen: () => _open(DashboardScreen(strings: s, isArabic: !isEnglish, service: widget.dashboard!)),
+              ),
+            ],
             const SizedBox(height: 24),
             Text(s.punchToday, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
@@ -213,6 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       strings: s,
                       isArabic: !isEnglish,
                       service: widget.requests,
+                      dashboard: widget.dashboard,
                       // PRD 4.4: punch photos for supervisors and the system admin only.
                       withPhotos: widget.profile.role == 'supervisor' || widget.profile.role == 'admin',
                     )),

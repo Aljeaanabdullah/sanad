@@ -8,6 +8,7 @@ import 'l10n.dart';
 import 'punch/phone_checks.dart';
 import 'punch/punch_service.dart';
 import 'requests/requests_service.dart';
+import 'sanad/dashboard_service.dart';
 import 'screens/change_password_screen.dart';
 import 'screens/consent_screen.dart';
 import 'screens/device_blocked_screen.dart';
@@ -15,9 +16,7 @@ import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/setup_screen.dart';
 import 'settings.dart';
-
-/// Jahez palette: blues + white.
-const seedBlue = Color(0xFF1565C0);
+import 'theme.dart';
 
 class JahezApp extends StatelessWidget {
   const JahezApp({
@@ -29,6 +28,7 @@ class JahezApp extends StatelessWidget {
     required this.punch,
     required this.checks,
     required this.requests,
+    this.dashboard,
   });
 
   final AppSettings settings;
@@ -38,22 +38,21 @@ class JahezApp extends StatelessWidget {
   final PunchService punch;
   final PhoneChecks checks;
   final RequestsService requests;
+  final DashboardService? dashboard;
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: settings,
       builder: (context, _) => MaterialApp(
-        title: 'Jahez',
+        title: 'Sanad',
         debugShowCheckedModeBanner: false,
         locale: settings.locale,
         supportedLocales: const [Locale('ar'), Locale('en')],
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         themeMode: settings.themeMode,
-        theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: seedBlue)),
-        darkTheme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: seedBlue, brightness: Brightness.dark),
-        ),
+        theme: sanadTheme(Brightness.light),
+        darkTheme: sanadTheme(Brightness.dark),
         home: AppFlow(
           settings: settings,
           auth: auth,
@@ -62,6 +61,7 @@ class JahezApp extends StatelessWidget {
           punch: punch,
           checks: checks,
           requests: requests,
+          dashboard: dashboard,
         ),
       ),
     );
@@ -83,6 +83,7 @@ class AppFlow extends StatefulWidget {
     required this.punch,
     required this.checks,
     required this.requests,
+    this.dashboard,
   });
 
   final AppSettings settings;
@@ -92,6 +93,7 @@ class AppFlow extends StatefulWidget {
   final PunchService punch;
   final PhoneChecks checks;
   final RequestsService requests;
+  final DashboardService? dashboard;
 
   @override
   State<AppFlow> createState() => _AppFlowState();
@@ -192,6 +194,7 @@ class _AppFlowState extends State<AppFlow> {
           punch: widget.punch,
           checks: widget.checks,
           requests: widget.requests,
+          dashboard: widget.dashboard,
         ),
     };
   }

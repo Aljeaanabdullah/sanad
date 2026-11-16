@@ -11,7 +11,7 @@ class Strings {
 
   String get(String key) => _t[key] ?? _t['error_generic']!;
 
-  String get appName => 'Jahez';
+  String get appName => get('app_name');
   String get chooseLanguage => get('choose_language');
   String get chooseTheme => get('choose_theme');
   String get light => get('light');
@@ -92,6 +92,7 @@ class Strings {
 }
 
 const _ar = {
+  'app_name': 'سَنَد',
   'choose_language': 'اختر اللغة',
   'choose_theme': 'اختر المظهر',
   'light': 'نهاري',
@@ -292,9 +293,42 @@ const _ar = {
   'enroll_error_employee_suspended': 'حساب الموظف موقوف.',
   'enroll_error_invalid_photos': 'الصور غير صالحة. أعد الالتقاط.',
   'error_generic': 'حدث خطأ. حاول مرة أخرى.',
+  // Sanad dashboard (phase S1)
+  'dash_title': 'لوحتي',
+  'dash_open_employee': 'لوحة الموظف',
+  'dash_present': 'حضور',
+  'dash_absent': 'غياب',
+  'dash_late': 'تأخير',
+  'dash_leave_days': 'أيام إجازة',
+  'dash_bonus': 'المكافأة',
+  'dash_eligible': 'مستحق',
+  'dash_not_eligible': 'غير مستحق',
+  'dash_pending': 'بانتظار قرار المدير',
+  'dash_estimate': 'تقديري',
+  'dash_draft': 'مسودة',
+  'dash_locked': 'معتمد',
+  'dash_estimate_note': 'هذي نتيجة تقديرية من بياناتك حتى الآن. النتيجة الرسمية تظهر بعد ما يعتمد المدير الكشف.',
+  'dash_leaves': 'الإجازات والغياب المسجّل',
+  'dash_penalties': 'العقوبات',
+  'dash_none': 'لا يوجد',
+  'dash_ask': 'اسأل سَنَد',
+  'dash_ask_hint': 'اكتب سؤالك عن مكافأتك أو حضورك',
+  'dash_q_bonus': 'ليش ما أخذت مكافأة؟',
+  'dash_q_deduction': 'ليش علي خصم؟',
+  'dash_q_late': 'كم مرة تأخرت؟',
+  'dash_view_only': 'تشوف لوحة هذا الموظف كما يراها هو. عرض فقط، بدون تعديل.',
+  'dash_error_not_allowed': 'ما عندك صلاحية تشوف هذي اللوحة.',
+  'dash_error_not_found': 'الموظف غير موجود.',
+  'dash_error_generic': 'تعذر تحميل اللوحة. اسحب للتحديث أو حاول لاحقاً.',
+  'dash_unexcused': 'غياب بدون عذر',
+  'dash_missing_checkout': 'خروج مفقود',
+  'dash_late_minutes': 'دقائق التأخير',
+  'dash_period': 'الفترة',
+  'dash_list_of': 'كشف',
 };
 
 const _en = {
+  'app_name': 'Sanad',
   'choose_language': 'Choose your language',
   'choose_theme': 'Choose the look',
   'light': 'Light',
@@ -495,4 +529,36 @@ const _en = {
   'enroll_error_employee_suspended': "The employee's account is suspended.",
   'enroll_error_invalid_photos': 'The photos are not valid. Retake them.',
   'error_generic': 'Something went wrong. Try again.',
+  // Sanad dashboard (phase S1)
+  'dash_title': 'My dashboard',
+  'dash_open_employee': 'Employee dashboard',
+  'dash_present': 'Present',
+  'dash_absent': 'Absent',
+  'dash_late': 'Late',
+  'dash_leave_days': 'Leave days',
+  'dash_bonus': 'Bonus',
+  'dash_eligible': 'Eligible',
+  'dash_not_eligible': 'Not eligible',
+  'dash_pending': 'Waiting for the manager',
+  'dash_estimate': 'Estimate',
+  'dash_draft': 'Draft',
+  'dash_locked': 'Approved',
+  'dash_estimate_note': 'This is an estimate from your data so far. The official result shows after the manager approves the list.',
+  'dash_leaves': 'Leaves and recorded absences',
+  'dash_penalties': 'Penalties',
+  'dash_none': 'None',
+  'dash_ask': 'Ask Sanad',
+  'dash_ask_hint': 'Ask about your bonus or attendance',
+  'dash_q_bonus': 'Why didn\'t I get a bonus?',
+  'dash_q_deduction': 'Why do I have a deduction?',
+  'dash_q_late': 'How many times was I late?',
+  'dash_view_only': 'You are viewing this employee\'s dashboard as they see it. View only.',
+  'dash_error_not_allowed': 'You are not allowed to see this dashboard.',
+  'dash_error_not_found': 'Employee not found.',
+  'dash_error_generic': 'Could not load the dashboard. Pull to refresh or try later.',
+  'dash_unexcused': 'Unexcused absence',
+  'dash_missing_checkout': 'Missing check-out',
+  'dash_late_minutes': 'Late minutes',
+  'dash_period': 'Period',
+  'dash_list_of': 'List',
 };

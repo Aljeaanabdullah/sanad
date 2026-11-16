@@ -4,6 +4,7 @@ import { requireStaff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getPrefs } from "@/lib/prefs";
 import { reqT } from "@/lib/i18n-req";
+import { dashT } from "@/lib/i18n-dash";
 import { AttendanceHistory } from "@/components/attendance-history";
 import { Badge, Card, Table } from "@/components/ui";
 
@@ -92,6 +93,13 @@ export default async function RecordPage({ params, searchParams }: PageProps<"/r
           {emp.file_number}
         </span>
         {dept && <Badge tone="ok">{name(dept)}</Badge>}
+        <Link
+          href={`/records/${id}/dashboard`}
+          data-testid="open-dashboard"
+          className="ms-auto rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-on-primary hover:opacity-90"
+        >
+          {dashT(lang).open}
+        </Link>
       </div>
 
       <div className="flex items-center gap-2" data-testid="month-nav">

@@ -183,7 +183,7 @@ export async function recordToPdf(record: EmployeeRecord, lang: Lang): Promise<B
     laBold: await embed("latin-700"),
   };
   doc.setTitle(`${L.title} ${record.employee.file_number}`);
-  doc.setCreator("Jahez");
+  doc.setCreator("Sanad");
 
   const w = new Writer(doc, fonts, lang === "ar");
   const name = lang === "ar" ? record.employee.full_name_ar : record.employee.full_name_en;

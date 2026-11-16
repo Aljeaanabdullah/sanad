@@ -7,8 +7,11 @@ import 'package:jahez/face/face_capture.dart';
 import 'package:jahez/punch/phone_checks.dart';
 import 'package:jahez/punch/punch_service.dart';
 import 'package:jahez/settings.dart';
+import 'package:jahez/sanad/dashboard_service.dart';
+import 'package:jahez/screens/dashboard_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'fake_dashboard.dart';
 import 'fake_requests.dart';
 
 /// In-memory stand-in for the Supabase backend.
@@ -116,12 +119,14 @@ class FakeChecks implements PhoneChecks {
 const okChecks = PhoneReport(vpn: false, rooted: false, mockLocation: false, position: null);
 
 Future<void> pumpApp(WidgetTester tester, FakeAuth auth,
-    {bool setupDone = true, String lang = 'ar', FakeEnroll? enroll, FakePunch? punch, PhoneReport checks = okChecks, FakeRequests? requests}) async {
+    {bool setupDone = true, String lang = 'ar', FakeEnroll? enroll, FakePunch? punch, PhoneReport checks = okChecks, FakeRequests? requests,
+    DashboardService? dashboard}) async {
   final settings = AppSettings(locale: Locale(lang), setupDone: setupDone);
   await tester.pumpWidget(JahezApp(settings: settings, auth: auth, enroll: enroll ?? FakeEnroll(), analyserFactory: noAnalyser,
       punch: punch ?? FakePunch(),
       checks: FakeChecks(checks),
-      requests: requests ?? FakeRequests()));
+      requests: requests ?? FakeRequests(),
+      dashboard: dashboard));
   await tester.pumpAndSettle();
 }
 
@@ -308,6 +313,17 @@ void main() {
     expect(find.text('أنت خارج نطاق موقع العمل.'), findsOneWidget);
     expect(find.textContaining('ورديتك'), findsOneWidget);
     expect(find.text('متأخر 5 دقيقة'), findsOneWidget);
+  });
+
+  testWidgets('home shows the Sanad dashboard card under the punch button and opens it', (tester) async {
+    final dash = FakeDashboard({null: dashJson()});
+    await pumpApp(tester, FakeAuth(mustChange: false, device: DeviceStatus.ok)..signedIn = true, dashboard: dash);
+    expect(find.byKey(const Key('punchButton')), findsOneWidget);
+    expect(find.byKey(const Key('dashboardCard')), findsOneWidget);
+    expect(find.byKey(const Key('dashBonusStatus')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('dashboardCard')));
+    await tester.pumpAndSettle();
+    expect(find.byType(DashboardScreen), findsOneWidget);
   });
 
   testWidgets('home says when there is no upcoming shift', (tester) async {

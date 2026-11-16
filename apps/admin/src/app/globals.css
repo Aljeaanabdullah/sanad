@@ -1,31 +1,33 @@
 @import "tailwindcss";
 
-/* Jahez palette: blues + white. Dark mode is chosen by the user (cookie -> .dark on <html>). */
+/* Sanad palette: dark navy + gold (PRD 12). Dark mode is chosen by the user (cookie -> .dark on <html>). */
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #f5f8fc;
+  --background: #f6f1e6;
   --surface: #ffffff;
-  --foreground: #0b1f3a;
-  --muted: #5a6b85;
-  --line: #d9e2ef;
-  --primary: #1565c0;
-  --primary-soft: #e3f0fd;
-  --on-primary: #ffffff;
-  --danger: #b42318;
-  --danger-soft: #fdecea;
+  --foreground: #0b1a33;
+  --muted: #5b6b85;
+  --line: #e4dcc8;
+  --primary: #0b1a33;
+  --primary-soft: #f3e6c4;
+  --on-primary: #e6c878;
+  --accent: #c9a24b;
+  --danger: #b3413a;
+  --danger-soft: #fbe9e7;
   color-scheme: light;
 }
 
 :root.dark {
-  --background: #0a1628;
-  --surface: #10223d;
-  --foreground: #e6efff;
-  --muted: #9fb2cf;
-  --line: #22395c;
-  --primary: #64a8f0;
-  --primary-soft: #16345c;
-  --on-primary: #06162b;
+  --background: #0b1628;
+  --surface: #13274a;
+  --foreground: #f6f1e6;
+  --muted: #a9b6cc;
+  --line: #2a3f63;
+  --primary: #e6c878;
+  --primary-soft: #3a2f12;
+  --on-primary: #0b1a33;
+  --accent: #c9a24b;
   --danger: #ff8a80;
   --danger-soft: #3d1717;
   color-scheme: dark;
@@ -40,6 +42,7 @@
   --color-primary: var(--primary);
   --color-primary-soft: var(--primary-soft);
   --color-on-primary: var(--on-primary);
+  --color-accent: var(--accent);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
   --font-sans: var(--font-plex-arabic);

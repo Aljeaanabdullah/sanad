@@ -3,7 +3,7 @@ export type Theme = "light" | "dark";
 
 export const dictionaries = {
   ar: {
-    appName: "Jahez",
+    appName: "سَنَد",
     panelTitle: "لوحة التحكم",
     fileNumber: "رقم الملف الوظيفي",
     password: "كلمة المرور",
@@ -52,7 +52,7 @@ export const dictionaries = {
     },
   },
   en: {
-    appName: "Jahez",
+    appName: "Sanad",
     panelTitle: "Admin panel",
     fileNumber: "File number",
     password: "Password",
