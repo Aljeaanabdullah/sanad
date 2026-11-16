@@ -24,7 +24,7 @@ describe('routeFor: each kind opens the right screen', () => {
     ['sup_not_in', { employees: [{ id: EID }] }, `/record/${EID}`],
     ['sup_absent', { employees: [{ id: EID }, { id: RID }] }, '/notifications'],
     ['sup_missing_checkout', { count: '3' }, '/notifications'],
-    ['emergency_alert', {}, '/notifications'],
+    ['emergency_alert', {}, '/emergency'],
     ['something_else', {}, '/notifications'],
   ])('%s %j -> %s', (kind, data, href) => {
     expect(routeFor(kind, data)).toBe(href);
@@ -106,5 +106,22 @@ describe('noticeView for the Phase 9 kinds', () => {
   it('request decisions open the request when the id is known', () => {
     const v = noticeView({ kind: 'request_decided', at, data: { request_id: RID, request_type: 'leave', leave_type: 'إجازة دورية', decision: 'approved', stage: 'hr', date: '2026-12-01' } }, makeT('en'));
     expect(v.href).toBe(`/request/${RID}`);
+  });
+});
+
+// Phase 9 <-> 11: an emergency push (or the in-app list item) opens the evacuation screen.
+describe('emergency_alert routing', () => {
+  const { fromPushData, routeFor } = require('../notify');
+  const EID = '0b6c1f9e-3a4d-4c1e-9b8a-2f6d7e8a9b0c';
+  it('opens the emergency screen with its id', () => {
+    expect(routeFor('emergency_alert', { emergency_id: EID })).toBe(`/emergency?id=${EID}`);
+  });
+  it('falls back to the emergency screen without an id or with a bad id', () => {
+    expect(routeFor('emergency_alert', {})).toBe('/emergency');
+    expect(routeFor('emergency_alert', { emergency_id: 'x; drop' })).toBe('/emergency');
+  });
+  it('a tapped FCM payload (flat strings, as send-push builds it) routes there', () => {
+    const p = fromPushData({ kind: 'emergency_alert', notification_id: EID, priority: 'high', emergency_id: EID, type: 'emergency_alert' });
+    expect(p).toEqual({ kind: 'emergency_alert', id: EID, route: `/emergency?id=${EID}` });
   });
 });

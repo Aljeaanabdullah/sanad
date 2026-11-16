@@ -19,7 +19,13 @@ export type MapCanvasProps = {
   fallbackCenter: LatLng;
   onPick?: (point: LatLng) => void;
   attributionLabel?: string;
+  /** Small dots (e.g. where employees pressed a button during an emergency). */
+  points?: MapPoint[];
+  /** Map height class (default h-80). */
+  heightClass?: string;
 };
+
+export type MapPoint = LatLng & { label?: string; tone: "ok" | "warn" };
 
 /** Kuwait City. */
 export const KUWAIT_CENTER: LatLng = { lat: 29.3759, lng: 47.9774 };

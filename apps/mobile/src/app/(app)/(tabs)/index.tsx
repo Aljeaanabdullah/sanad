@@ -4,6 +4,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { RefreshControl } from 'react-native';
 import type { Block } from '../../../components/home/block';
+import { EmergencyBanner } from '../../../components/emergency/EmergencyBanner';
 import { BonusSummary } from '../../../components/home/BonusSummary';
 import { NotifyCard } from '../../../components/home/NotifyCard';
 import { PunchCard } from '../../../components/home/PunchCard';
@@ -88,6 +89,7 @@ export default function Home() {
         <PunchCard shift={shift} punches={punches.state === 'ok' ? punches.data : null} onPunch={onPunch} />
       </Header>
       <Screen refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={c.accent} colors={[c.accent]} />}>
+        <EmergencyBanner />
         <NotifyCard />
         <BonusSummary dash={dash} onOpen={() => router.push('/dashboard')} onRetry={loadDash} />
         <QuickActions />

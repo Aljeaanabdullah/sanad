@@ -9,6 +9,8 @@ export const NOTIFICATION_KINDS = [
   'late', 'emergency_alert',
 ] as const;
 
+import { emergencyRouteFor } from './emergencyNotification';
+
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const id = (v: unknown) => (typeof v === 'string' && UUID.test(v) ? v : null);
 
@@ -16,6 +18,9 @@ const id = (v: unknown) => (typeof v === 'string' && UUID.test(v) ? v : null);
 export function routeFor(kind: string, data: Record<string, unknown> | null | undefined): string {
   const d = data ?? {};
   switch (kind) {
+    // Phase 11: the evacuation screen (with the emergency id when the payload has it).
+    case 'emergency_alert':
+      return emergencyRouteFor({ ...d, type: 'emergency_alert' }) ?? '/emergency';
     case 'shift_reminder':
     case 'late_warning':
     case 'checkout_reminder':

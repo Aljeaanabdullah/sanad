@@ -13,7 +13,7 @@ import { detailRows, recordLabels, type EmployeeRecord } from "./employee-record
 const fontPath = (name: string) => path.join(process.cwd(), "src", "fonts", `ibm-plex-sans-arabic-${name}-normal.ttf`);
 const ARABIC = /[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]/;
 
-type Fonts = { ar: PDFFont; arBold: PDFFont; la: PDFFont; laBold: PDFFont };
+export type Fonts = { ar: PDFFont; arBold: PDFFont; la: PDFFont; laBold: PDFFont };
 type Run = { text: string; arabic: boolean };
 
 /**
@@ -216,6 +216,9 @@ export async function newArabicPdf(): Promise<{ doc: PDFDocument; fonts: Fonts }
   };
   return { doc, fonts };
 }
+
+/** Same as newArabicPdf (name used by the emergency report). */
+export const newPdf = newArabicPdf;
 
 export async function recordToPdf(record: EmployeeRecord, lang: Lang): Promise<Buffer> {
   const L = recordLabels(lang);

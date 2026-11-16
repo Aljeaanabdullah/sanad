@@ -27,6 +27,7 @@ const routes: Partial<Record<NavKey, string>> = {
   liveBoard: "/live",
   reports: "/reports",
   auditLog: "/audit-log",
+  emergencies: "/emergencies",
 };
 
 const itemClass = "flex items-center justify-between gap-2 rounded-lg px-3 py-2";
