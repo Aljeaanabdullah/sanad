@@ -13,7 +13,7 @@ import { detailRows, recordLabels, type EmployeeRecord } from "./employee-record
 const fontPath = (name: string) => path.join(process.cwd(), "src", "fonts", `ibm-plex-sans-arabic-${name}-normal.ttf`);
 const ARABIC = /[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]/;
 
-type Fonts = { ar: PDFFont; arBold: PDFFont; la: PDFFont; laBold: PDFFont };
+export type Fonts = { ar: PDFFont; arBold: PDFFont; la: PDFFont; laBold: PDFFont };
 type Run = { text: string; arabic: boolean };
 
 /**
@@ -23,7 +23,7 @@ type Run = { text: string; arabic: boolean };
  */
 export function toRuns(text: string): Run[] {
   const runs: (Run & { closed?: boolean })[] = [];
-  const PUNCT = /^[:.,;!?()"'\-]+$/;
+  const PUNCT = /^[:.,;!?()"'\-…]+$/;
   const push = (piece: string, arabic: boolean, joinWithSpace: boolean, closed = false) => {
     const last = runs[runs.length - 1];
     if (last && !last.closed && !closed && last.arabic === arabic) last.text += joinWithSpace ? ` ${piece}` : piece;
@@ -36,14 +36,14 @@ export function toRuns(text: string): Run[] {
       continue;
     }
     word
-      .split(/([:.,;!?()"'\-]+)/)
+      .split(/([:.,;!?()"'\-…]+)/)
       .filter(Boolean)
       .forEach((piece, i) => (PUNCT.test(piece) ? push(piece, false, false, true) : push(piece, true, i === 0)));
   }
   return runs.map(({ text, arabic }) => ({ text, arabic }));
 }
 
-class Writer {
+export class Writer {
   page!: PDFPage;
   y = 0;
   readonly width = 595.28; // A4
@@ -171,8 +171,8 @@ class Writer {
   }
 }
 
-export async function recordToPdf(record: EmployeeRecord, lang: Lang): Promise<Buffer> {
-  const L = recordLabels(lang);
+/** A new A4 document with the Arabic + Latin fonts embedded (shared by every PDF export). */
+export async function newPdf(): Promise<{ doc: PDFDocument; fonts: Fonts }> {
   const doc = await PDFDocument.create();
   doc.registerFontkit(fontkit);
   const embed = (name: string) => doc.embedFont(readFileSync(fontPath(name)), { subset: true });
@@ -182,6 +182,12 @@ export async function recordToPdf(record: EmployeeRecord, lang: Lang): Promise<B
     la: await embed("latin-400"),
     laBold: await embed("latin-700"),
   };
+  return { doc, fonts };
+}
+
+export async function recordToPdf(record: EmployeeRecord, lang: Lang): Promise<Buffer> {
+  const L = recordLabels(lang);
+  const { doc, fonts } = await newPdf();
   doc.setTitle(`${L.title} ${record.employee.file_number}`);
   doc.setCreator("Sanad");
 

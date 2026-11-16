@@ -17,4 +17,11 @@ describe("PDF text runs", () => {
       { text: "2026-11-09 17:16", arabic: false },
     ]);
   });
+
+  it("puts the shortening mark after an Arabic word in the Latin font (the Arabic font has no glyph for it)", () => {
+    expect(toRuns("بأمان في مكا…")).toEqual([
+      { text: "بأمان في مكا", arabic: true },
+      { text: "…", arabic: false },
+    ]);
+  });
 });

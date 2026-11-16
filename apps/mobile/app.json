@@ -14,7 +14,7 @@
       "infoPlist": {
         "NSFaceIDUsageDescription": "سند يستخدم بصمة الوجه للتأكد إنك صاحب الجهاز وقت التبصيم. Sanad uses Face ID to confirm it is you when you punch in or out.",
         "NSCameraUsageDescription": "سند يلتقط صورة للمراجعة وقت التبصيم. Sanad takes a review photo when you punch in or out.",
-        "NSLocationWhenInUseUsageDescription": "سند يقرأ موقعك وقت التبصيم فقط للتأكد إنك داخل موقع العمل. Sanad reads your location only when you punch, to check you are at your work site."
+        "NSLocationWhenInUseUsageDescription": "سند يقرأ موقعك وقت التبصيم فقط للتأكد إنك داخل موقع العمل، وأثناء حالة الطوارئ لإرشادك إلى المبنى الآمن. Sanad reads your location only when you punch, to check you are at your work site, and during an emergency, to guide you to the safe building."
       }
     },
     "android": {
@@ -72,7 +72,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "سند يقرأ موقعك وقت التبصيم فقط للتأكد إنك داخل موقع العمل. Sanad reads your location only when you punch, to check you are at your work site.",
+          "locationWhenInUsePermission": "سند يقرأ موقعك وقت التبصيم فقط للتأكد إنك داخل موقع العمل، وأثناء حالة الطوارئ لإرشادك إلى المبنى الآمن. Sanad reads your location only when you punch, to check you are at your work site, and during an emergency, to guide you to the safe building.",
           "isAndroidBackgroundLocationEnabled": false,
           "isIosBackgroundLocationEnabled": false
         }
