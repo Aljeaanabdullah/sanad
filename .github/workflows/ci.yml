@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, "phase-*"]
   workflow_dispatch:
 
 jobs:
@@ -26,21 +26,23 @@ jobs:
       - run: npm run build
 
   mobile:
-    name: Mobile app (Flutter)
+    name: Mobile app (Expo)
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: apps/mobile
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - uses: actions/setup-node@v4
         with:
-          channel: stable
-          flutter-version: 3.47.9
-          cache: true
-      - run: flutter pub get
-      - run: flutter analyze
-      - run: flutter test
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/mobile/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test -- --ci
+      # The JavaScript bundle must build for Android (catches missing imports / bad routes).
+      - run: npx expo export --platform android --output-dir /tmp/sanad-export
 
   # Sanad: the Android app file (APK) to install on a phone. Download it from the run's "Artifacts".
   android-apk:
@@ -52,22 +54,38 @@ jobs:
         working-directory: apps/mobile
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/mobile/package-lock.json
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          flutter-version: 3.47.9
-          cache: true
-      - run: flutter pub get
-      - run: flutter build apk --release
+      - uses: gradle/actions/setup-gradle@v4
+      - run: npm ci
+      # Native Android project from app.json (not kept in git), then a release APK.
+      # Signed with the debug key for testing on phones; a store build will use EAS / a real key.
+      - run: npx expo prebuild --platform android --no-install
+      - run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a,armeabi-v7a
+        working-directory: apps/mobile/android
       - uses: actions/upload-artifact@v4
         with:
           name: sanad-android-apk
-          path: apps/mobile/build/app/outputs/flutter-apk/app-release.apk
+          path: apps/mobile/android/app/build/outputs/apk/release/app-release.apk
           retention-days: 30
+
+  functions:
+    name: Edge functions (punch)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      # Runs the real punch function against an in-memory fake database (PRD 4.6 rules).
+      - run: node --import ./supabase/functions/punch/test/register.mjs --test supabase/functions/punch/test/punch.test.mjs
 
   secrets:
     name: No secrets in repo

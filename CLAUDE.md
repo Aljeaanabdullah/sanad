@@ -7,7 +7,7 @@ HR app for one company in Kuwait: punch in/out by face (with liveness) + GPS geo
 - Talk to the user in Arabic, in simple words. The UI is Arabic + English.
 
 ## Stack and folders
-- `apps/mobile` — Flutter (iOS + Android). Face: Google ML Kit (detection) + dlib ResNet face model (TFLite, public domain), on-device.
+- `apps/mobile` — Expo (React Native + TypeScript + Expo Router), iOS + Android (owner decision 2026-11-16, replaces Flutter). Punch verification: device Face ID / fingerprint (expo-local-authentication) + a review photo (PRD 4.6). The server still accepts the old face-descriptor path.
 - `apps/admin` — Next.js web panel. Face enrollment uses the same dlib ResNet weights in the browser (face-api.js). Consent is given in the mobile app only.
 - `supabase/` — Supabase project `jahez` (ref `etaetoflotynlmgrehuu`, eu-central-1): Postgres, RLS, Auth, Storage, Edge Functions, cron.
 - `docs/` — PRD and plan. Push notifications: FCM.
@@ -22,7 +22,7 @@ HR app for one company in Kuwait: punch in/out by face (with liveness) + GPS geo
 
 ## Rules from the plan
 - Employee ID is the file number (رقم الملف الوظيفي). Use dummy data only until the user says otherwise: 3,500 random employees numbered 710000–713499; system admin is 735043. The admin assigns HR roles and types every initial password (same rules; changed on first login).
-- Validate every punch on the server: server time, geofence of a site enabled for that employee, bound device, face match + liveness. Reject VPN, mock location, root/jailbreak. Punching needs internet.
+- Validate every punch on the server: server time, geofence of a site enabled for that employee, bound device, device Face ID / fingerprint + review photo (PRD 4.6; the old face match + liveness path is still accepted). Reject VPN, mock location, root/jailbreak. Punching needs internet.
 - Read location only at punch time and during an active emergency. No background tracking.
 - Face data needs recorded consent first. Face embeddings are readable by no client role; enrollment photos (bucket `face-enrollment-photos`) are viewable by the admin only. Punch photos auto-delete after 3 months. Termination = export full record (Excel + PDF), then delete everything except the audit log (owner decision).
 - Every table has RLS for the 4 roles (employee, supervisor, HR, admin). No secrets in the repo; use `.env.example`.
