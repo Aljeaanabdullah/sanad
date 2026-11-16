@@ -80,9 +80,19 @@ const TOPICS: [string, string[]][] = [
   ["bonus", ["مكافا", "مكافئ", "بونص", "استحق", "مستحق", "bonus", "eligib", "reward"]],
 ];
 
-export function topicOf(question: string) {
+/** Same letter folding the topic matcher uses (no diacritics, one alef, ه for ة, ي for ى). */
+export function normalizeQuestion(question: string) {
+  return normalize(question);
+}
+
+/** Every topic the question touches (a question can touch more than one). */
+export function topicsIn(question: string): string[] {
   const q = normalize(question);
-  const hits = TOPICS.filter(([, words]) => words.some((w) => q.includes(w))).map(([k]) => k);
+  return TOPICS.filter(([, words]) => words.some((w) => q.includes(w))).map(([k]) => k);
+}
+
+export function topicOf(question: string) {
+  const hits = topicsIn(question);
   if (hits.length === 0) return "unknown";
   if (hits.includes("bonus") && !hits.includes("penalty")) return "bonus";
   return hits[0];
