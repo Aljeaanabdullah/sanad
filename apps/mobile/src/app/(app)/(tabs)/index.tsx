@@ -6,13 +6,14 @@ import { RefreshControl } from 'react-native';
 import type { Block } from '../../../components/home/block';
 import { EmergencyBanner } from '../../../components/emergency/EmergencyBanner';
 import { BonusSummary } from '../../../components/home/BonusSummary';
+import { NotifyCard } from '../../../components/home/NotifyCard';
 import { PunchCard } from '../../../components/home/PunchCard';
 import { QuickActions } from '../../../components/home/QuickActions';
 import { TodayPunches } from '../../../components/home/TodayPunches';
 import { Header, IconButton, Screen } from '../../../components/ui';
-import { currentShift, loadDashboard, myNotifications, todayPunches, type PunchEntry, type ShiftInfo } from '../../../lib/api';
+import { currentShift, loadDashboard, todayPunches, unreadNotificationCount, type PunchEntry, type ShiftInfo } from '../../../lib/api';
 import { longDate } from '../../../lib/dates';
-import { firstName, recentCount, type PunchKind } from '../../../lib/punch';
+import { firstName, type PunchKind } from '../../../lib/punch';
 import { useSession } from '../../../lib/session';
 import { useSettings } from '../../../lib/settings';
 import type { DashboardData } from '../../../sanad/dashboard';
@@ -40,7 +41,8 @@ export default function Home() {
   const loadPunches = useCallback(() => loadInto(todayPunches, setPunches), []);
   const loadDash = useCallback(() => loadInto(() => loadDashboard(), setDash), []);
   const loadNotices = useCallback(
-    () => myNotifications().then((items) => setNotices(recentCount(items)), () => {}),
+    // Unread notifications on the bell (they become read when the list is opened).
+    () => unreadNotificationCount().then(setNotices, () => {}),
     [],
   );
 
@@ -88,6 +90,7 @@ export default function Home() {
       </Header>
       <Screen refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={c.accent} colors={[c.accent]} />}>
         <EmergencyBanner />
+        <NotifyCard />
         <BonusSummary dash={dash} onOpen={() => router.push('/dashboard')} onRetry={loadDash} />
         <QuickActions />
         <TodayPunches punches={punches} onRetry={loadPunches} />

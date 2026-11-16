@@ -23,7 +23,7 @@ type Run = { text: string; arabic: boolean };
  */
 export function toRuns(text: string): Run[] {
   const runs: (Run & { closed?: boolean })[] = [];
-  const PUNCT = /^[:.,;!?()"'\-…]+$/;
+  const PUNCT = /^[:.,;!?()"'\-…*]+$/;
   const push = (piece: string, arabic: boolean, joinWithSpace: boolean, closed = false) => {
     const last = runs[runs.length - 1];
     if (last && !last.closed && !closed && last.arabic === arabic) last.text += joinWithSpace ? ` ${piece}` : piece;
@@ -36,25 +36,32 @@ export function toRuns(text: string): Run[] {
       continue;
     }
     word
-      .split(/([:.,;!?()"'\-…]+)/)
+      .split(/([:.,;!?()"'\-…*]+)/)
       .filter(Boolean)
       .forEach((piece, i) => (PUNCT.test(piece) ? push(piece, false, false, true) : push(piece, true, i === 0)));
   }
   return runs.map(({ text, arabic }) => ({ text, arabic }));
 }
 
+type Color = [number, number, number];
+
 export class Writer {
   page!: PDFPage;
   y = 0;
-  readonly width = 595.28; // A4
-  readonly height = 841.89;
+  readonly width: number; // A4, portrait or landscape
+  readonly height: number;
   readonly margin = 40;
+  private readonly accent: Color;
 
   constructor(
     private doc: PDFDocument,
     private fonts: Fonts,
     private rtl: boolean,
+    opts: { landscape?: boolean; accent?: Color } = {},
   ) {
+    this.width = opts.landscape ? 841.89 : 595.28;
+    this.height = opts.landscape ? 595.28 : 841.89;
+    this.accent = opts.accent ?? [0.08, 0.4, 0.75];
     this.newPage();
   }
 
@@ -71,10 +78,23 @@ export class Writer {
     return run.arabic ? (bold ? this.fonts.arBold : this.fonts.ar) : bold ? this.fonts.laBold : this.fonts.la;
   }
 
+  // Measuring Arabic runs means shaping them (slow), and long reports repeat the same names,
+  // dates and labels many times: widths are remembered per font, size and text.
+  private widths = new Map<string, number>();
+  private runWidth(run: Run, size: number, bold: boolean) {
+    const key = `${run.arabic ? "a" : "l"}${bold ? "b" : ""}${size}|${run.text}`;
+    let w = this.widths.get(key);
+    if (w === undefined) {
+      w = this.font(run, bold).widthOfTextAtSize(run.text, size);
+      this.widths.set(key, w);
+    }
+    return w;
+  }
+
   textWidth(text: string, size: number, bold = false) {
     const runs = toRuns(text);
-    const gaps = Math.max(0, runs.length - 1) * this.fonts.la.widthOfTextAtSize(" ", size);
-    return runs.reduce((w, r) => w + this.font(r, bold).widthOfTextAtSize(r.text, size), 0) + gaps;
+    const gaps = Math.max(0, runs.length - 1) * this.runWidth({ text: " ", arabic: false }, size, false);
+    return runs.reduce((w, r) => w + this.runWidth(r, size, bold), 0) + gaps;
   }
 
   /** Shortens text with "…" so it fits in maxWidth. */
@@ -89,12 +109,12 @@ export class Writer {
   line(text: string, left: number, right: number, y: number, size: number, opts: { bold?: boolean; color?: [number, number, number] } = {}) {
     const bold = !!opts.bold;
     const color = rgb(...(opts.color ?? [0.04, 0.12, 0.23]));
-    const space = this.fonts.la.widthOfTextAtSize(" ", size);
+    const space = this.runWidth({ text: " ", arabic: false }, size, false);
     const runs = toRuns(this.fit(text, size, right - left, bold));
     let x = this.rtl ? right : left;
     for (const run of runs) {
       const font = this.font(run, bold);
-      const w = font.widthOfTextAtSize(run.text, size);
+      const w = this.runWidth(run, size, bold);
       const at = this.rtl ? x - w : x;
       this.page.drawText(run.text, { x: at, y, size, font, color });
       x = this.rtl ? at - space : at + w + space;
@@ -104,7 +124,7 @@ export class Writer {
   heading(text: string, size: number) {
     this.ensure(size + 12);
     this.y -= size;
-    this.line(text, this.margin, this.width - this.margin, this.y, size, { bold: true, color: [0.08, 0.4, 0.75] });
+    this.line(text, this.margin, this.width - this.margin, this.y, size, { bold: true, color: this.accent });
     this.y -= 10;
   }
 
@@ -133,7 +153,7 @@ export class Writer {
         y: this.y - rowH,
         width: this.width - 2 * this.margin,
         height: rowH,
-        color: rgb(0.08, 0.4, 0.75),
+        color: rgb(...this.accent),
       });
       columns.forEach((c, i) => {
         const [l, r] = cellBounds(i);
@@ -171,11 +191,23 @@ export class Writer {
   }
 }
 
-/** A new A4 document with the Arabic + Latin fonts embedded (shared by every PDF export). */
-export async function newPdf(): Promise<{ doc: PDFDocument; fonts: Fonts }> {
+/** A new PDF with the four IBM Plex Sans Arabic faces embedded (subset). */
+export async function newArabicPdf(): Promise<{ doc: PDFDocument; fonts: Fonts }> {
   const doc = await PDFDocument.create();
   doc.registerFontkit(fontkit);
-  const embed = (name: string) => doc.embedFont(readFileSync(fontPath(name)), { subset: true });
+  const embed = async (name: string) => {
+    const font = await doc.embedFont(readFileSync(fontPath(name)), { subset: true });
+    // drawText shapes the text again on every call; a report draws the same names and dates
+    // thousands of times, so the encoded text is remembered (the subset already holds its glyphs).
+    const encode = font.encodeText.bind(font);
+    const seen = new Map<string, ReturnType<typeof encode>>();
+    font.encodeText = (text: string) => {
+      let e = seen.get(text);
+      if (!e) seen.set(text, (e = encode(text)));
+      return e;
+    };
+    return font;
+  };
   const fonts: Fonts = {
     ar: await embed("arabic-400"),
     arBold: await embed("arabic-700"),
@@ -185,9 +217,12 @@ export async function newPdf(): Promise<{ doc: PDFDocument; fonts: Fonts }> {
   return { doc, fonts };
 }
 
+/** Same as newArabicPdf (name used by the emergency report). */
+export const newPdf = newArabicPdf;
+
 export async function recordToPdf(record: EmployeeRecord, lang: Lang): Promise<Buffer> {
   const L = recordLabels(lang);
-  const { doc, fonts } = await newPdf();
+  const { doc, fonts } = await newArabicPdf();
   doc.setTitle(`${L.title} ${record.employee.file_number}`);
   doc.setCreator("Sanad");
 

@@ -420,3 +420,12 @@ enabled = true
 # formatted with uppercase keywords, indent 2, max width 180, trailing commas,
 # and column/key alignment. Set to "null" to emit raw, unformatted SQL.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":180,\"commaStyle\":\"trailing\"}"
+
+# Sanad Phase 9: called by the database (pg_net, header x-push-secret checked against Vault), not by a user.
+[functions.send-push]
+verify_jwt = false
+
+# Phase 12: called only by pg_cron (job punch-photos-purge) with a Vault secret header, not with a user JWT.
+# Deploy: supabase functions deploy purge-punch-photos --no-verify-jwt
+[functions.purge-punch-photos]
+verify_jwt = false

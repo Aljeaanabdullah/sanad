@@ -57,9 +57,10 @@ jest.mock('../../../lib/api', () => {
     ...actual,
     loadDashboard: jest.fn(async () => mockDash),
     myNotifications: jest.fn(async () => [
-      { kind: 'late', at: new Date(Date.now() - 2 * 3600e3), data: { date: '2026-11-12', minutes: 14 } },
-      { kind: 'bonus_list', at: new Date(Date.now() - 3 * 86400e3), data: { month: '2026-10', eligibility: 'مستحق' } },
+      { id: 'n1', kind: 'late', at: new Date(Date.now() - 2 * 3600e3), data: { date: '2026-11-12', minutes: 14 }, readAt: null },
+      { id: 'n2', kind: 'bonus_list', at: new Date(Date.now() - 3 * 86400e3), data: { month: '2026-10', eligibility: 'مستحق' }, readAt: new Date() },
     ]),
+    markNotificationsRead: jest.fn(async () => 1),
     attendanceHistory: jest.fn(async () => [
       { day: '2026-11-02', kind: 'work', shiftStart: null, shiftEnd: null, arrival: 'late', departure: 'done', checkIn: new Date(), checkOut: null, lateMinutes: 12, earlyLeaveMinutes: 0, checkInCorrected: false, checkOutCorrected: false },
     ]),
@@ -158,6 +159,23 @@ it('assistant sends an unknown question to the AI and shows the automated-reply 
   expect(screen.queryByText('سند يكتب…')).toBeNull();
 });
 
+it('a typed what-if question with keywords goes to the AI, but the same topic from a button stays ready', async () => {
+  mockAsk.mockReset();
+  mockAsk.mockResolvedValue({ kind: 'answer', answer: 'الإجازة المعتمدة 3 أيام ما تتعدى 10 أيام، فما تأثر.', remaining: 18 });
+  const Assistant = require('../../../app/(app)/assistant').default;
+  await render(wrap(<Assistant />));
+  await settle();
+  await typeAndSend('اذا اخذت اجازه الاسبوع الياي ٣ ايام بأثر على مكافأتي؟');
+  await settle();
+  expect(mockAsk).toHaveBeenCalledWith('اذا اخذت اجازه الاسبوع الياي ٣ ايام بأثر على مكافأتي؟');
+  expect(screen.getByText('الإجازة المعتمدة 3 أيام ما تتعدى 10 أيام، فما تأثر.')).toBeTruthy();
+  mockAsk.mockClear();
+  await fireEvent.press(screen.getByText('ليش ما أخذت مكافأة؟'));
+  expect(mockAsk).not.toHaveBeenCalled();
+  await typeAndSend('كم يوم غبت؟');
+  expect(mockAsk).not.toHaveBeenCalled();
+});
+
 it('assistant shows the relay message when the AI refuses (daily limit)', async () => {
   mockAsk.mockReset();
   mockAsk.mockResolvedValue({ kind: 'error', key: 'limit', message: 'وصلت الحد اليومي للأسئلة. تقدر تسأل مرة ثانية باچر.' });
@@ -176,6 +194,9 @@ it('notifications list renders texts and relative times', async () => {
   await settle();
   expect(screen.getByText('Late arrival')).toBeTruthy();
   expect(screen.getByText('2 h ago')).toBeTruthy();
+  // One unread: marked "New", and opening the list marks everything read.
+  expect(screen.getAllByText('New')).toHaveLength(1);
+  expect(require('../../../lib/api').markNotificationsRead).toHaveBeenCalledWith(null);
 });
 
 it('reports calendar renders the month and day details', async () => {

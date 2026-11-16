@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import * as Auth from './auth';
 import { ensureDeviceKey } from './deviceKey';
+import { unregisterPush } from './push';
 import type { Profile } from './auth';
 import { supabase } from './supabase';
 
@@ -102,6 +103,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         setStep('ready');
       },
       signOut: async () => {
+        // This phone stops getting the account's notifications (needs the session, so before signing out).
+        await unregisterPush().catch(() => {});
         await Auth.signOut();
         setProfile(null);
         setStep('signed_out');

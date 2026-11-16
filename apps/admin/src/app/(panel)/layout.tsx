@@ -24,6 +24,9 @@ const routes: Partial<Record<NavKey, string>> = {
   faceEnrollment: "/face-enrollment",
   approvals: "/approvals",
   records: "/records",
+  liveBoard: "/live",
+  reports: "/reports",
+  auditLog: "/audit-log",
   emergencies: "/emergencies",
 };
 
