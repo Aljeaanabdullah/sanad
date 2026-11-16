@@ -9,7 +9,7 @@ import { DecisionForm } from "./decision-form";
 
 type InboxRow = {
   id: string;
-  request_type: "punch_correction" | "external_mission";
+  request_type: "punch_correction" | "external_mission" | "leave";
   status: "pending_supervisor" | "pending_hr";
   shift_date: string;
   corrected_punch_type: "check_in" | "check_out" | null;
@@ -24,6 +24,8 @@ type InboxRow = {
   department_en: string | null;
   site_ar: string | null;
   site_en: string | null;
+  leave_type: string | null;
+  leave_to: string | null;
 };
 
 // Requests the signed-in supervisor / HR / admin can decide now (Phase 8).
@@ -64,9 +66,27 @@ export default async function ApprovalsPage() {
               )}
             </p>
             <dl className="grid gap-x-4 gap-y-1 text-sm sm:grid-cols-[max-content_1fr]">
-              <dt className="text-muted">{t.shiftDay}</dt>
-              <dd>{day.format(new Date(`${r.shift_date}T00:00:00Z`))}</dd>
-              {r.request_type === "punch_correction" ? (
+              {r.request_type === "leave" ? (
+                <>
+                  <dt className="text-muted">{t.leaveType}</dt>
+                  <dd>{t.leaveTypes[r.leave_type ?? ""] ?? r.leave_type}</dd>
+                  <dt className="text-muted">{t.leaveDates}</dt>
+                  <dd>
+                    {day.format(new Date(`${r.shift_date}T00:00:00Z`))} – {day.format(new Date(`${r.leave_to}T00:00:00Z`))}
+                  </dd>
+                </>
+              ) : (
+                <>
+                  <dt className="text-muted">{t.shiftDay}</dt>
+                  <dd>{day.format(new Date(`${r.shift_date}T00:00:00Z`))}</dd>
+                </>
+              )}
+              {r.request_type === "leave" ? (
+                <>
+                  <dt className="text-muted">ⓘ</dt>
+                  <dd className="text-muted">{t.leaveNote}</dd>
+                </>
+              ) : r.request_type === "punch_correction" ? (
                 <>
                   <dt className="text-muted">{t.correctedTo}</dt>
                   <dd>

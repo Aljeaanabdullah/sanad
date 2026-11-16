@@ -41,6 +41,17 @@ class FakeRequests implements RequestsService {
   }
 
   @override
+  Future<String> submitLeave({required String leaveType, required DateTime from, required DateTime to, required String reason}) async {
+    final e = submitError;
+    if (e != null) {
+      submitError = null;
+      throw RequestError(e);
+    }
+    submitted.add({'type': 'leave', 'leave_type': leaveType, 'from': from, 'to': to, 'reason': reason});
+    return 'new-id';
+  }
+
+  @override
   Future<void> cancel(String requestId) async => cancelled.add(requestId);
 
   @override

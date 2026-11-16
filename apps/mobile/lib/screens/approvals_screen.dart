@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../l10n.dart';
 import '../requests/requests_service.dart';
+import '../sanad/dashboard_service.dart';
+import 'dashboard_screen.dart';
 import 'month_record_screen.dart';
 import 'requests_screens.dart';
 
@@ -105,11 +107,13 @@ class _ApprovalsScreenState extends State<ApprovalsScreen> {
 
 /// Supervisor / HR / admin: open any employee's monthly record by file number.
 class EmployeeLookupScreen extends StatefulWidget {
-  const EmployeeLookupScreen({super.key, required this.strings, required this.isArabic, required this.service, required this.withPhotos});
+  const EmployeeLookupScreen({super.key, required this.strings, required this.isArabic, required this.service, required this.withPhotos, this.dashboard});
   final Strings strings;
   final bool isArabic;
   final RequestsService service;
   final bool withPhotos;
+  /// Sanad (PRD 18): staff can open any employee's dashboard, view only.
+  final DashboardService? dashboard;
 
   @override
   State<EmployeeLookupScreen> createState() => _EmployeeLookupScreenState();
@@ -125,7 +129,7 @@ class _EmployeeLookupScreenState extends State<EmployeeLookupScreen> {
     super.dispose();
   }
 
-  Future<void> _find() async {
+  Future<void> _find({bool dashboard = false}) async {
     final s = widget.strings;
     final n = int.tryParse(_file.text.trim());
     final emp = n == null ? null : await widget.service.findEmployee(n).catchError((_) => null);
@@ -135,6 +139,18 @@ class _EmployeeLookupScreenState extends State<EmployeeLookupScreen> {
       return;
     }
     setState(() => _error = null);
+    if (dashboard && widget.dashboard != null) {
+      await Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => DashboardScreen(
+          strings: s,
+          isArabic: widget.isArabic,
+          service: widget.dashboard!,
+          employeeId: emp.id,
+          title: '${widget.isArabic ? emp.nameAr : emp.nameEn} · ${emp.fileNumber}',
+        ),
+      ));
+      return;
+    }
     await Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => MonthRecordScreen(
         strings: s,
@@ -168,6 +184,15 @@ class _EmployeeLookupScreenState extends State<EmployeeLookupScreen> {
           if (_error != null) Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
           const SizedBox(height: 12),
           FilledButton(key: const Key('lookupShow'), onPressed: _find, child: Text(s.get('show'))),
+          if (widget.dashboard != null) ...[
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              key: const Key('lookupDashboard'),
+              icon: const Icon(Icons.dashboard),
+              label: Text(s.get('dash_open_employee')),
+              onPressed: () => _find(dashboard: true),
+            ),
+          ],
         ],
       ),
     );

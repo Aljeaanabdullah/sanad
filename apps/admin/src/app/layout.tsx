@@ -10,7 +10,7 @@ const plexArabic = IBM_Plex_Sans_Arabic({
 });
 
 export const metadata: Metadata = {
-  title: "Jahez — لوحة التحكم",
+  title: "سَنَد — لوحة التحكم",
   description: "نظام تحضير الموظفين",
 };
 

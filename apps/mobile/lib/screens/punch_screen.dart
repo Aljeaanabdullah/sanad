@@ -6,6 +6,7 @@ import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 
 import '../face/face_capture.dart';
 import '../l10n.dart';
+import '../theme.dart';
 import '../punch/liveness.dart';
 import '../punch/phone_checks.dart';
 import '../punch/punch_service.dart';
@@ -251,9 +252,57 @@ class _PunchScreenState extends State<PunchScreen> {
     );
   }
 
+  /// Sanad (PRD 18.2): full navy success screen after an accepted punch.
+  Widget _successView(Strings s, PunchResult r) {
+    final at = r.punchedAt.toLocal();
+    final loc = MaterialLocalizations.of(context);
+    final site = widget.isArabic ? r.siteAr : r.siteEn;
+    return Container(
+      key: const Key('punchSuccess'),
+      decoration: BoxDecoration(color: SanadColors.navy, borderRadius: BorderRadius.circular(24)),
+      padding: const EdgeInsets.all(24),
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Center(
+          child: Stack(alignment: Alignment.bottomRight, children: [
+            Container(
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: const Color(0xFF26C6DA), width: 3)),
+              child: const Icon(Icons.fingerprint, size: 100, color: Color(0xFF4FC3F7)),
+            ),
+            const CircleAvatar(radius: 22, backgroundColor: SanadColors.ok, child: Icon(Icons.check, color: Colors.white, size: 28)),
+          ]),
+        ),
+        const SizedBox(height: 28),
+        Text(r.punchType == 'check_in' ? s.get('punch_in_success') : s.get('punch_out_success'),
+            key: const Key('punchResult'),
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 10),
+        Text(loc.formatFullDate(at), textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFFA9B6CC))),
+        Text(TimeOfDay.fromDateTime(at).format(context), textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 20)),
+        if (site != null) Text(site, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFFA9B6CC))),
+        const SizedBox(height: 32),
+        Center(
+          child: OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.white,
+              side: const BorderSide(color: Color(0xFF26C6DA)),
+              padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 14),
+              shape: const StadiumBorder(),
+            ),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(s.get('ok')),
+          ),
+        ),
+      ]),
+    );
+  }
+
   Widget _resultView(Strings s, ColorScheme colors) {
     final r = _result;
     final ok = r?.accepted == true;
+    if (ok) return _successView(s, r!);
     final code = r?.reason ?? _localProblem ?? 'generic';
     final time = r == null ? '' : TimeOfDay.fromDateTime(r.punchedAt.toLocal()).format(context);
     final site = r == null ? null : (widget.isArabic ? r.siteAr : r.siteEn);

@@ -7,7 +7,7 @@ import { detailRows, recordLabels, type EmployeeRecord } from "./employee-record
 export async function recordToXlsx(record: EmployeeRecord, lang: Lang): Promise<Buffer> {
   const L = recordLabels(lang);
   const wb = new ExcelJS.Workbook();
-  wb.creator = "Jahez";
+  wb.creator = "Sanad";
   const view = [{ rightToLeft: lang === "ar" }];
   const header = (ws: ExcelJS.Worksheet) => {
     const row = ws.getRow(1);

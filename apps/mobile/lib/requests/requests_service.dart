@@ -67,10 +67,12 @@ class RequestItem {
     this.fileNumber,
     this.departmentAr,
     this.departmentEn,
+    this.leaveType,
+    this.leaveTo,
   });
 
   final String id;
-  final String type; // punch_correction | external_mission
+  final String type; // punch_correction | external_mission | leave
   final String status; // pending_supervisor | pending_hr | approved | rejected | cancelled
   final DateTime shiftDate;
   final String reason;
@@ -85,6 +87,9 @@ class RequestItem {
   final int? fileNumber;
   final String? departmentAr;
   final String? departmentEn;
+  // Leave request (Sanad): the leave type and its last day; [shiftDate] is the first day.
+  final String? leaveType;
+  final DateTime? leaveTo;
 
   bool get isPending => status == 'pending_supervisor' || status == 'pending_hr';
 }
@@ -143,6 +148,9 @@ class RequestError implements Exception {
   String toString() => 'RequestError($code)';
 }
 
+/// Leave types an employee can request (stored in Arabic, as in the `leaves` table).
+const leaveTypes = ['إجازة دورية', 'إجازة مرضية', 'إجازة طارئة', 'إجازة بدون راتب'];
+
 /// "YYYY-MM-DD" of a calendar date.
 String ymd(DateTime d) =>
     '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
@@ -156,6 +164,8 @@ abstract class RequestsService {
   Future<List<RequestItem>> myRequests();
   Future<String> submitCorrection({required DateTime shiftDate, required String punchType, required DateTime time, required String reason});
   Future<String> submitMission({required DateTime date, required String siteId, required String reason});
+  /// Sanad: a leave request (same approval path). [leaveType] is one of [leaveTypes].
+  Future<String> submitLeave({required String leaveType, required DateTime from, required DateTime to, required String reason});
   Future<void> cancel(String requestId);
   Future<List<TimelineEntry>> timeline(String requestId);
   Future<List<SiteOption>> missionSites();
@@ -175,6 +185,7 @@ class SupabaseRequestsService implements RequestsService {
     'correction_too_old', 'time_in_future', 'no_shift_that_day', 'time_outside_shift', 'check_in_first',
     'duplicate_request', 'mission_date_out_of_range', 'site_not_found', 'site_already_enabled', 'reason_required',
     'cannot_cancel', 'not_allowed', 'note_too_long',
+    'leave_dates_invalid', 'leave_dates_out_of_range', 'leave_overlaps', 'leave_period_locked', 'invalid_request',
   ];
 
   Future<T> _call<T>(Future<T> Function() f) async {
@@ -209,6 +220,8 @@ class SupabaseRequestsService implements RequestsService {
       fileNumber: r['file_number'] as int?,
       departmentAr: r['department_ar'] as String?,
       departmentEn: r['department_en'] as String?,
+      leaveType: r['leave_type'] as String?,
+      leaveTo: r['leave_to'] == null ? null : DateTime.parse(r['leave_to'] as String),
     );
   }
 
@@ -219,7 +232,7 @@ class SupabaseRequestsService implements RequestsService {
         final me = await _client.from('employees').select('id').eq('user_id', user.id).single();
         final rows = await _client
             .from('requests')
-            .select('id, request_type, status, shift_date, corrected_punch_type, corrected_time, reason, created_at, sites(name_ar, name_en)')
+            .select('id, request_type, status, shift_date, corrected_punch_type, corrected_time, reason, created_at, leave_type, leave_to, sites(name_ar, name_en)')
             .eq('employee_id', me['id'] as String)
             .order('created_at', ascending: false)
             .limit(100);
@@ -243,6 +256,15 @@ class SupabaseRequestsService implements RequestsService {
             'p_shift_date': ymd(date),
             'p_reason': reason,
             'p_site': siteId,
+          }) as String);
+
+  @override
+  Future<String> submitLeave({required String leaveType, required DateTime from, required DateTime to, required String reason}) =>
+      _call(() async => await _client.rpc('submit_leave_request', params: {
+            'p_leave_type': leaveType,
+            'p_from': ymd(from),
+            'p_to': ymd(to),
+            'p_reason': reason,
           }) as String);
 
   @override

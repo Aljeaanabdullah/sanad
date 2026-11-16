@@ -4,6 +4,7 @@ on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   admin:
@@ -40,6 +41,33 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
+
+  # Sanad: the Android app file (APK) to install on a phone. Download it from the run's "Artifacts".
+  android-apk:
+    name: Android APK
+    needs: mobile
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.9
+          cache: true
+      - run: flutter pub get
+      - run: flutter build apk --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sanad-android-apk
+          path: apps/mobile/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
 
   secrets:
     name: No secrets in repo
