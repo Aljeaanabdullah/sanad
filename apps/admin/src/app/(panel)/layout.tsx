@@ -24,6 +24,7 @@ const routes: Partial<Record<NavKey, string>> = {
   faceEnrollment: "/face-enrollment",
   approvals: "/approvals",
   records: "/records",
+  auditLog: "/audit-log",
 };
 
 const itemClass = "flex items-center justify-between gap-2 rounded-lg px-3 py-2";
