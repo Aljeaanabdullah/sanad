@@ -22,7 +22,7 @@ HR app for one company in Kuwait: punch in/out by face (with liveness) + GPS geo
 
 ## Rules from the plan
 - Employee ID is the file number (رقم الملف الوظيفي). Use dummy data only until the user says otherwise: 3,500 random employees numbered 710000–713499; system admin is 735043. The admin assigns HR roles and types every initial password (same rules; changed on first login).
-- Validate every punch on the server: server time, geofence of a site enabled for that employee, bound device, device Face ID / fingerprint + review photo (PRD 4.6; the old face match + liveness path is still accepted). Reject VPN, mock location, root/jailbreak. Punching needs internet.
+- Validate every punch on the server: server time, geofence of a site enabled for that employee, bound device, device Face ID / fingerprint + review photo (PRD 4.6; the old face match + liveness path is still accepted). Reject mock location and root/jailbreak; VPN is recorded only (PRD 1.11). Device-biometric punches are signed by a biometric-bound key on the bound phone (PRD 4.7). Punching needs internet.
 - Read location only at punch time and during an active emergency. No background tracking.
 - Face data needs recorded consent first. Face embeddings are readable by no client role; enrollment photos (bucket `face-enrollment-photos`) are viewable by the admin only. Punch photos auto-delete after 3 months. Termination = export full record (Excel + PDF), then delete everything except the audit log (owner decision).
 - Every table has RLS for the 4 roles (employee, supervisor, HR, admin). No secrets in the repo; use `.env.example`.

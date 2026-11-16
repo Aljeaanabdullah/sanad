@@ -1,11 +1,15 @@
-// A tiny in-memory stand-in for the service-role Supabase client used by the punch function.
+// A tiny in-memory stand-in for the service-role Supabase client used by the punch and device-key functions.
 export const state = { reset() {} };
 
 export function setup(s) {
   Object.assign(state, {
     user: { id: 'u1' },
     employee: { id: 'e1', is_active: true },
-    device: { id: 'd1', device_identifier: 'dev-1' },
+    device: { id: 'd1', device_identifier: 'dev-1', platform: 'android', public_key: null, key_attested: false },
+    settings: { require_device_signature: false, allow_face_descriptor: true, allow_unattested_ios: true },
+    // nonce -> { purpose, expired, used }
+    challenges: {},
+    updates: [],
     consents: 1,
     recent: [],
     slot: { punch_type: 'check_in', shift_date: '2026-11-16', shift_start: '2026-11-16T05:00:00Z', reason: null },
@@ -30,12 +34,22 @@ function query(table) {
     maybeSingle() {
       if (table === 'employees') return Promise.resolve({ data: state.employee });
       if (table === 'devices') return Promise.resolve({ data: state.device });
+      if (table === 'punch_security_settings') return Promise.resolve({ data: state.settings });
       if (table === 'attendance_days') return Promise.resolve({ data: { arrival: 'on_time', late_minutes: 0 } });
       return Promise.resolve({ data: null });
     },
     then(res) {
       if (table === 'consents' && q._head) return Promise.resolve({ count: state.consents }).then(res);
       return Promise.resolve({ data: [] }).then(res);
+    },
+    update(row) {
+      const u = { eq: () => u, is: () => u, select: () => {
+        if (table !== 'devices' || !state.device || state.device.public_key) return Promise.resolve({ data: [] });
+        state.updates.push(row);
+        Object.assign(state.device, row);
+        return Promise.resolve({ data: [{ id: state.device.id }] });
+      } };
+      return u;
     },
     insert(row) {
       state.inserted.push(row);
@@ -54,6 +68,12 @@ export function createClient() {
       if (name === 'punch_slot') return { data: [state.slot] };
       if (name === 'sites_near') return { data: state.near };
       if (name === 'face_distance') return { data: state.faceDistance };
+      if (name === 'consume_device_challenge') {
+        const c = state.challenges[args.p_nonce];
+        if (!c || c.used || c.purpose !== args.p_purpose) return { data: 'unknown' };
+        c.used = true;
+        return { data: c.expired ? 'expired' : 'ok' };
+      }
       return { data: null };
     },
     storage: { from: () => ({ upload: async (path) => { state.uploads.push(path); return { error: null }; } }) },
