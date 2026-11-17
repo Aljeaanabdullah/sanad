@@ -67,7 +67,7 @@ const expectNothingSent = () => {
 };
 
 it('all checks pass: the photo step opens with no warning', async () => {
-  show();
+  await show();
   expect(await screen.findByText(t('punch_photo_hint'))).toBeTruthy();
   expect(screen.getByTestId('camera')).toBeTruthy();
   expect(screen.queryByText(t('punch_report_detected', { reason: t('punch_reason_mock_location') }))).toBeNull();
@@ -77,7 +77,7 @@ it('all checks pass: the photo step opens with no warning', async () => {
 
 it('no internet: stops first, before reading the location', async () => {
   Phone.network.mockResolvedValue({ online: false, vpn: false });
-  show();
+  await show();
   expect(await screen.findByText(t('punch_error_no_internet'))).toBeTruthy();
   expect(Phone.locationPermission).not.toHaveBeenCalled();
   expect(Phone.readLocation).not.toHaveBeenCalled();
@@ -87,9 +87,9 @@ it('no internet: stops first, before reading the location', async () => {
 
 it('"approximate" location is refused, with a Settings button', async () => {
   Phone.locationPermission.mockResolvedValue('approximate');
-  show();
+  await show();
   expect(await screen.findByText(t('punch_location_precise'))).toBeTruthy();
-  fireEvent.press(screen.getByText(t('punch_open_settings')));
+  await fireEvent.press(screen.getByText(t('punch_open_settings')));
   expect(Phone.openSettings).toHaveBeenCalled();
   expect(Phone.readLocation).not.toHaveBeenCalled();
   expectNothingSent();
@@ -97,16 +97,16 @@ it('"approximate" location is refused, with a Settings button', async () => {
 
 it('permission not given yet: "Allow" asks again and re-runs the checks', async () => {
   Phone.locationPermission.mockResolvedValueOnce('ask');
-  show();
+  await show();
   expect(await screen.findByText(t('punch_need_location'))).toBeTruthy();
-  fireEvent.press(screen.getByText(t('allow')));
+  await fireEvent.press(screen.getByText(t('allow')));
   expect(await screen.findByText(t('punch_photo_hint'))).toBeTruthy();
   expect(Phone.locationPermission).toHaveBeenCalledTimes(2);
 });
 
 it('permission blocked: sends the employee to Settings', async () => {
   Phone.locationPermission.mockResolvedValue('blocked');
-  show();
+  await show();
   expect(await screen.findByText(t('punch_location_blocked'))).toBeTruthy();
   expect(screen.getByText(t('punch_open_settings'))).toBeTruthy();
   expectNothingSent();
@@ -114,7 +114,7 @@ it('permission blocked: sends the employee to Settings', async () => {
 
 it('GPS off: asks to turn it on', async () => {
   Phone.locationServicesOn.mockResolvedValue(false);
-  show();
+  await show();
   expect(await screen.findByText(t('punch_location_off'))).toBeTruthy();
   expect(Phone.readLocation).not.toHaveBeenCalled();
   expectNothingSent();
@@ -122,29 +122,29 @@ it('GPS off: asks to turn it on', async () => {
 
 it('the location cannot be read (e.g. the 20-second limit): a clear message and Retry', async () => {
   Phone.readLocation.mockRejectedValueOnce(new Error('location_timeout'));
-  show();
+  await show();
   expect(await screen.findByText(t('punch_reason_no_location'))).toBeTruthy();
-  fireEvent.press(screen.getByText(t('punch_try_again')));
+  await fireEvent.press(screen.getByText(t('punch_try_again')));
   expect(await screen.findByText(t('punch_photo_hint'))).toBeTruthy();
   expect(Phone.readLocation).toHaveBeenCalledTimes(2);
 });
 
 it('mock location: a warning is shown, the flow goes on and the server decides (and records it)', async () => {
   Phone.readLocation.mockResolvedValue({ lat: 29.37, lng: 47.97, accuracy: 10, mocked: true });
-  show();
+  await show();
   expect(await screen.findByText(t('punch_report_detected', { reason: t('punch_reason_mock_location') }))).toBeTruthy();
   expect(screen.getByText(t('punch_photo_hint'))).toBeTruthy();
 });
 
 it('rooted phone: a warning is shown', async () => {
   Phone.rooted.mockResolvedValue(true);
-  show();
+  await show();
   expect(await screen.findByText(t('punch_report_detected', { reason: t('punch_reason_rooted') }))).toBeTruthy();
 });
 
 it('VPN alone: no warning (recorded only, PRD 1.11)', async () => {
   Phone.network.mockResolvedValue({ online: true, vpn: true });
-  show();
+  await show();
   await screen.findByText(t('punch_photo_hint'));
   await waitFor(() => expect(Phone.rooted).toHaveBeenCalled());
   expect(screen.queryByText(/لاحظنا مشكلة في الجوال/)).toBeNull();

@@ -1,0 +1,59 @@
+name: Local database tests
+
+# Tests that need a database run against a throw-away LOCAL Supabase inside the CI machine
+# (`supabase start`). They never touch the live project: no secrets are given to these jobs, and
+# supabase/tests/run-local.sh refuses any address that is not 127.0.0.1 / localhost.
+# (The phone app's unit tests run in ci.yml, job "Mobile app (Expo)".)
+
+on:
+  pull_request:
+  push:
+    branches: [main, "phase-*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rls:
+    name: Database permissions (pgTAP, 4 roles)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      # Applies every migration to a fresh local database, cuts off calls to the live project,
+      # then runs supabase/tests/database/*.test.sql.
+      - run: supabase/tests/run-local.sh
+
+  admin-smoke:
+    name: Web panel smoke tests (Playwright, local database)
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/admin/package-lock.json
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: npm ci
+        working-directory: apps/admin
+      - run: npx playwright install --with-deps chromium
+        working-directory: apps/admin
+      # Builds the panel with the LOCAL Supabase values, seeds a small test world, and clicks through
+      # sign-in, each role's menu, employees search, approvals, reports and emergencies.
+      - run: supabase/tests/run-local.sh --web
+        env:
+          SMOKE_BUILT: "1"
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: admin-smoke-traces
+          path: apps/admin/test-results-local
+          retention-days: 7

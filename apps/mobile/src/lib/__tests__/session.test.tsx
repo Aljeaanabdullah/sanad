@@ -58,10 +58,9 @@ beforeEach(() => {
 });
 
 describe('start-up', () => {
-  it('starts in loading, then signed_out when there is no saved session', async () => {
+  it('goes to signed_out when there is no saved session', async () => {
     Auth.currentProfile.mockResolvedValue(null);
-    const { result } = mount();
-    expect(result.current.step).toBe('loading');
+    const { result } = await mount();
     await waitFor(() => expect(result.current.step).toBe('signed_out'));
     expect(result.current.profile).toBeNull();
     expect(Auth.bindThisDevice).not.toHaveBeenCalled();
@@ -69,7 +68,7 @@ describe('start-up', () => {
 
   it('goes straight to ready for a saved session on the bound phone with consent', async () => {
     Auth.currentProfile.mockResolvedValue(profile());
-    const { result } = mount();
+    const { result } = await mount();
     await waitFor(() => expect(result.current.step).toBe('ready'));
     expect(result.current.profile?.fileNumber).toBe(710042);
     expect(Auth.hasConsent).toHaveBeenCalledWith('e1');
@@ -79,7 +78,7 @@ describe('start-up', () => {
 
   it('retries the profile after a network failure instead of signing out', async () => {
     Auth.currentProfile.mockRejectedValueOnce(new Error('no_internet')).mockResolvedValueOnce(profile());
-    const { result } = mount();
+    const { result } = await mount();
     await waitFor(() => expect(result.current.step).toBe('ready'), { timeout: 4000 });
     expect(Auth.currentProfile).toHaveBeenCalledTimes(2);
   });
@@ -87,7 +86,7 @@ describe('start-up', () => {
   it('a stalled profile request never keeps the splash up: 3 tries of 15 s, then signed_out', async () => {
     jest.useFakeTimers();
     Auth.currentProfile.mockImplementation(() => new Promise(() => {})); // never answers
-    const { result } = mount();
+    const { result } = await mount();
     expect(result.current.step).toBe('loading');
     // 15 s + 1.5 s pause + 15 s + 3 s pause + 15 s = 49.5 s.
     for (let i = 0; i < 12; i++) {
@@ -103,7 +102,7 @@ describe('start-up', () => {
 describe('after sign-in', () => {
   async function signedOut() {
     Auth.currentProfile.mockResolvedValue(null);
-    const r = mount();
+    const r = await mount();
     await waitFor(() => expect(r.result.current.step).toBe('signed_out'));
     return r;
   }
@@ -163,7 +162,7 @@ describe('after sign-in', () => {
 describe('signing out', () => {
   it('removes the push token first, then signs out', async () => {
     Auth.currentProfile.mockResolvedValue(profile());
-    const { result } = mount();
+    const { result } = await mount();
     await waitFor(() => expect(result.current.step).toBe('ready'));
     const order: string[] = [];
     unregisterPush.mockImplementation(async () => void order.push('push'));
@@ -176,7 +175,7 @@ describe('signing out', () => {
 
   it('signs out even when the push token cannot be removed', async () => {
     Auth.currentProfile.mockResolvedValue(profile());
-    const { result } = mount();
+    const { result } = await mount();
     await waitFor(() => expect(result.current.step).toBe('ready'));
     unregisterPush.mockRejectedValue(new Error('offline'));
     await act(() => result.current.signOut());
@@ -186,17 +185,17 @@ describe('signing out', () => {
 
   it('follows a sign-out that happened outside the app (revoked session)', async () => {
     Auth.currentProfile.mockResolvedValue(profile());
-    const { result } = mount();
+    const { result } = await mount();
     await waitFor(() => expect(result.current.step).toBe('ready'));
-    act(() => mockAuthListener?.('TOKEN_REFRESHED'));
+    await act(async () => mockAuthListener?.('TOKEN_REFRESHED'));
     expect(result.current.step).toBe('ready');
-    act(() => mockAuthListener?.('SIGNED_OUT'));
+    await act(async () => mockAuthListener?.('SIGNED_OUT'));
     expect(result.current.step).toBe('signed_out');
     expect(result.current.profile).toBeNull();
   });
 });
 
-it('useSession outside the provider is a programming error', () => {
+it('useSession outside the provider is a programming error', async () => {
   jest.spyOn(console, 'error').mockImplementation(() => {});
-  expect(() => renderHook(() => useSession())).toThrow('useSession outside SessionProvider');
+  await expect(renderHook(() => useSession())).rejects.toThrow('useSession outside SessionProvider');
 });
