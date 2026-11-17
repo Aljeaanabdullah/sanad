@@ -9,6 +9,8 @@ export const NOTIFICATION_KINDS = [
   'late', 'emergency_alert',
   // Phase S8 ideas box.
   'idea_status', 'idea_awaiting', 'idea_overdue',
+  // S9: the ideal employee of the month was announced (sent to every employee).
+  'ideal_employee',
 ] as const;
 
 import { emergencyRouteFor } from './emergencyNotification';
@@ -41,6 +43,8 @@ export function routeFor(kind: string, data: Record<string, unknown> | null | un
       const i = id(d.idea_id);
       return i ? `/ideas/${i}` : '/ideas';
     }
+    case 'ideal_employee':
+      return '/ideal-employee';
     case 'late':
       return '/reports';
     case 'leave_recorded':
