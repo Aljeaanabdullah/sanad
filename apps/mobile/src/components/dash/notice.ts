@@ -11,7 +11,7 @@ import type { IconName } from '../ui';
 
 export type NoticeView = {
   icon: IconName;
-  tone: 'ok' | 'danger' | 'accent' | 'primary' | 'muted';
+  tone: 'ok' | 'danger' | 'warn' | 'accent' | 'primary' | 'muted';
   title: string;
   body: string;
   /** Where tapping the notice goes (null = not tappable). */
@@ -45,7 +45,7 @@ export function noticeView(n: Notice, t: T): NoticeView {
     case 'late':
       return {
         icon: 'time-outline',
-        tone: 'accent',
+        tone: 'warn',
         title: t('notice_late'),
         body: `${day(d.date)} · ${t('notice_minutes', { n: Number(d.minutes ?? 0) })}`,
         href: '/reports',
@@ -100,12 +100,12 @@ export function noticeView(n: Notice, t: T): NoticeView {
 
 const LOOK: Record<string, { icon: IconName; tone: NoticeView['tone'] }> = {
   shift_reminder: { icon: 'alarm-outline', tone: 'primary' },
-  late_warning: { icon: 'time-outline', tone: 'accent' },
+  late_warning: { icon: 'time-outline', tone: 'warn' },
   checkout_reminder: { icon: 'log-out-outline', tone: 'primary' },
   missing_checkout: { icon: 'alert-circle-outline', tone: 'danger' },
-  sup_not_in: { icon: 'people-outline', tone: 'accent' },
+  sup_not_in: { icon: 'people-outline', tone: 'warn' },
   sup_absent: { icon: 'person-remove-outline', tone: 'danger' },
-  sup_missing_checkout: { icon: 'exit-outline', tone: 'accent' },
+  sup_missing_checkout: { icon: 'exit-outline', tone: 'warn' },
   sup_failed_verification: { icon: 'shield-outline', tone: 'danger' },
   request_to_approve: { icon: 'document-text-outline', tone: 'primary' },
   emergency_alert: { icon: 'warning-outline', tone: 'danger' },

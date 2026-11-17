@@ -10,7 +10,7 @@ import type { Role } from '../../../lib/auth';
 import { useSession } from '../../../lib/session';
 import { useSettings, type ThemeMode } from '../../../lib/settings';
 import type { Lang } from '../../../lib/i18n';
-import { fonts, space } from '../../../lib/theme';
+import { brand, fonts, space } from '../../../lib/theme';
 
 const ROLE_KEY: Record<Role, string> = {
   employee: 'more_role_employee',
@@ -72,11 +72,11 @@ export default function MoreScreen() {
       <Screen>
         <Card testID="profile-card">
           <Row gap={space.md}>
-            <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: '#0B1A33', alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: brand.rail, alignItems: 'center', justifyContent: 'center' }}>
               {initials ? (
-                <Txt variant="heading" center style={{ color: '#E6C878', fontFamily: fonts.bold }}>{initials}</Txt>
+                <Txt variant="heading" center style={{ color: brand.railDot, fontFamily: fonts.bold }}>{initials}</Txt>
               ) : (
-                <Icon name="person" color="#E6C878" />
+                <Icon name="person" color={brand.railDot} />
               )}
             </View>
             <View style={{ flex: 1, gap: 2 }}>

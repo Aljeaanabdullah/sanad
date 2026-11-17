@@ -34,7 +34,7 @@ import {
 } from '../../lib/punch';
 import * as Phone from '../../lib/punchDevice';
 import { useSettings } from '../../lib/settings';
-import { radius, space } from '../../lib/theme';
+import { brand, radius, space } from '../../lib/theme';
 
 type Action = 'retry' | 'request' | 'settings';
 type Problem = { step: StepId; key: string; vars?: Record<string, string | number>; note?: string; actions: Action[] };
@@ -281,7 +281,7 @@ export default function PunchScreen() {
       <Button label={t('punch_open_settings')} icon="settings-outline" onPress={Phone.openSettings} />
     )
   ) : step === 'photo' && camPerm?.granted ? (
-    <Button label={t('punch_take_photo')} kind="gold" size="lg" icon="camera" disabled={!cameraReady} loading={capturing} onPress={capture} testID="punch-shutter" />
+    <Button label={t('punch_take_photo')} kind="hero" size="lg" icon="camera" disabled={!cameraReady} loading={capturing} onPress={capture} testID="punch-shutter" />
   ) : undefined;
 
   return (
@@ -299,7 +299,7 @@ export default function PunchScreen() {
         {step === 'photo' && !problem ? (
           camPerm?.granted ? (
             <View style={{ gap: space.sm }}>
-              <View style={{ width: '100%', aspectRatio: 1, borderRadius: radius.lg, overflow: 'hidden', backgroundColor: '#0B1A33' }}>
+              <View style={{ width: '100%', aspectRatio: 1, borderRadius: radius.lg, overflow: 'hidden', backgroundColor: brand.rail }}>
                 <CameraView
                   ref={camera}
                   style={{ flex: 1 }}
@@ -309,11 +309,11 @@ export default function PunchScreen() {
                   onMountError={() => fail({ step: 'photo', key: 'camera_error', actions: ['retry', 'settings'] })}
                 />
                 <View pointerEvents="none" style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, alignItems: 'center', justifyContent: 'center' }}>
-                  <View style={{ width: '62%', height: '82%', borderRadius: 999, borderWidth: 3, borderColor: '#C9A24B' }} />
+                  <View style={{ width: '62%', height: '82%', borderRadius: 999, borderWidth: 3, borderColor: brand.railDot }} />
                 </View>
                 {!cameraReady ? (
                   <View pointerEvents="none" style={{ position: 'absolute', bottom: space.md, left: 0, right: 0 }}>
-                    <Txt variant="label" center style={{ color: '#F6F1E6' }}>{t('punch_camera_starting')}</Txt>
+                    <Txt variant="label" center style={{ color: brand.onRail }}>{t('punch_camera_starting')}</Txt>
                   </View>
                 ) : null}
               </View>
