@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getPrefs } from "@/lib/prefs";
 import { dashT } from "@/lib/i18n-dash";
 import { bonusOf, MONTH_RE, shiftMonth, type DashboardData } from "@/lib/sanad-dashboard";
-import { Alert, Badge, Card, Table, Icon, Empty } from "@/components/ui";
+import { Alert, Badge, Card, Table, Icon } from "@/components/ui";
 import { AskBox } from "./ask-box";
 
 // Sanad phase S1 (PRD 18): any employee's dashboard, exactly as they see it on the phone. View only.
@@ -49,11 +49,12 @@ export default async function EmployeeDashboardPage({ params, searchParams }: Pa
   const statusClass = b.eligible == null ? "text-muted" : b.eligible ? "text-ok" : "text-danger";
   const navClass = "inline-flex min-h-11 items-center rounded-full border border-line-strong bg-surface px-3 py-1 text-sm whitespace-nowrap hover:border-primary hover:bg-primary-soft sm:min-h-9";
   const a = d.attendance;
-  const tiles: [string, number, boolean][] = [
-    [t.present, a.present, false],
-    [t.absent, a.absent, a.absent_unexcused > 0],
-    [t.late, a.late_dates.length, a.late_dates.length >= 2],
-    [t.leaveDays, d.leave_days, d.leave_days > 10],
+  // Same tile and the same hues as the live board.
+  const tiles: [string, number, boolean, string][] = [
+    [t.present, a.present, false, "[--disc:var(--disc-on-time)]"],
+    [t.absent, a.absent, a.absent_unexcused > 0, "[--disc:var(--disc-absent)]"],
+    [t.late, a.late_dates.length, a.late_dates.length >= 2, "[--disc:var(--disc-late)]"],
+    [t.leaveDays, d.leave_days, d.leave_days > 10, "[--disc:var(--disc-leave)]"],
   ];
 
   return (
@@ -95,9 +96,12 @@ export default async function EmployeeDashboardPage({ params, searchParams }: Pa
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {tiles.map(([label, value, bad]) => (
+        {tiles.map(([label, value, bad, disc]) => (
           <div key={label} className="flex flex-col gap-0.5 rounded-2xl border border-line bg-surface p-3 shadow-card sm:p-4">
-            <div className="text-sm text-muted">{label}</div>
+            <div className="flex items-center gap-2 text-sm text-muted">
+              <i className={`disc ${disc}`} aria-hidden />
+              {label}
+            </div>
             <div className={`text-[1.75rem] leading-9 font-semibold tabular-nums ${bad ? "text-danger" : ""}`}>{value}</div>
           </div>
         ))}
@@ -131,7 +135,7 @@ export default async function EmployeeDashboardPage({ params, searchParams }: Pa
       <Card>
         <h2 className="mb-3 font-bold">{t.leaves}</h2>
         {d.leaves.length === 0 ? (
-          <Empty>{t.none}</Empty>
+          <p className="text-sm text-muted">{t.none}</p>
         ) : (
           <Table>
             <thead>
@@ -162,7 +166,7 @@ export default async function EmployeeDashboardPage({ params, searchParams }: Pa
       <Card>
         <h2 className="mb-3 font-bold">{t.penalties}</h2>
         {d.penalties.length === 0 ? (
-          <Empty>{t.none}</Empty>
+          <p className="text-sm text-muted">{t.none}</p>
         ) : (
           <Table>
             <thead>

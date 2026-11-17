@@ -6,7 +6,7 @@ import { getPrefs } from "@/lib/prefs";
 import { reqT } from "@/lib/i18n-req";
 import { dashT } from "@/lib/i18n-dash";
 import { AttendanceHistory } from "@/components/attendance-history";
-import { Badge, Card, Table, Icon, Empty } from "@/components/ui";
+import { Badge, Card, Table, Icon } from "@/components/ui";
 
 const MONTH = /^(\d{4})-(\d{2})$/;
 type Named = { name_ar: string; name_en: string } | null;
@@ -96,7 +96,7 @@ export default async function RecordPage({ params, searchParams }: PageProps<"/r
         <Link
           href={`/records/${id}/dashboard`}
           data-testid="open-dashboard"
-          className="ms-auto inline-flex min-h-9 items-center rounded-full bg-primary px-4 py-1 text-sm font-medium text-on-primary hover:bg-primary-hover"
+          className="ms-auto inline-flex min-h-11 items-center rounded-full bg-primary px-4 py-1 sm:min-h-9 text-sm font-medium text-on-primary hover:bg-primary-hover"
         >
           {dashT(lang).open}
         </Link>
@@ -126,7 +126,7 @@ export default async function RecordPage({ params, searchParams }: PageProps<"/r
         <h2 className="mb-1 font-bold">{t.punchesTitle}</h2>
         {!canSeePhotos && <p className="mb-3 text-sm text-muted">{t.photosHidden}</p>}
         {(punches ?? []).length === 0 ? (
-          <Empty>{t.punchesNone}</Empty>
+          <p className="text-sm text-muted">{t.punchesNone}</p>
         ) : (
           <Table>
             <thead>
@@ -184,7 +184,7 @@ export default async function RecordPage({ params, searchParams }: PageProps<"/r
       <Card>
         <h2 className="mb-3 font-bold">{t.requestsTitle}</h2>
         {(requests ?? []).length === 0 ? (
-          <Empty>{t.requestsNone}</Empty>
+          <p className="text-sm text-muted">{t.requestsNone}</p>
         ) : (
           <Table>
             <thead>

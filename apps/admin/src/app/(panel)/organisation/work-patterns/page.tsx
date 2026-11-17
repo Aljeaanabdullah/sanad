@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getPrefs } from "@/lib/prefs";
 import { orgT } from "@/lib/i18n-org";
 import { intervalToMinutes, isRotation } from "@/lib/validation";
-import { buttonClass, Table } from "@/components/ui";
+import { buttonClass, Table, Icon } from "@/components/ui";
 
 type Row = {
   id: string;
@@ -47,7 +47,7 @@ export default async function WorkPatternsPage() {
     <div className="flex flex-col gap-4">
       <div>
         <Link href="/organisation/work-patterns/new" className={buttonClass.primary}>
-          + {o.newPattern}
+          <Icon name="plus" /> {o.newPattern}
         </Link>
       </div>
       <Table>

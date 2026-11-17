@@ -81,7 +81,7 @@ export async function AttendanceHistory({
           <tr>
             <th>{t.day}</th>
             <th>{t.status}</th>
-            <th>{t.shift}</th>
+            <th className="max-sm:hidden">{t.shift}</th>
             <th>{t.checkIn}</th>
             <th>{t.checkOut}</th>
           </tr>
@@ -110,7 +110,7 @@ export async function AttendanceHistory({
                     </span>
                   ))}
                 </td>
-                <td className="whitespace-nowrap">
+                <td className="whitespace-nowrap max-sm:hidden">
                   {r.shift_start ? (
                     <span dir="ltr">
                       {time(r.shift_start)} – {time(r.shift_end)}

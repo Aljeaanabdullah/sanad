@@ -37,7 +37,7 @@ export async function EnrolledFaces({ lang, page }: { lang: Lang; page: number }
     : { data: [] };
   const urlFor = new Map((signed ?? []).map((s) => [s.path, s.signedUrl]));
   const name = (n: { full_name_ar: string; full_name_en: string } | null) => (n ? (lang === "ar" ? n.full_name_ar : n.full_name_en) : "—");
-  const date = new Intl.DateTimeFormat(lang === "ar" ? "ar-KW-u-nu-latn" : "en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kuwait" });
+  const date = new Intl.DateTimeFormat(lang === "ar" ? "ar-KW-u-nu-latn" : "en-GB", { dateStyle: "medium", timeStyle: "short", hourCycle: "h23", timeZone: "Asia/Kuwait" });
   const pages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
 
   return (

@@ -172,7 +172,7 @@ export default async function EmployeesPage({ searchParams }: PageProps<"/employ
                 )}
               </td>
               <td className="text-end">
-                <Link href={`/employees/${r.id}`} className="font-medium text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary">
+                <Link href={`/employees/${r.id}`} className="text-muted hover:text-primary">
                   {e.open}
                 </Link>
               </td>

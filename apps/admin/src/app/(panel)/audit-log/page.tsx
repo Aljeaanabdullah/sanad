@@ -21,7 +21,7 @@ import {
   type AuditEntry,
 } from "@/lib/audit-log";
 import { loadPeople, queryAuditLog, type Person } from "@/lib/audit-log-query";
-import { Alert, Card, Field, Input, Select, Table, buttonClass, Empty, Badge } from "@/components/ui";
+import { Alert, Card, Field, Input, Select, Table, buttonClass, Empty, Badge, Icon } from "@/components/ui";
 
 const actionTone: Record<string, "ok" | "info" | "danger"> = { insert: "ok", update: "info", delete: "danger" };
 
@@ -211,7 +211,10 @@ export default async function AuditLogPage({ searchParams }: PageProps<"/audit-l
                   <td>{record(e)}</td>
                   <td className="min-w-64 whitespace-normal!">
                     <details className="group">
-                      <summary className="cursor-pointer marker:text-muted hover:text-primary">{summarize(t, e)}</summary>
+                      <summary className="flex cursor-pointer list-none items-start gap-1.5 hover:text-primary [&::-webkit-details-marker]:hidden">
+                        <Icon name="next" className="mt-1 text-muted ltr:group-open:rotate-90 rtl:group-open:-rotate-90" />
+                        <span>{summarize(t, e)}</span>
+                      </summary>
                       {diff.length === 0 ? (
                         <p className="mt-2 text-xs text-muted">{t.noChanges}</p>
                       ) : (
@@ -223,9 +226,7 @@ export default async function AuditLogPage({ searchParams }: PageProps<"/audit-l
                                 {e.action === "update" ? (
                                   <>
                                     <del className="text-danger decoration-danger/60">{formatValue(t, d.before)}</del>{" "}
-                                    <span aria-hidden className="inline-block text-muted rtl:rotate-180">
-                                      →
-                                    </span>
+                                    <Icon name="next" className="text-muted" />
                                     <span className="sr-only">{t.after}</span>{" "}
                                     <ins className="font-medium text-ok no-underline">{formatValue(t, d.after)}</ins>
                                   </>

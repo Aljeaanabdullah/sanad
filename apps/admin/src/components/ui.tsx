@@ -108,7 +108,7 @@ export function Badge({ tone, children }: { tone: keyof typeof badgeTone; childr
 export function Table({ children }: { children: ReactNode }) {
   return (
     <div className="table-scroll relative overflow-x-auto rounded-xl border border-line shadow-card in-[.card]:-mx-4 in-[.card]:rounded-none in-[.card]:border-x-0 in-[.card]:shadow-none in-[.card]:last:-mb-4 in-[.card]:last:border-b-0 sm:in-[.card]:-mx-5 sm:in-[.card]:last:-mb-5">
-      <table className="w-full text-sm [&_td]:px-4 [&_td]:py-2.5 max-sm:[&_td]:whitespace-nowrap [&_th]:px-4 [&_th]:py-2.5 [&_th]:text-start [&_th]:text-[0.8125rem] [&_th]:font-medium [&_th]:whitespace-nowrap [&_th]:text-muted [&_thead]:bg-primary/4 [&_tr]:border-b [&_tr]:border-line [&_tbody_tr]:hover:bg-primary/4 [&_tbody_tr:last-child]:border-0">
+      <table className="w-full text-sm [&_td]:px-4 [&_td]:py-2.5 max-sm:[&_td]:px-3 max-sm:[&_td]:whitespace-nowrap max-sm:[&_th]:px-3 [&_th]:px-4 [&_th]:py-2.5 [&_th]:text-start [&_th]:text-[0.8125rem] [&_th]:font-medium [&_th]:whitespace-nowrap [&_th]:text-muted [&_thead]:bg-primary/4 [&_tr]:border-b [&_tr]:border-line [&_tbody_tr]:hover:bg-primary/4 [&_tbody_tr:last-child]:border-0">
         {children}
       </table>
     </div>

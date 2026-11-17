@@ -2,7 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getPrefs } from "@/lib/prefs";
 import { orgT } from "@/lib/i18n-org";
-import { Badge, buttonClass, Table } from "@/components/ui";
+import { Badge, buttonClass, Table, Icon } from "@/components/ui";
 
 type Row = {
   id: string;
@@ -29,7 +29,7 @@ export default async function SitesPage() {
     <div className="flex flex-col gap-4">
       <div>
         <Link href="/organisation/sites/new" className={buttonClass.primary}>
-          + {o.newSite}
+          <Icon name="plus" /> {o.newSite}
         </Link>
       </div>
       <Table>
