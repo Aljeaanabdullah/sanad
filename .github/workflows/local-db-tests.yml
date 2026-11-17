@@ -21,9 +21,11 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+      # A fixed CLI version: "latest" asks the GitHub API first, which hits its rate limit on shared runners
+      # and fails the job before any test runs. 3.2.0 is the version the tests were written and run with.
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 3.2.0
       # Applies every migration to a fresh local database, cuts off calls to the live project,
       # then runs supabase/tests/database/*.test.sql.
       - run: supabase/tests/run-local.sh
@@ -39,9 +41,11 @@ jobs:
           node-version: 24
           cache: npm
           cache-dependency-path: apps/admin/package-lock.json
+      # A fixed CLI version: "latest" asks the GitHub API first, which hits its rate limit on shared runners
+      # and fails the job before any test runs. 3.2.0 is the version the tests were written and run with.
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 3.2.0
       - run: npm ci
         working-directory: apps/admin
       - run: npx playwright install --with-deps chromium
