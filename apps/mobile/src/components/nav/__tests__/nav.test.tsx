@@ -68,7 +68,33 @@ it('section roots show the menu button and the Sanad button', async () => {
   const sanad = screen.getByTestId('sanad-button');
   expect(sanad.props.accessibilityLabel).toBe('اسأل سَنَد');
   await fireEvent.press(sanad);
+  // The ring folds into the handshake first; the assistant opens within 400 ms.
+  expect(mockRouter.push).not.toHaveBeenCalled();
+  await act(async () => {
+    await new Promise((r) => setTimeout(r, 400));
+  });
   expect(mockRouter.push).toHaveBeenCalledWith('/assistant');
+  expect(mockRouter.push).toHaveBeenCalledTimes(1);
+});
+
+it('with reduce motion the Sanad button opens the assistant at once', async () => {
+  const { AccessibilityInfo } = require('react-native');
+  const original = AccessibilityInfo.isReduceMotionEnabled;
+  AccessibilityInfo.isReduceMotionEnabled = jest.fn(async () => true);
+  await render(wrap(<Section />));
+  await settle();
+  await fireEvent.press(screen.getByTestId('sanad-button'));
+  await act(async () => {
+    await new Promise((r) => setTimeout(r, 0));
+  });
+  expect(mockRouter.push).toHaveBeenCalledWith('/assistant');
+  AccessibilityInfo.isReduceMotionEnabled = original;
+});
+
+it('the Sanad mark thinks in the chat while a reply is on its way', async () => {
+  const { ChatBubble } = require('../../dash/Chat');
+  await render(wrap(<ChatBubble mine={false} text="..." thinking />));
+  expect(screen.getByTestId('sanad-thinking', { includeHiddenElements: true })).toBeTruthy();
 });
 
 it('pushed screens keep Back and hide the Sanad button', async () => {
@@ -84,9 +110,11 @@ it('the menu lists every section and opens the ideas box and the ideal employee'
   await fireEvent.press(screen.getByTestId('menu-button'));
   await settle();
   expect(screen.getByTestId('side-menu')).toBeTruthy();
-  for (const label of ['الرئيسية', 'الطلبات', 'التقارير', 'الموظف المثالي', 'صندوق الأفكار', 'الإشعارات', 'الطوارئ', 'حسابي والإعدادات']) {
-    expect(screen.getByLabelText(label)).toBeTruthy();
+  for (const label of ['الرئيسية', 'الطلبات', 'التقارير', 'لوحتي', 'طلب إجازة', 'اسأل سَنَد', 'الموظف المثالي', 'صندوق الأفكار', 'الإشعارات', 'الطوارئ', 'حسابي والإعدادات']) {
+    // «اسأل سَنَد» is also the Sanad button's label.
+    expect(screen.getAllByLabelText(label).length).toBeGreaterThan(0);
   }
+  expect(screen.getByTestId('menu-leave').props.accessibilityLabel).toBe('طلب إجازة');
   expect(screen.getByTestId('menu-home').props.accessibilityState).toEqual({ selected: true });
   expect(screen.queryByTestId('menu-approvals')).toBeNull();
   await fireEvent.press(screen.getByTestId('menu-ideas'));

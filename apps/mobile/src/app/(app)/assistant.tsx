@@ -111,7 +111,7 @@ export default function AssistantScreen() {
           onContentSizeChange={() => list.current?.scrollToEnd({ animated: true })}
           renderItem={({ item, index }) => (
             <View accessibilityLiveRegion={index === msgs.length - 1 && !item.mine ? 'polite' : 'none'}>
-              <ChatBubble mine={item.mine} text={item.text} testID={item.mine ? undefined : `assistant-reply-${item.id}`}>
+              <ChatBubble mine={item.mine} text={item.text} thinking={!!item.pending} testID={item.mine ? undefined : `assistant-reply-${item.id}`}>
                 {item.leave ? (
                   <Button label={t('leave_request')} icon="airplane-outline" kind="secondary" onPress={() => router.push('/leave')} />
                 ) : null}

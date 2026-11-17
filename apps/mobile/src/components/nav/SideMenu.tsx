@@ -3,7 +3,7 @@
 // section in rail teal, and marks the current one with the web's lit disc. Back or a tap outside closes it.
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useEffect, useRef, useState } from 'react';
-import { AccessibilityInfo, Animated, Easing, Modal, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Animated, Easing, Modal, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { isCurrent, menuGroups, type MenuItem } from '../../lib/nav';
 import { useSession } from '../../lib/session';
@@ -11,6 +11,7 @@ import { useSettings } from '../../lib/settings';
 import { brand, fonts, radius, space, TOUCH, type } from '../../lib/theme';
 import { BrandMark, Wordmark } from '../auth/Brand';
 import { IconButton, Row, useDir } from '../ui';
+import { useReduceMotion } from './SanadMark';
 
 const DURATION = 220;
 
@@ -23,11 +24,7 @@ export function SideMenu({ open, pathname, onClose, onGo }: { open: boolean; pat
   const width = Math.min(320, Math.round(screen * 0.84));
   const anim = useRef(new Animated.Value(0)).current;
   const [mounted, setMounted] = useState(open);
-  const [reduce, setReduce] = useState(false);
-
-  useEffect(() => {
-    AccessibilityInfo.isReduceMotionEnabled().then(setReduce, () => {});
-  }, []);
+  const reduce = useReduceMotion();
 
   useEffect(() => {
     if (open) setMounted(true);

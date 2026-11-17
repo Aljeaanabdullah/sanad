@@ -3,7 +3,9 @@ import { isCurrent, menuGroups, navAction } from '../nav';
 const keys = (role: Parameters<typeof menuGroups>[0]) => menuGroups(role).flat().map((i) => i.key);
 
 it('lists every section, with approvals and lookup for staff only', () => {
-  expect(keys('employee')).toEqual(['home', 'requests', 'reports', 'dashboard', 'ideal-employee', 'ideas', 'notifications', 'emergency', 'assistant', 'settings']);
+  expect(keys('employee')).toEqual(['home', 'requests', 'reports', 'dashboard', 'leave', 'assistant', 'ideal-employee', 'ideas', 'notifications', 'emergency', 'settings']);
+  // No duplicates (the old quick services «طلباتي» and «تقويم الحضور» are «الطلبات» and «التقارير»).
+  expect(new Set(keys('admin')).size).toBe(keys('admin').length);
   for (const role of ['supervisor', 'hr', 'admin'] as const) {
     expect(keys(role)).toEqual(expect.arrayContaining(['approvals', 'lookup']));
   }

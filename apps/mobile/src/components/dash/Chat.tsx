@@ -4,10 +4,12 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useSettings } from '../../lib/settings';
-import { brand, fonts, radius, space, TOUCH, type } from '../../lib/theme';
-import { Icon, Row, Txt, useDir } from '../ui';
+import { fonts, radius, space, TOUCH, type } from '../../lib/theme';
+import { SanadMark } from '../nav/SanadMark';
+import { Row, Txt, useDir } from '../ui';
 
-export function ChatBubble({ mine, text, children, testID }: { mine: boolean; text: string; children?: ReactNode; testID?: string }) {
+/** One message. Sanad's replies carry the Sanad mark, which "thinks" (its discs light up in turn) while `thinking`. */
+export function ChatBubble({ mine, text, children, testID, thinking }: { mine: boolean; text: string; children?: ReactNode; testID?: string; thinking?: boolean }) {
   const { c, t } = useSettings();
   const d = useDir();
   // Mine sits on the reading end, Sanad's replies on the reading start.
@@ -16,9 +18,7 @@ export function ChatBubble({ mine, text, children, testID }: { mine: boolean; te
     <View testID={testID} style={{ alignSelf: side, maxWidth: '86%' }} accessible accessibilityLabel={mine ? `${t('asst_you')}: ${text}` : `${t('app_name')}: ${text}`}>
       <Row gap={space.sm} align="flex-end">
         {!mine ? (
-          <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: brand.rail, alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name="sparkles-outline" size={16} color={brand.railDot} />
-          </View>
+          <SanadMark size={32} state={thinking ? 'thinking' : 'still'} testID={thinking ? 'sanad-thinking' : undefined} />
         ) : null}
         <View
           style={{

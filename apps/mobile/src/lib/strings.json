@@ -340,7 +340,8 @@
     "menu_lookup": "سجل موظف",
     "menu_settings": "حسابي والإعدادات",
     "sanad_button": "اسأل سَنَد",
-    "sanad_button_hint": "يفتح المساعد الذكي"
+    "sanad_button_hint": "يفتح المساعد الذكي",
+    "menu_leave": "طلب إجازة"
   },
   "en": {
     "app_name": "Sanad",
@@ -683,6 +684,7 @@
     "menu_lookup": "Employee record",
     "menu_settings": "Account and settings",
     "sanad_button": "Ask Sanad",
-    "sanad_button_hint": "Opens the assistant"
+    "sanad_button_hint": "Opens the assistant",
+    "menu_leave": "Leave request"
   }
 }

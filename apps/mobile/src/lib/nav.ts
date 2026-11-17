@@ -32,12 +32,16 @@ export function menuGroups(role: Role): MenuItem[][] {
       { key: 'reports', href: '/reports', label: 'menu_reports', icon: 'calendar-outline', iconOn: 'calendar' },
       { key: 'dashboard', href: '/dashboard', label: 'menu_dashboard', icon: 'stats-chart-outline', iconOn: 'stats-chart' },
     ],
+    // Services (they were the home screen's quick services until 2026-11-17).
+    [
+      { key: 'leave', href: '/leave', label: 'menu_leave', icon: 'airplane-outline', iconOn: 'airplane' },
+      { key: 'assistant', href: '/assistant', label: 'menu_assistant', icon: 'chatbubbles-outline', iconOn: 'chatbubbles' },
+    ],
     [
       { key: 'ideal-employee', href: '/ideal-employee', label: 'menu_ideal_employee', icon: 'ribbon-outline', iconOn: 'ribbon' },
       { key: 'ideas', href: '/ideas', label: 'menu_ideas', icon: 'bulb-outline', iconOn: 'bulb' },
       { key: 'notifications', href: '/notifications', label: 'menu_notifications', icon: 'notifications-outline', iconOn: 'notifications' },
       { key: 'emergency', href: '/emergency', label: 'menu_emergency', icon: 'warning-outline', iconOn: 'warning' },
-      { key: 'assistant', href: '/assistant', label: 'menu_assistant', icon: 'chatbubbles-outline', iconOn: 'chatbubbles' },
     ],
   ];
   if (role !== 'employee') {
