@@ -10,7 +10,7 @@ import { BrandMark } from '../auth/Brand';
 const SEQUINS = 12;
 const SEQUIN = 5;
 // The three enamel hues of the ring, repeating around it.
-const HUES = [brand.glow, brand.turquoise, '#a6cbc7'];
+const HUES = [brand.railDot, brand.turquoise, '#a6cbc7'];
 
 export function SanadButton({ onPress }: { onPress: () => void }) {
   const { c, t } = useSettings();
@@ -18,7 +18,8 @@ export function SanadButton({ onPress }: { onPress: () => void }) {
   const size = SANAD_BUTTON;
   const halo = 4;
   const ring = size / 2 - SEQUIN - 2; // distance of each sequin's centre from the button's centre
-  const fill = c.dark ? '#18555c' : brand.rail;
+  // Rail teal by day; one step lighter at night so it still stands off the dark ground.
+  const fill = c.dark ? brand.railOn : brand.rail;
 
   return (
     <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + space.md, alignItems: 'center' }}>
@@ -62,7 +63,7 @@ export function SanadButton({ onPress }: { onPress: () => void }) {
               />
             );
           })}
-          <BrandMark size={34} color={brand.glow} decorative />
+          <BrandMark size={34} decorative />
         </View>
       </Pressable>
     </View>

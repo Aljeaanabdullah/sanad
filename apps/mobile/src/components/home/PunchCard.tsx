@@ -36,7 +36,7 @@ export function PunchCard({ shift, punches, onPunch }: { shift: Block<ShiftInfo 
     <Button
       testID="home-punch"
       size="lg"
-      kind={next === 'check_out' ? 'danger' : 'accent'}
+      kind={next === 'check_out' ? 'danger' : 'hero'}
       icon={next === 'check_out' ? 'log-out-outline' : 'finger-print'}
       label={t(next === 'check_out' ? 'home_check_out' : 'home_check_in')}
       disabled={disabled}

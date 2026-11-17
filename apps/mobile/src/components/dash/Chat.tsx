@@ -4,7 +4,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useSettings } from '../../lib/settings';
-import { fonts, radius, space, TOUCH, type } from '../../lib/theme';
+import { brand, fonts, radius, space, TOUCH, type } from '../../lib/theme';
 import { Icon, Row, Txt, useDir } from '../ui';
 
 export function ChatBubble({ mine, text, children, testID }: { mine: boolean; text: string; children?: ReactNode; testID?: string }) {
@@ -16,8 +16,8 @@ export function ChatBubble({ mine, text, children, testID }: { mine: boolean; te
     <View testID={testID} style={{ alignSelf: side, maxWidth: '86%' }} accessible accessibilityLabel={mine ? `${t('asst_you')}: ${text}` : `${t('app_name')}: ${text}`}>
       <Row gap={space.sm} align="flex-end">
         {!mine ? (
-          <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: c.bar, alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name="sparkles-outline" size={16} color={c.barDot} />
+          <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: brand.rail, alignItems: 'center', justifyContent: 'center' }}>
+            <Icon name="sparkles-outline" size={16} color={brand.railDot} />
           </View>
         ) : null}
         <View
@@ -75,7 +75,7 @@ export function ChatInput({ onSend, placeholder, sendLabel }: { onSend: (text: s
             paddingHorizontal: space.lg,
             borderRadius: radius.pill,
             borderWidth: focused ? 2 : 1,
-            borderColor: focused ? c.accent : c.controlLine,
+            borderColor: focused ? c.primary : c.control,
             backgroundColor: c.surface,
             color: c.text,
             fontFamily: fonts.regular,

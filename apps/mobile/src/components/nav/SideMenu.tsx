@@ -8,7 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { isCurrent, menuGroups, type MenuItem } from '../../lib/nav';
 import { useSession } from '../../lib/session';
 import { useSettings } from '../../lib/settings';
-import { fonts, radius, space, TOUCH, type } from '../../lib/theme';
+import { brand, fonts, radius, space, TOUCH, type } from '../../lib/theme';
 import { BrandMark, Wordmark } from '../auth/Brand';
 import { IconButton, Row, useDir } from '../ui';
 
@@ -64,7 +64,7 @@ export function SideMenu({ open, pathname, onClose, onGo }: { open: boolean; pat
           bottom: 0,
           [d.rtl ? 'right' : 'left']: 0,
           width,
-          backgroundColor: c.bar,
+          backgroundColor: brand.rail,
           borderColor: c.line,
           [d.rtl ? 'borderLeftWidth' : 'borderRightWidth']: c.dark ? StyleSheet.hairlineWidth : 0,
           transform: [{ translateX }],
@@ -77,14 +77,14 @@ export function SideMenu({ open, pathname, onClose, onGo }: { open: boolean; pat
             <BrandMark size={40} />
             <Wordmark size="title" />
           </Row>
-          <IconButton icon="close" label={t('menu_close')} onPress={onClose} color={c.barInk} />
+          <IconButton icon="close" label={t('menu_close')} onPress={onClose} color={brand.onRail} />
         </Row>
         {name ? (
           <View style={{ paddingHorizontal: space.lg, paddingTop: space.sm, paddingBottom: space.md }}>
-            <Text numberOfLines={1} style={[type.body, { fontFamily: fonts.medium, color: c.barInk, textAlign: d.align, writingDirection: d.writing }]}>{name}</Text>
+            <Text numberOfLines={1} style={[type.body, { fontFamily: fonts.medium, color: brand.onRail, textAlign: d.align, writingDirection: d.writing }]}>{name}</Text>
             <Row gap={space.xs}>
-              <Text style={[type.caption, { fontFamily: fonts.regular, color: c.barMuted }]}>{t('file_no_label')}</Text>
-              <Text style={[type.caption, { fontFamily: fonts.medium, color: c.barMuted, writingDirection: 'ltr', fontVariant: ['tabular-nums'] }]}>{String(profile?.fileNumber ?? '')}</Text>
+              <Text style={[type.caption, { fontFamily: fonts.regular, color: brand.railInk }]}>{t('file_no_label')}</Text>
+              <Text style={[type.caption, { fontFamily: fonts.medium, color: brand.railInk, writingDirection: 'ltr', fontVariant: ['tabular-nums'] }]}>{String(profile?.fileNumber ?? '')}</Text>
             </Row>
           </View>
         ) : null}
@@ -112,7 +112,7 @@ function MenuRow({ item, current, onPress }: { item: MenuItem; current: boolean;
       accessibilityRole="menuitem"
       accessibilityState={{ selected: current }}
       accessibilityLabel={t(item.label)}
-      android_ripple={{ color: c.barOn }}
+      android_ripple={{ color: brand.railOn }}
       style={({ pressed }) => ({
         minHeight: TOUCH + 2,
         borderRadius: radius.sm,
@@ -120,15 +120,15 @@ function MenuRow({ item, current, onPress }: { item: MenuItem; current: boolean;
         flexDirection: d.row,
         alignItems: 'center',
         gap: space.md,
-        backgroundColor: current ? c.barOn : pressed ? 'rgba(255,255,255,0.06)' : 'transparent',
+        backgroundColor: current ? brand.railOn : pressed ? 'rgba(255,255,255,0.06)' : 'transparent',
       })}
     >
       {/* The current screen carries one lit disc, as in the web rail. */}
-      <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: current ? c.barDot : 'transparent' }} />
-      <Ionicons name={current ? item.iconOn : item.icon} size={22} color={current ? c.barInk : c.barMuted} />
+      <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: current ? brand.railDot : 'transparent' }} />
+      <Ionicons name={current ? item.iconOn : item.icon} size={22} color={current ? brand.onRail : brand.railInk} />
       <Text
         numberOfLines={1}
-        style={[type.body, { flex: 1, fontFamily: current ? fonts.semibold : fonts.regular, color: current ? c.barInk : c.barMuted, textAlign: d.align, writingDirection: d.writing }]}
+        style={[type.body, { flex: 1, fontFamily: current ? fonts.semibold : fonts.regular, color: current ? brand.onRail : brand.railInk, textAlign: d.align, writingDirection: d.writing }]}
       >
         {t(item.label)}
       </Text>

@@ -7,7 +7,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "backgroundColor": "#0B1A33",
+    "backgroundColor": "#0d3b41",
     "ios": {
       "bundleIdentifier": "com.sanad.hr",
       "supportsTablet": false,
@@ -20,7 +20,7 @@
     "android": {
       "package": "com.sanad.hr",
       "adaptiveIcon": {
-        "backgroundColor": "#0B1A33",
+        "backgroundColor": "#0d3b41",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -52,7 +52,7 @@
           "image": "./assets/splash-icon.png",
           "imageWidth": 160,
           "resizeMode": "contain",
-          "backgroundColor": "#0B1A33"
+          "backgroundColor": "#0d3b41"
         }
       ],
       [
@@ -88,7 +88,7 @@
         "expo-notifications",
         {
           "icon": "./assets/android-icon-monochrome.png",
-          "color": "#C9A24B",
+          "color": "#1fa89c",
           "defaultChannel": "sanad"
         }
       ]

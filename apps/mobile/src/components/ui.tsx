@@ -21,7 +21,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useNav } from '../lib/nav';
 import { useSettings } from '../lib/settings';
-import { fonts, radius, SANAD_BUTTON_ROOM, space, TOUCH, type, type Palette } from '../lib/theme';
+import { brand, fonts, radius, SANAD_BUTTON_ROOM, space, statusTints, TOUCH, type, type Palette, type StatusTone } from '../lib/theme';
 
 export type IconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -144,16 +144,15 @@ export function Screen({ children, scroll = true, padded = true, refreshControl,
   footer?: ReactNode;
 }) {
   const { c } = useSettings();
+  // Where the round Sanad button floats, leave room under the last card for it.
   const nav = useNav();
   const insets = useSafeAreaInsets();
   const pad = padded ? { paddingHorizontal: space.lg, paddingTop: space.lg } : null;
-  // Leave room under the last card for the round Sanad button where it floats.
-  const bottom = footer ? space.lg : insets.bottom + (nav?.sanadButton ? SANAD_BUTTON_ROOM : space.xl);
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       {scroll ? (
         <ScrollView
-          contentContainerStyle={[pad, { paddingBottom: bottom, gap: space.lg }, contentStyle]}
+          contentContainerStyle={[pad, { paddingBottom: footer ? space.lg : insets.bottom + (nav?.sanadButton ? SANAD_BUTTON_ROOM : space.xl), gap: space.lg }, contentStyle]}
           refreshControl={refreshControl}
           keyboardShouldPersistTaps="handled"
         >
@@ -172,9 +171,9 @@ export function Screen({ children, scroll = true, padded = true, refreshControl,
 }
 
 /**
- * Top app bar in rail teal (the web panel's rail colour), in both themes. `back` shows a system-style
- * back button; without it, inside the app, the three-line button on the reading start opens the side
- * menu. `actions` go on the reading end. Pass `big` on section roots for the large greeting header.
+ * Top app bar. Rail teal in both themes (the Sanad header, like the panel's rail). `back` shows a system-style back button;
+ * without it, inside the app, the three-line button on the reading start opens the side menu (components/nav).
+ * `actions` go on the reading end. Pass `big` on section roots for the large greeting header.
  */
 export function Header({ title, subtitle, back, actions, big, children }: {
   title: string;
@@ -185,39 +184,29 @@ export function Header({ title, subtitle, back, actions, big, children }: {
   /** Extra content inside the teal band (e.g. the punch card on Home). */
   children?: ReactNode;
 }) {
-  const { c, t } = useSettings();
+  const { t } = useSettings();
   const nav = useNav();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const d = useDir();
   return (
-    <View
-      style={{
-        backgroundColor: c.bar,
-        paddingTop: insets.top + space.sm,
-        paddingBottom: big ? space.xl : space.md,
-        paddingHorizontal: space.lg,
-        // At night the bar is darker than the ground; a hairline keeps its edge.
-        borderBottomWidth: c.dark ? StyleSheet.hairlineWidth : 0,
-        borderBottomColor: c.line,
-      }}
-    >
+    <View style={{ backgroundColor: brand.rail, paddingTop: insets.top + space.sm, paddingBottom: big ? space.xl : space.md, paddingHorizontal: space.lg }}>
       <Row gap={space.sm} style={{ minHeight: TOUCH }}>
         {back ? (
-          <IconButton icon={d.back} label="back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} color={c.barInk} />
+          <IconButton icon={d.back} label="back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} color={brand.onRail} />
         ) : nav ? (
-          <IconButton icon="menu" label={t('menu_open')} onPress={nav.openMenu} color={c.barInk} testID="menu-button" />
+          <IconButton icon="menu" label={t('menu_open')} onPress={nav.openMenu} color={brand.onRail} testID="menu-button" />
         ) : null}
         <View style={{ flex: 1 }}>
           <Text
             accessibilityRole="header"
             numberOfLines={1}
-            style={[big ? type.title : type.heading, { fontFamily: fonts.bold, color: c.barInk, textAlign: d.align, writingDirection: d.writing }]}
+            style={[big ? type.title : type.heading, { fontFamily: fonts.bold, color: brand.onRail, textAlign: d.align, writingDirection: d.writing }]}
           >
             {title}
           </Text>
           {subtitle ? (
-            <Text numberOfLines={1} style={[type.label, { fontFamily: fonts.regular, color: c.barMuted, textAlign: d.align, writingDirection: d.writing }]}>
+            <Text numberOfLines={1} style={[type.label, { fontFamily: fonts.regular, color: brand.railInk, textAlign: d.align, writingDirection: d.writing }]}>
               {subtitle}
             </Text>
           ) : null}
@@ -231,7 +220,7 @@ export function Header({ title, subtitle, back, actions, big, children }: {
 
 // ---------------------------------------------------------------- surfaces
 
-/** A flat white (or deep sea in dark) card with a hairline border. Never nest cards. */
+/** A flat white (or deep sea in dark) card with a 1px line border. Never nest cards. */
 export function Card({ children, onPress, style, padded = true, accessibilityLabel, testID }: {
   children: ReactNode;
   onPress?: () => void;
@@ -244,7 +233,7 @@ export function Card({ children, onPress, style, padded = true, accessibilityLab
   const base: ViewStyle = {
     backgroundColor: c.surface,
     borderRadius: radius.md,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: 1,
     borderColor: c.line,
     padding: padded ? space.lg : 0,
     overflow: 'hidden',
@@ -330,17 +319,16 @@ export function StatTile({ value, label, tone = 'default', icon, onPress }: { va
       <Txt variant="caption" tone="muted" numberOfLines={2}>{label}</Txt>
     </View>
   );
-  const style: ViewStyle = { flex: 1, minWidth: 96, backgroundColor: c.surface, borderRadius: radius.md, borderWidth: StyleSheet.hairlineWidth, borderColor: c.line, padding: space.md };
+  const style: ViewStyle = { flex: 1, minWidth: 96, backgroundColor: c.surface, borderRadius: radius.md, borderWidth: 1, borderColor: c.line, padding: space.md };
   if (!onPress) return <View style={style}>{content}</View>;
   return <Pressable onPress={onPress} accessibilityRole="button" style={({ pressed }) => [style, pressed && { opacity: 0.8 }]}>{content}</Pressable>;
 }
 
 // ---------------------------------------------------------------- actions
 
-/** `gold` is the old name of `accent`, kept so older screens still build. */
-type ButtonKind = 'primary' | 'secondary' | 'danger' | 'ghost' | 'accent' | 'gold';
+type ButtonKind = 'primary' | 'secondary' | 'danger' | 'ghost' | 'hero';
 
-/** Buttons: primary (deep teal, or turquoise in dark), accent (turquoise: the punch-in hero), danger (punch out, reject), secondary (outlined), ghost (text). */
+/** Pill buttons: primary (deep sea teal, or turquoise in dark), hero (turquoise, the punch-in button), danger (punch out, reject), secondary (outlined), ghost (text). */
 export function Button({ label, onPress, kind = 'primary', icon, loading, disabled, size = 'md', full = true, testID }: {
   label: string;
   onPress: () => void;
@@ -356,10 +344,9 @@ export function Button({ label, onPress, kind = 'primary', icon, loading, disabl
   const d = useDir();
   const colors: Record<ButtonKind, { bg: string; fg: string; border?: string }> = {
     primary: { bg: c.primary, fg: c.onPrimary },
-    accent: { bg: c.accentFill, fg: c.onAccent },
-    gold: { bg: c.accentFill, fg: c.onAccent },
+    hero: { bg: c.hero, fg: c.onHero },
     danger: { bg: c.danger, fg: c.onDanger },
-    secondary: { bg: 'transparent', fg: c.primary, border: c.primary },
+    secondary: { bg: c.surface, fg: c.primary, border: c.primary },
     ghost: { bg: 'transparent', fg: c.primary },
   };
   const k = colors[kind];
@@ -376,7 +363,8 @@ export function Button({ label, onPress, kind = 'primary', icon, loading, disabl
       style={({ pressed }) => ({
         minHeight: size === 'lg' ? 60 : TOUCH + 4,
         paddingHorizontal: space.xl,
-        borderRadius: radius.md,
+        borderRadius: radius.pill,
+        overflow: 'hidden',
         backgroundColor: k.bg,
         borderWidth: k.border ? 1.5 : 0,
         borderColor: k.border,
@@ -391,7 +379,7 @@ export function Button({ label, onPress, kind = 'primary', icon, loading, disabl
       ) : (
         <View style={{ flexDirection: d.row, alignItems: 'center', gap: space.sm }}>
           {icon ? <Ionicons name={icon} size={size === 'lg' ? 24 : 20} color={k.fg} /> : null}
-          <Text style={[size === 'lg' ? type.heading : type.body, { fontFamily: fonts.semibold, color: k.fg }]}>{label}</Text>
+          <Text style={[size === 'lg' ? type.heading : type.body, { fontFamily: fonts.bold, color: k.fg }]}>{label}</Text>
         </View>
       )}
     </Pressable>
@@ -412,8 +400,8 @@ export function IconButton({ icon, label, onPress, color, badge, testID }: { ico
     >
       <Ionicons name={icon} size={24} color={color ?? c.text} />
       {badge ? (
-        <View style={{ position: 'absolute', top: 6, right: 6, minWidth: 18, height: 18, borderRadius: 9, backgroundColor: c.accentFill, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 }}>
-          <Text style={{ fontFamily: fonts.bold, fontSize: 11, color: c.onAccent }}>{badge > 9 ? '9+' : badge}</Text>
+        <View style={{ position: 'absolute', top: 6, right: 6, minWidth: 18, height: 18, borderRadius: 9, backgroundColor: brand.railDot, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 }}>
+          <Text style={{ fontFamily: fonts.bold, fontSize: 11, color: brand.ink }}>{badge > 9 ? '9+' : badge}</Text>
         </View>
       ) : null}
     </Pressable>
@@ -435,7 +423,7 @@ export function Chip({ label, selected, onPress, icon }: { label: string; select
         paddingHorizontal: space.md,
         borderRadius: radius.pill,
         borderWidth: 1,
-        borderColor: selected ? c.primary : c.line,
+        borderColor: selected ? c.primary : c.control,
         backgroundColor: selected ? c.primary : c.surface,
         flexDirection: d.row,
         alignItems: 'center',
@@ -474,26 +462,25 @@ export function Segmented<V extends string>({ options, value, onChange }: { opti
 
 // ---------------------------------------------------------------- status
 
-type BadgeTone = 'ok' | 'danger' | 'warn' | 'info' | 'neutral';
+type BadgeTone = StatusTone;
 
-/** A small status pill (accepted / rejected / pending / eligible...). Text always says the state; colour only supports it. */
+/** A small status pill (accepted / rejected / pending / eligible...): a disc and a word, like the panel's badges.
+ *  Text always says the state; colour only supports it. */
 export function Badge({ label, tone = 'neutral', icon }: { label: string; tone?: BadgeTone; icon?: IconName }) {
   const { c } = useSettings();
   const d = useDir();
-  const map: Record<BadgeTone, { bg: string; fg: string }> = {
-    ok: { bg: c.okSoft, fg: c.ok },
-    danger: { bg: c.dangerSoft, fg: c.danger },
-    warn: { bg: c.warnSoft, fg: c.warn },
-    info: { bg: c.infoSoft, fg: c.info },
-    neutral: { bg: c.surfaceAlt, fg: c.muted },
-  };
-  const k = map[tone];
+  const k = statusTints(c)[tone];
   return (
-    <View style={{ flexDirection: d.row, alignItems: 'center', gap: 4, alignSelf: 'flex-start', backgroundColor: k.bg, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 3 }}>
-      {icon ? <Ionicons name={icon} size={13} color={k.fg} /> : null}
+    <View style={{ flexDirection: d.row, alignItems: 'center', gap: 5, alignSelf: 'flex-start', backgroundColor: k.bg, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 3 }}>
+      {icon ? <Ionicons name={icon} size={13} color={k.fg} /> : <Disc color={k.fg} size={6} />}
       <Text style={[type.caption, { fontFamily: fonts.bold, color: k.fg }]}>{label}</Text>
     </View>
   );
+}
+
+/** The enamel disc: the unit of the sea-glass identity (a small filled circle). Decorative only. */
+export function Disc({ color, size = 9 }: { color: string; size?: number }) {
+  return <View accessible={false} importantForAccessibility="no" style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: color }} />;
 }
 
 /** Shimmer-free skeleton block (respects reduced motion by not animating). */
@@ -549,14 +536,9 @@ export function ErrorState({ message, onRetry }: { message: string; onRetry?: ()
 /** An inline notice inside a form or card (warning, info, error). Full tinted background, no side stripe. */
 export function Notice({ tone = 'info', text, icon }: { tone?: BadgeTone; text: string; icon?: IconName }) {
   const { c } = useSettings();
-  const map: Record<BadgeTone, { bg: string; fg: string; icon: IconName }> = {
-    ok: { bg: c.okSoft, fg: c.ok, icon: 'checkmark-circle' },
-    danger: { bg: c.dangerSoft, fg: c.danger, icon: 'alert-circle' },
-    warn: { bg: c.warnSoft, fg: c.warn, icon: 'warning' },
-    info: { bg: c.infoSoft, fg: c.info, icon: 'information-circle' },
-    neutral: { bg: c.surfaceAlt, fg: c.text, icon: 'information-circle' },
-  };
-  const k = map[tone];
+  const icons: Record<BadgeTone, IconName> = { ok: 'checkmark-circle', danger: 'alert-circle', warn: 'warning', info: 'information-circle', neutral: 'information-circle' };
+  const tint = statusTints(c)[tone];
+  const k = { bg: tint.bg, fg: tone === 'neutral' ? c.text : tint.fg, icon: icons[tone] };
   return (
     <Row gap={space.sm} align="flex-start" style={{ backgroundColor: k.bg, borderRadius: radius.sm, padding: space.md }}>
       <Ionicons name={icon ?? k.icon} size={20} color={k.fg} />
@@ -591,7 +573,7 @@ export function Field({ label, error, helper, ...input }: TextInputProps & { lab
             paddingVertical: input.multiline ? space.md : 0,
             borderRadius: radius.sm,
             borderWidth: focused ? 2 : 1,
-            borderColor: error ? c.danger : focused ? c.accent : c.controlLine,
+            borderColor: error ? c.danger : focused ? c.primary : c.control,
             backgroundColor: c.surface,
             textAlign: d.align,
             textAlignVertical: input.multiline ? 'top' : 'center',
@@ -615,7 +597,7 @@ export function PickerField({ label, value, placeholder, icon = 'calendar-outlin
         onPress={onPress}
         accessibilityRole="button"
         accessibilityLabel={`${label}: ${value ?? placeholder}`}
-        style={{ minHeight: TOUCH + 4, paddingHorizontal: space.md, borderRadius: radius.sm, borderWidth: 1, borderColor: error ? c.danger : c.controlLine, backgroundColor: c.surface, justifyContent: 'center' }}
+        style={{ minHeight: TOUCH + 4, paddingHorizontal: space.md, borderRadius: radius.sm, borderWidth: 1, borderColor: error ? c.danger : c.control, backgroundColor: c.surface, justifyContent: 'center' }}
       >
         <Row gap={space.sm}>
           <Icon name={icon} size={20} tone="muted" />
@@ -638,7 +620,6 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
   const anim = useRef(new Animated.Value(0)).current;
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const insets = useSafeAreaInsets();
-  const { c } = useSettings();
   const show = useCallback(
     (text: string, tone: Snack['tone'] = 'info') => {
       if (timer.current) clearTimeout(timer.current);
@@ -652,7 +633,7 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
   );
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
   const icon: Record<Snack['tone'], IconName> = { ok: 'checkmark-circle', danger: 'alert-circle', info: 'information-circle' };
-  const color: Record<Snack['tone'], string> = { ok: '#72d8b0', danger: '#ff9d91', info: '#5fd3c6' };
+  const color: Record<Snack['tone'], string> = { ok: '#72d8b0', danger: '#ff9d91', info: brand.railDot };
   return (
     <SnackCtx.Provider value={show}>
       {children}
@@ -666,19 +647,19 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
             opacity: anim, transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }],
           }}
         >
-          <SnackBody text={snack.text} icon={icon[snack.tone]} color={color[snack.tone]} bg={c.snack} />
+          <SnackBody text={snack.text} icon={icon[snack.tone]} color={color[snack.tone]} />
         </Animated.View>
       ) : null}
     </SnackCtx.Provider>
   );
 }
 
-function SnackBody({ text, icon, color, bg }: { text: string; icon: IconName; color: string; bg: string }) {
+function SnackBody({ text, icon, color }: { text: string; icon: IconName; color: string }) {
   const d = useDir();
   return (
-    <View style={{ flexDirection: d.row, alignItems: 'center', gap: space.sm, backgroundColor: bg, borderRadius: radius.sm, paddingHorizontal: space.lg, paddingVertical: space.md, elevation: 6, shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 8, shadowOffset: { width: 0, height: 3 } }}>
+    <View style={{ flexDirection: d.row, alignItems: 'center', gap: space.sm, backgroundColor: brand.snack, borderRadius: radius.sm, paddingHorizontal: space.lg, paddingVertical: space.md, elevation: 6, shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 8, shadowOffset: { width: 0, height: 3 } }}>
       <Ionicons name={icon} size={20} color={color} />
-      <Text style={[type.label, { flex: 1, fontFamily: fonts.medium, color: '#ffffff', textAlign: d.align }]}>{text}</Text>
+      <Text style={[type.label, { flex: 1, fontFamily: fonts.medium, color: brand.onRail, textAlign: d.align }]}>{text}</Text>
     </View>
   );
 }

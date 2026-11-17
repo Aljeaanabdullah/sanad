@@ -1,6 +1,7 @@
 // Every server call the app makes. Data is protected by RLS / SECURITY DEFINER RPCs on Supabase.
 import type { DashboardData } from '../sanad/dashboard';
 import { kuwaitTime, ymd } from './dates';
+import { note } from './net';
 import { supabase } from './supabase';
 
 /** A refusal with a code that has a text in strings.json (`req_error_<code>`). */
@@ -18,11 +19,14 @@ const KNOWN = [
 ];
 
 function fail(message: string | undefined): never {
+  if (message?.includes('timed out')) throw new RequestError('timeout'); // net.ts TimeoutError
   throw new RequestError(KNOWN.find((k) => message?.includes(k)) ?? 'generic');
 }
 
 async function myEmployeeId(): Promise<string | null> {
+  note('getUser: start');
   const { data } = await supabase.auth.getUser();
+  note('getUser: end', data.user ? 'ok' : 'no user');
   if (!data.user) return null;
   const { data: me } = await supabase.from('employees').select('id').eq('user_id', data.user.id).single();
   return me?.id ?? null;

@@ -21,7 +21,7 @@ export function Sheet({ visible, onClose, title, children, tall }: {
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, justifyContent: 'flex-end' }}>
         <Pressable
-          style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(11,26,51,0.55)' }]}
+          style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(6,37,40,0.55)' }]}
           onPress={onClose}
           accessibilityRole="button"
           accessibilityLabel={t('close')}

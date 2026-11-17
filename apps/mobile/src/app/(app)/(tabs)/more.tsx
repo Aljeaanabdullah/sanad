@@ -1,8 +1,9 @@
 // Account and settings (was the "More" tab): my profile, language and theme, privacy text, version,
 // sign out. The links it used to list (dashboard, assistant, notifications, and approvals / employee
-// lookup for staff) are in the side menu now (components/nav, owner decision 2026-11-17).
+// lookup for staff) are in the side menu now (components/nav, phase S7, owner decision 2026-11-17).
 import * as Application from 'expo-application';
 import Constants from 'expo-constants';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 import { Badge, Button, Card, Header, Icon, ListRow, Row, Screen, Section, Segmented, Txt } from '../../../components/ui';
@@ -10,7 +11,7 @@ import type { Role } from '../../../lib/auth';
 import { useSession } from '../../../lib/session';
 import { useSettings, type ThemeMode } from '../../../lib/settings';
 import type { Lang } from '../../../lib/i18n';
-import { fonts, space } from '../../../lib/theme';
+import { brand, fonts, space } from '../../../lib/theme';
 
 const ROLE_KEY: Record<Role, string> = {
   employee: 'more_role_employee',
@@ -28,6 +29,7 @@ function appVersion(): string {
 export default function MoreScreen() {
   const { t, lang, theme, update, c } = useSettings();
   const { profile, signOut } = useSession();
+  const router = useRouter();
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
 
@@ -59,11 +61,11 @@ export default function MoreScreen() {
       <Screen>
         <Card testID="profile-card">
           <Row gap={space.md}>
-            <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: c.bar, alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: brand.rail, alignItems: 'center', justifyContent: 'center' }}>
               {initials ? (
-                <Txt variant="heading" center style={{ color: c.barDot, fontFamily: fonts.bold }}>{initials}</Txt>
+                <Txt variant="heading" center style={{ color: brand.railDot, fontFamily: fonts.bold }}>{initials}</Txt>
               ) : (
-                <Icon name="person" color={c.barDot} />
+                <Icon name="person" color={brand.railDot} />
               )}
             </View>
             <View style={{ flex: 1, gap: 2 }}>
@@ -124,6 +126,7 @@ export default function MoreScreen() {
                 <Txt tone="muted">{t('consent_body_sanad')}</Txt>
               </View>
             ) : null}
+            <ListRow testID="more-diagnostics" icon="pulse-outline" title={t('diag_open')} subtitle={t('diag_open_sub')} onPress={() => router.push('/diagnostics')} />
             <ListRow icon="information-circle-outline" title={t('more_version')} trailing={<Txt numeric tone="muted">{appVersion()}</Txt>} last />
           </Card>
         </Section>

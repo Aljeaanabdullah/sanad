@@ -1,6 +1,6 @@
-// Sanad brand pieces: the temporary logo (the letter «س» in a turquoise diamond, PRD 12), the white
-// wordmark, and a language toggle for the rail-teal band of the sign-in flow. BrandMark is also the
-// mark on the round Sanad button.
+// Sanad brand pieces for the sign-in flow only (setup and login): the temporary logo
+// (the letter «س» in a diamond, PRD 12), the wordmark, and a language toggle for the teal band.
+// Sea glass: turquoise (the towers' lit disc) on rail teal, like the panel's sign-in brand side.
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,10 +8,10 @@ import { useSettings } from '../../lib/settings';
 import { brand, fonts, radius, space, TOUCH, type } from '../../lib/theme';
 import { Row, useDir } from '../ui';
 
-const MUTED_ON_NAVY = '#c1dcd9'; // rail ink, same as the Header subtitle
+const MUTED_ON_RAIL = brand.railInk; // same as the Header subtitle
 
-/** The «س» in a turquoise diamond. `color` changes the line and letter (e.g. dark ink on a turquoise fill). */
-export function BrandMark({ size = 56, color = brand.glow, decorative }: { size?: number; color?: string; decorative?: boolean }) {
+/** The «س» in a turquoise diamond. `decorative` hides it from screen readers (inside a labelled button). */
+export function BrandMark({ size = 56, decorative }: { size?: number; decorative?: boolean }) {
   const { t } = useSettings();
   const side = size / Math.SQRT2; // the rotated square fits inside `size`
   return (
@@ -20,7 +20,8 @@ export function BrandMark({ size = 56, color = brand.glow, decorative }: { size?
       accessibilityRole={decorative ? undefined : 'image'}
       accessibilityLabel={decorative ? undefined : t('auth_logo_label')}
       importantForAccessibility={decorative ? 'no-hide-descendants' : 'auto'}
-      style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+      style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}
+    >
       <View
         style={{
           position: 'absolute',
@@ -28,33 +29,33 @@ export function BrandMark({ size = 56, color = brand.glow, decorative }: { size?
           height: side,
           borderRadius: Math.max(4, side * 0.18),
           borderWidth: 2,
-          borderColor: color,
-          backgroundColor: `${color}1f`, // the line colour at 12%
+          borderColor: brand.railDot,
+          backgroundColor: 'rgba(95,211,198,0.12)',
           transform: [{ rotate: '45deg' }],
         }}
       />
-      <Text style={{ fontFamily: fonts.black, fontSize: size * 0.42, lineHeight: size * 0.6, color, includeFontPadding: false }}>
+      <Text style={{ fontFamily: fonts.black, fontSize: size * 0.42, lineHeight: size * 0.6, color: brand.railDot, includeFontPadding: false }}>
         {t('auth_logo_letter')}
       </Text>
     </View>
   );
 }
 
-/** «سَنَد» in white, Readex Pro 700 (as in the web rail). */
+/** «سَنَد» in white on the teal band, Readex Pro 700. */
 export function Wordmark({ size = 'display' }: { size?: 'display' | 'title' }) {
   const { t } = useSettings();
   const big = size === 'display';
   return (
     <Text
       accessibilityRole="header"
-      style={{ fontFamily: fonts.black, fontSize: big ? 52 : type.title.fontSize + 6, lineHeight: big ? 72 : 40, color: brand.white, writingDirection: 'rtl' }}
+      style={{ fontFamily: fonts.black, fontSize: big ? 52 : type.title.fontSize + 6, lineHeight: big ? 72 : 40, color: brand.onRail, writingDirection: 'rtl' }}
     >
       {t('auth_wordmark')}
     </Text>
   );
 }
 
-/** Small pill on the rail-teal band that switches Arabic <-> English. */
+/** Small pill on the teal band that switches Arabic <-> English. */
 export function LangToggle() {
   const { t, lang, update } = useSettings();
   const d = useDir();
@@ -72,16 +73,16 @@ export function LangToggle() {
         opacity: pressed ? 0.7 : 1,
       })}
     >
-      <View style={{ flexDirection: d.row, alignItems: 'center', gap: space.xs, borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)', borderRadius: radius.pill, paddingHorizontal: space.md, paddingVertical: 6 }}>
-        <Ionicons name="globe-outline" size={16} color={brand.white} />
-        <Text style={[type.label, { fontFamily: fonts.medium, color: brand.white }]}>{t('auth_other_lang')}</Text>
+      <View style={{ flexDirection: d.row, alignItems: 'center', gap: space.xs, borderWidth: 1, borderColor: 'rgba(193,220,217,0.45)', borderRadius: radius.pill, paddingHorizontal: space.md, paddingVertical: 6 }}>
+        <Ionicons name="globe-outline" size={16} color={brand.onRail} />
+        <Text style={[type.label, { fontFamily: fonts.medium, color: brand.onRail }]}>{t('auth_other_lang')}</Text>
       </View>
     </Pressable>
   );
 }
 
 /**
- * The rail-teal band at the top of the login screen: language toggle, logo + wordmark, one-line purpose.
+ * The teal band at the top of the login screen: language toggle, logo + wordmark, one-line purpose.
  * `folded` hides the purpose line (while the keyboard is up) so the fields keep their room.
  */
 export function LoginHero({ folded }: { folded?: boolean }) {
@@ -98,7 +99,7 @@ export function LoginHero({ folded }: { folded?: boolean }) {
         <Wordmark size="title" />
       </Row>
       {folded ? null : (
-        <Text style={[type.body, { fontFamily: fonts.regular, color: MUTED_ON_NAVY, textAlign: d.align, writingDirection: d.writing, marginTop: space.xs }]}>
+        <Text style={[type.body, { fontFamily: fonts.regular, color: MUTED_ON_RAIL, textAlign: d.align, writingDirection: d.writing, marginTop: space.xs }]}>
           {t('auth_purpose')}
         </Text>
       )}
@@ -106,4 +107,4 @@ export function LoginHero({ folded }: { folded?: boolean }) {
   );
 }
 
-export { MUTED_ON_NAVY };
+export { MUTED_ON_RAIL };
