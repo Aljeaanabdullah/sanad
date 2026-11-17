@@ -148,21 +148,25 @@ export function Screen({ children, scroll = true, padded = true, refreshControl,
   const nav = useNav();
   const insets = useSafeAreaInsets();
   const pad = padded ? { paddingHorizontal: space.lg, paddingTop: space.lg } : null;
+  // Space below the content (or below a footer form) that nothing may cover: the safe area, plus the
+  // Sanad button's room where it floats, so the last row and the footer always sit above the button.
+  const under = insets.bottom + (nav?.sanadButton ? SANAD_BUTTON_ROOM : 0);
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       {scroll ? (
         <ScrollView
-          contentContainerStyle={[pad, { paddingBottom: footer ? space.lg : insets.bottom + (nav?.sanadButton ? SANAD_BUTTON_ROOM : space.xl), gap: space.lg }, contentStyle]}
+          testID="screen-scroll"
+          contentContainerStyle={[pad, { paddingBottom: footer ? space.lg : under + (nav?.sanadButton ? 0 : space.xl), gap: space.lg }, contentStyle]}
           refreshControl={refreshControl}
           keyboardShouldPersistTaps="handled"
         >
           {children}
         </ScrollView>
       ) : (
-        <View style={[{ flex: 1 }, pad, contentStyle]}>{children}</View>
+        <View style={[{ flex: 1 }, pad, !footer && nav?.sanadButton ? { paddingBottom: under } : null, contentStyle]}>{children}</View>
       )}
       {footer ? (
-        <View style={{ paddingHorizontal: space.lg, paddingTop: space.md, paddingBottom: insets.bottom + space.md, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.line, backgroundColor: c.bg }}>
+        <View testID="screen-footer" style={{ paddingHorizontal: space.lg, paddingTop: space.md, paddingBottom: under + (nav?.sanadButton ? 0 : space.md), borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.line, backgroundColor: c.bg }}>
           {footer}
         </View>
       ) : null}

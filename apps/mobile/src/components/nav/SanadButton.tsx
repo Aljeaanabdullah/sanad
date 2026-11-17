@@ -4,7 +4,7 @@
 import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSettings } from '../../lib/settings';
-import { brand, SANAD_BUTTON, space } from '../../lib/theme';
+import { brand, SANAD_BUTTON, SANAD_BUTTON_HALO, SANAD_BUTTON_LIFT } from '../../lib/theme';
 import { BrandMark } from '../auth/Brand';
 
 const SEQUINS = 12;
@@ -16,13 +16,13 @@ export function SanadButton({ onPress }: { onPress: () => void }) {
   const { c, t } = useSettings();
   const insets = useSafeAreaInsets();
   const size = SANAD_BUTTON;
-  const halo = 4;
+  const halo = SANAD_BUTTON_HALO;
   const ring = size / 2 - SEQUIN - 2; // distance of each sequin's centre from the button's centre
   // Rail teal by day; one step lighter at night so it still stands off the dark ground.
   const fill = c.dark ? brand.railOn : brand.rail;
 
   return (
-    <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + space.md, alignItems: 'center' }}>
+    <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + SANAD_BUTTON_LIFT, alignItems: 'center' }}>
       <Pressable
         testID="sanad-button"
         onPress={onPress}

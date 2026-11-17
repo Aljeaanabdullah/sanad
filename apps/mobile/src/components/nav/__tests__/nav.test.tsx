@@ -127,3 +127,28 @@ it('closes from the backdrop', async () => {
   await settle();
   expect(screen.queryByTestId('side-menu')).toBeNull();
 });
+
+it('leaves room under the content so the last row scrolls fully above the Sanad button', async () => {
+  const { SANAD_BUTTON_ROOM, SANAD_BUTTON_TOP } = require('../../../lib/theme');
+  const { StyleSheet } = require('react-native');
+  const bottomOf = (id: string, key: 'contentContainerStyle' | 'style') => StyleSheet.flatten(screen.getByTestId(id).props[key]).paddingBottom as number;
+  // Safe-area inset is 16 in wrap().
+  await render(wrap(<Section />));
+  expect(SANAD_BUTTON_ROOM).toBeGreaterThanOrEqual(SANAD_BUTTON_TOP + 16);
+  expect(bottomOf('screen-scroll', 'contentContainerStyle')).toBe(16 + SANAD_BUTTON_ROOM);
+  await screen.unmount();
+  // A form footer sits above the button too.
+  await render(
+    wrap(
+      <Screen footer={<Txt>save</Txt>}>
+        <Txt>form</Txt>
+      </Screen>,
+    ),
+  );
+  expect(bottomOf('screen-footer', 'style')).toBe(16 + SANAD_BUTTON_ROOM);
+  await screen.unmount();
+  // Where the button is not shown, only the usual space.
+  mockPath = '/leave';
+  await render(wrap(<Section back />));
+  expect(bottomOf('screen-scroll', 'contentContainerStyle')).toBe(16 + 24);
+});

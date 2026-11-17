@@ -136,6 +136,14 @@ export const type = {
 } as const;
 /** Minimum touch target (Android 48dp). */
 export const TOUCH = 48;
-/** Size of the round Sanad button at the bottom centre, and the room screens leave for it. */
+/** The round Sanad button at the bottom centre: its disc, the ring of screen ground around it, and its lift above the safe area. */
 export const SANAD_BUTTON = 64;
-export const SANAD_BUTTON_ROOM = SANAD_BUTTON + 28;
+export const SANAD_BUTTON_HALO = 4;
+export const SANAD_BUTTON_LIFT = space.md;
+/** Height the button takes above the safe-area inset (84). */
+export const SANAD_BUTTON_TOP = SANAD_BUTTON_LIFT + SANAD_BUTTON + SANAD_BUTTON_HALO * 2;
+/**
+ * Room every screen leaves at the bottom (above the safe-area inset) where the button floats, so the
+ * last row can always scroll fully above it with a clear gap (100).
+ */
+export const SANAD_BUTTON_ROOM = SANAD_BUTTON_TOP + space.lg;
