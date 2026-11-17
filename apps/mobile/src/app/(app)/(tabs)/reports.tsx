@@ -8,7 +8,7 @@ import { CalendarGrid, CalendarLegend } from '../../../components/dash/CalendarG
 import { MonthSwitcher } from '../../../components/dash/MonthSwitcher';
 import { Badge, Button, Card, ErrorState, Header, Row, Screen, Section, Skeleton, StatTile, Txt } from '../../../components/ui';
 import { attendanceHistory, loadDashboard, type DayRecord } from '../../../lib/api';
-import { SCREEN_LOAD_TIMEOUT_MS, withTimeout } from '../../../lib/net';
+import { SCREEN_LOAD_TIMEOUT_MS, note, withTimeout } from '../../../lib/net';
 import { buildMonth, DAY_VIEW, periodMonthsFor, typeLabel, type DayInfo } from '../../../lib/calendarView';
 import { hm, longDate, monthYear, parseYmd, ymd } from '../../../lib/dates';
 import { useSession } from '../../../lib/session';
@@ -33,8 +33,12 @@ export default function ReportsScreen() {
 
   const load = useCallback(
     async (y: number, m: number, pull = false) => {
-      if (!profile) return;
+      if (!profile) {
+        note('attendance: no profile', 'skipped');
+        return;
+      }
       const key = `${y}-${m}`;
+      note(`attendance: start ${key}`);
       if (pull) setRefreshing(true);
       if (loadedFor.current !== key) {
         setRecords(null);
@@ -49,11 +53,13 @@ export default function ReportsScreen() {
         ]);
         const ls: Leave[] = [];
         for (const r of dashes) if (r.status === 'fulfilled') ls.push(...r.value.leaves);
+        note(`attendance: end ${key}`, `ok (${recs.length})`);
         loadedFor.current = key;
         setRecords(recs);
         setLeaves(ls);
         setFailed(false);
-      } catch {
+      } catch (e) {
+        note(`attendance: end ${key}`, `failed: ${String((e as Error)?.message ?? '').slice(0, 40)}`);
         if (loadedFor.current !== key) setFailed(true);
       } finally {
         setRefreshing(false);

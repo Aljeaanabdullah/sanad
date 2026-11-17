@@ -1,6 +1,7 @@
 // Every server call the app makes. Data is protected by RLS / SECURITY DEFINER RPCs on Supabase.
 import type { DashboardData } from '../sanad/dashboard';
 import { kuwaitTime, ymd } from './dates';
+import { note } from './net';
 import { supabase } from './supabase';
 
 /** A refusal with a code that has a text in strings.json (`req_error_<code>`). */
@@ -23,7 +24,9 @@ function fail(message: string | undefined): never {
 }
 
 async function myEmployeeId(): Promise<string | null> {
+  note('getUser: start');
   const { data } = await supabase.auth.getUser();
+  note('getUser: end', data.user ? 'ok' : 'no user');
   if (!data.user) return null;
   const { data: me } = await supabase.from('employees').select('id').eq('user_id', data.user.id).single();
   return me?.id ?? null;

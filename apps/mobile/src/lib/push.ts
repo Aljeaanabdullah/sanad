@@ -7,6 +7,7 @@ import * as Notifications from 'expo-notifications';
 import { Linking, Platform } from 'react-native';
 import type { Lang } from './i18n';
 import type { PermissionInfo } from './notify';
+import { note } from './net';
 import { supabase } from './supabase';
 
 /** Same ids as the server (send-push CHANNEL_NORMAL / CHANNEL_EMERGENCY). */
@@ -96,7 +97,10 @@ export async function registerPush(lang: Lang, knownToken?: string): Promise<Reg
   }
   if (typeof token !== 'string' || token.length < 20) return 'unavailable';
   const key = `${token}|${lang}`;
-  if (sentKey === key) return 'registered';
+  if (sentKey === key) {
+    note('push token: already sent', 'skipped');
+    return 'registered';
+  }
   sentKey = key; // set before the call: a listener firing meanwhile does not send it again
   const { error } = await supabase.rpc('register_push_token', {
     p_token: token,

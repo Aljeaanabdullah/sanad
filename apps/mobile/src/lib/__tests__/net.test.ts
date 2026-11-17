@@ -77,3 +77,26 @@ test('withTimeout: a value in time is returned', async () => {
   await expect(withTimeout(Promise.resolve(7), 1000)).resolves.toBe(7);
   expect(jest.getTimerCount()).toBe(0);
 });
+
+describe('connection check trace', () => {
+  const { networkTrace, traceLabel, note } = jest.requireActual('../net') as typeof import('../net');
+
+  test('labels never carry the query string (no ids, no values)', () => {
+    expect(traceLabel('https://x.supabase.co/rest/v1/requests?select=id&employee_id=eq.abc', 'get')).toBe('GET /rest/v1/requests');
+    expect(traceLabel('https://x.supabase.co/rest/v1/rpc/attendance_history', 'POST')).toBe('POST rpc/attendance_history');
+    expect(traceLabel('https://x.supabase.co/auth/v1/token?grant_type=refresh_token', 'POST')).toBe('POST auth/token');
+  });
+
+  test('a call is listed as waiting, then with its status and time', async () => {
+    jest.useRealTimers();
+    let answer!: (r: Response) => void;
+    const base = jest.fn(() => new Promise<Response>((r) => (answer = r)));
+    const p = fetchWithTimeout(base as unknown as typeof fetch)('https://x.supabase.co/rest/v1/sites?select=id');
+    expect(networkTrace()[0]).toMatchObject({ label: 'GET /rest/v1/sites', result: null });
+    answer({ status: 200 } as Response);
+    await p;
+    expect(networkTrace()[0]).toMatchObject({ label: 'GET /rest/v1/sites', result: '200' });
+    note('requests: start');
+    expect(networkTrace()[0]).toMatchObject({ label: 'requests: start', result: 'ok' });
+  });
+});
