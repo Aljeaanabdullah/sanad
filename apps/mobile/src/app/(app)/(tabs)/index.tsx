@@ -65,7 +65,9 @@ export default function Home() {
   }, [loadAll]);
 
   const onPunch = (next: PunchKind | null) => {
-    router.push(next ? `/punch?next=${next === 'check_out' ? 'out' : 'in'}` : '/punch');
+    // `at` = the press time, so the punch screen can measure the whole try (pilot metric, report.attempt_ms).
+    const at = Date.now();
+    router.push(next ? `/punch?next=${next === 'check_out' ? 'out' : 'in'}&at=${at}` : `/punch?at=${at}`);
   };
 
   const name = firstName(profile, lang);

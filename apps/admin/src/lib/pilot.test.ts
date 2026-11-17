@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fillDays, firstOkVerdict, parsePilotFilters, percent, pilotQuery, reasonLabel, seconds, share } from "./pilot";
+import { clientTimes, fillDays, firstOkVerdict, fullTimeVerdict, parsePilotFilters, percent, pilotQuery, reasonLabel, seconds, share } from "./pilot";
 
 describe("pilot metrics helpers", () => {
   it("opens on the last 14 days when no date is given", () => {
@@ -47,5 +47,22 @@ describe("pilot metrics helpers", () => {
   it("falls back to the code for an unknown reason", () => {
     expect(reasonLabel({ weak_gps: "Weak" }, "weak_gps")).toBe("Weak");
     expect(reasonLabel({}, "new_reason")).toBe("new_reason");
+  });
+
+  it("reads the phone and full times, empty when the database does not send them yet", () => {
+    expect(clientTimes({})).toEqual({
+      client: { n: 0, p50: null, p90: null, max: null },
+      full: { n: 0, p50: null, p90: null, max: null, under_10s: 0 },
+    });
+    const full = { n: 3, p50: 6000, p90: 8000, max: 9000, under_10s: 3 };
+    expect(clientTimes({ client_ms: { n: 3, p50: 5000, p90: 7000, max: 8000 }, full_ms: full }).full).toBe(full);
+  });
+
+  it("judges the full time against 10 seconds", () => {
+    const t = (p50: number | null, p90: number | null, n = 5) => ({ n, p50, p90, max: p90 });
+    expect(fullTimeVerdict(t(6000, 9900))).toBe("ok");
+    expect(fullTimeVerdict(t(6000, 10000))).toBe("warn");
+    expect(fullTimeVerdict(t(10000, 14000))).toBe("danger");
+    expect(fullTimeVerdict(t(null, null, 0))).toBe("none");
   });
 });

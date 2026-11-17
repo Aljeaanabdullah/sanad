@@ -1,7 +1,8 @@
 import { addDays, parseReportFilters, type FilterError } from "./reports";
 
 // Pilot metrics (Phase 13, PRD section 16). The numbers come from public.pilot_metrics
-// (supabase/migrations/20261117192407_pilot_metrics.sql), read with the signed-in user's session.
+// (supabase/migrations/20261117192407_pilot_metrics.sql, phone time added in
+// 20261117193112_pilot_metrics_client_time.sql), read with the signed-in user's session.
 
 /** The pilot runs two weeks, so the screen opens on the last 14 days (Kuwait). */
 export const PILOT_DEFAULT_DAYS = 14;
@@ -13,6 +14,8 @@ export const FIRST_OK_STOP = 0.9;
 /** PRD 16: the whole punch takes under 10 seconds. */
 export const FULL_TIME_TARGET_S = 10;
 
+export type Timing = { n: number; p50: number | null; p90: number | null; max: number | null };
+
 export type PilotMetrics = {
   from: string;
   to: string;
@@ -23,7 +26,11 @@ export type PilotMetrics = {
   employees: number;
   tries: number;
   first_ok: number;
-  server_ms: { n: number; p50: number | null; p90: number | null; max: number | null };
+  server_ms: Timing;
+  /** Phone time (press -> just before sending, client_report.attempt_ms). Missing before the second migration. */
+  client_ms?: Timing;
+  /** Per punch, phone time + server time: an estimate a little under the real full time. */
+  full_ms?: Timing & { under_10s: number };
   reasons: { reason: string; n: number }[];
   methods: { method: string; attempts: number; accepted: number; rejected: number; tries: number; first_ok: number }[];
   days: { day: string; accepted: number; rejected: number }[];
@@ -91,4 +98,25 @@ export function fillDays(m: Pick<PilotMetrics, "from" | "to" | "days">): { day: 
 /** A label for a refusal reason code, falling back to the code itself for one we do not know yet. */
 export function reasonLabel(labels: Record<string, string>, code: string): string {
   return labels[code] ?? code;
+}
+
+/** No phone times yet: the database function is older, or no punch came from the new app version. */
+const EMPTY_FULL: Timing & { under_10s: number } = { n: 0, p50: null, p90: null, max: null, under_10s: 0 };
+const EMPTY: Timing = { n: 0, p50: null, p90: null, max: null };
+
+/** The phone and full times, with empty values when the database does not send them yet. */
+export function clientTimes(m: Pick<PilotMetrics, "client_ms" | "full_ms">): { client: Timing; full: Timing & { under_10s: number } } {
+  return { client: m.client_ms ?? EMPTY, full: m.full_ms ?? EMPTY_FULL };
+}
+
+/**
+ * The full time against PRD 16 (under 10 seconds): "ok" when 90% of punches are under it, "warn" when only
+ * the median is, "danger" when the median is over it, "none" without phone times.
+ */
+export function fullTimeVerdict(full: Timing): Verdict {
+  const limit = FULL_TIME_TARGET_S * 1000;
+  if (full.n === 0 || full.p50 === null) return "none";
+  if (full.p90 !== null && full.p90 < limit) return "ok";
+  if (full.p50 < limit) return "warn";
+  return "danger";
 }

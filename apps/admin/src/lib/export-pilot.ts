@@ -3,7 +3,7 @@ import ExcelJS from "exceljs";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Lang } from "./i18n";
 import { pilotT } from "./i18n-pilot";
-import { fillDays, percent, RETRY_MINUTES, reasonLabel, share, type PilotFilters, type PilotMetrics } from "./pilot";
+import { clientTimes, fillDays, percent, RETRY_MINUTES, reasonLabel, share, type PilotFilters, type PilotMetrics } from "./pilot";
 
 /** The metrics for a period, read with the caller's session (the SQL function is security invoker). */
 export async function loadPilotMetrics(supabase: SupabaseClient, f: PilotFilters): Promise<PilotMetrics> {
@@ -37,6 +37,7 @@ export async function pilotToXlsx(
     row.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF0E5A61" } }; // sea-glass primary
   };
   const firstOk = share(m.first_ok, m.tries);
+  const { client, full } = clientTimes(m);
 
   const sum = wb.addWorksheet(X.sheetSummary, { views: view });
   sum.columns = [
@@ -59,7 +60,17 @@ export async function pilotToXlsx(
     [X.serverP50, secs(m.server_ms.p50), ""],
     [X.serverP90, secs(m.server_ms.p90), ""],
     [X.serverMax, secs(m.server_ms.max), ""],
-    [X.fullTime, X.fullTimeValue, X.fullTimeTarget],
+    ...(full.n > 0
+      ? [
+          [X.clientN, client.n, ""],
+          [X.clientP50, secs(client.p50), ""],
+          [X.clientP90, secs(client.p90), ""],
+          [X.fullP50, secs(full.p50), X.fullTimeTarget],
+          [X.fullP90, secs(full.p90), X.fullTimeTarget],
+          [X.fullMax, secs(full.max), ""],
+          [X.fullUnder, percent(share(full.under_10s, full.n)), ""],
+        ]
+      : [[t.fullTime, X.fullTimeNone, X.fullTimeTarget]]),
     [X.exportedAt, scope.exportedAt, ""],
     [],
     [X.notes, "", ""],
