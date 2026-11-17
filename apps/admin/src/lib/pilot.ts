@@ -1,7 +1,7 @@
 import { addDays, parseReportFilters, type FilterError } from "./reports";
 
 // Pilot metrics (Phase 13, PRD section 16). The numbers come from public.pilot_metrics
-// (supabase/migrations/20261117120000_pilot_metrics.sql), read with the signed-in user's session.
+// (supabase/migrations/20261117192407_pilot_metrics.sql), read with the signed-in user's session.
 
 /** The pilot runs two weeks, so the screen opens on the last 14 days (Kuwait). */
 export const PILOT_DEFAULT_DAYS = 14;
