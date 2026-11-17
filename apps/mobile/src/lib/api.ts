@@ -18,6 +18,7 @@ const KNOWN = [
 ];
 
 function fail(message: string | undefined): never {
+  if (message?.includes('timed out')) throw new RequestError('timeout'); // net.ts TimeoutError
   throw new RequestError(KNOWN.find((k) => message?.includes(k)) ?? 'generic');
 }
 

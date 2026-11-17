@@ -8,6 +8,7 @@ import { CalendarGrid, CalendarLegend } from '../../../components/dash/CalendarG
 import { MonthSwitcher } from '../../../components/dash/MonthSwitcher';
 import { Badge, Button, Card, ErrorState, Header, Row, Screen, Section, Skeleton, StatTile, Txt } from '../../../components/ui';
 import { attendanceHistory, loadDashboard, type DayRecord } from '../../../lib/api';
+import { SCREEN_LOAD_TIMEOUT_MS, withTimeout } from '../../../lib/net';
 import { buildMonth, DAY_VIEW, periodMonthsFor, typeLabel, type DayInfo } from '../../../lib/calendarView';
 import { hm, longDate, monthYear, parseYmd, ymd } from '../../../lib/dates';
 import { useSession } from '../../../lib/session';
@@ -40,10 +41,11 @@ export default function ReportsScreen() {
         setFailed(false);
       }
       try {
+        // A stalled call turns into the error card with "Try again", never an endless skeleton.
         const [recs, dashes] = await Promise.all([
-          attendanceHistory(profile.id, new Date(y, m, 1), new Date(y, m + 1, 0)),
+          withTimeout(attendanceHistory(profile.id, new Date(y, m, 1), new Date(y, m + 1, 0)), SCREEN_LOAD_TIMEOUT_MS),
           // Leave info is extra: a failed dashboard only hides the leave marks.
-          Promise.allSettled(periodMonthsFor(y, m).map((pm) => loadDashboard(null, pm))),
+          Promise.allSettled(periodMonthsFor(y, m).map((pm) => withTimeout(loadDashboard(null, pm), SCREEN_LOAD_TIMEOUT_MS))),
         ]);
         const ls: Leave[] = [];
         for (const r of dashes) if (r.status === 'fulfilled') ls.push(...r.value.leaves);

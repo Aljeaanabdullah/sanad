@@ -6,6 +6,7 @@ import { RefreshControl, View } from 'react-native';
 import { ActionTile, RequestRow } from '../../../components/requests/parts';
 import { Badge, Card, Chip, EmptyState, ErrorState, Header, ListRow, Row, Screen, Section, SkeletonCard } from '../../../components/ui';
 import { approvalInbox, myRequests, type RequestItem } from '../../../lib/api';
+import { SCREEN_LOAD_TIMEOUT_MS, withTimeout } from '../../../lib/net';
 import { countByFilter, errorKey, filterRequests, isStaff, type RequestFilter } from '../../../lib/requestsView';
 import { useSession } from '../../../lib/session';
 import { useSettings } from '../../../lib/settings';
@@ -30,7 +31,10 @@ export default function RequestsTab() {
 
   const load = useCallback(async () => {
     setError(null);
-    const [mine, inbox] = await Promise.allSettled([myRequests(), staff ? approvalInbox() : Promise.resolve([])]);
+    const [mine, inbox] = await Promise.allSettled([
+      withTimeout(myRequests(), SCREEN_LOAD_TIMEOUT_MS),
+      staff ? withTimeout(approvalInbox(), SCREEN_LOAD_TIMEOUT_MS) : Promise.resolve([]),
+    ]);
     if (mine.status === 'fulfilled') setItems(mine.value);
     else setError(t(errorKey(mine.reason)));
     if (staff) setInboxCount(inbox.status === 'fulfilled' ? inbox.value.length : null);
