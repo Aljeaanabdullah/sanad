@@ -9,7 +9,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest",
+    "eas-build-pre-install": "node scripts/eas-google-services.mjs"
   },
   "dependencies": {
     "@expo-google-fonts/tajawal": "^0.4.1",
