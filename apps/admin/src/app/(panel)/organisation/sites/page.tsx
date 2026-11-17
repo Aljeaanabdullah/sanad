@@ -2,7 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getPrefs } from "@/lib/prefs";
 import { orgT } from "@/lib/i18n-org";
-import { Badge, buttonClass, Table } from "@/components/ui";
+import { Badge, buttonClass, Table, Icon } from "@/components/ui";
 
 type Row = {
   id: string;
@@ -29,7 +29,7 @@ export default async function SitesPage() {
     <div className="flex flex-col gap-4">
       <div>
         <Link href="/organisation/sites/new" className={buttonClass.primary}>
-          + {o.newSite}
+          <Icon name="plus" /> {o.newSite}
         </Link>
       </div>
       <Table>
@@ -55,7 +55,7 @@ export default async function SitesPage() {
           )}
           {rows.map((s) => (
             <tr key={s.id}>
-              <td className="font-medium">{lang === "ar" ? s.name_ar : s.name_en}</td>
+              <td className="font-medium whitespace-nowrap">{lang === "ar" ? s.name_ar : s.name_en}</td>
               <td dir="ltr" className="text-start">
                 {s.radius_m}
               </td>
@@ -65,7 +65,7 @@ export default async function SitesPage() {
                 <Badge tone={s.is_active ? "ok" : "off"}>{s.is_active ? o.active : o.inactive}</Badge>
               </td>
               <td className="text-end">
-                <Link href={`/organisation/sites/${s.id}`} className="text-primary hover:underline">
+                <Link href={`/organisation/sites/${s.id}`} className="font-medium text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary">
                   {o.edit}
                 </Link>
               </td>

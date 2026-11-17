@@ -15,7 +15,7 @@ import {
   type ReportKind,
 } from "@/lib/reports";
 import { attendancePage, punchPage } from "@/lib/report-data";
-import { Alert, buttonClass, Card, Field, Input, Select, Table } from "@/components/ui";
+import { Alert, buttonClass, Card, Field, Input, Select, Table, Empty } from "@/components/ui";
 
 type Named = { id: string; name_ar: string; name_en: string };
 
@@ -50,7 +50,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
     : { data: [] };
   const urlOf = new Map((signed ?? []).map((s) => [s.path, s.signedUrl]));
 
-  const tabClass = "rounded-lg px-3 py-1.5 text-sm";
+  const tabClass = "-mb-px border-b-2 px-3 py-2 text-sm whitespace-nowrap";
   const query = (over: Partial<typeof f>) => filterQuery({ ...f, page: 1, ...over });
   const columns = KIND_COLUMNS[f.kind];
 
@@ -61,7 +61,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
         <p className="text-sm text-muted">{t.reportsHint}</p>
       </div>
 
-      <nav className="flex flex-wrap gap-2" aria-label={t.reportsTitle} data-testid="report-tabs">
+      <nav className="flex gap-1 overflow-x-auto border-b border-line [scrollbar-width:none]" aria-label={t.reportsTitle} data-testid="report-tabs">
         {REPORT_KINDS.map((k: ReportKind) => (
           <Link
             key={k}
@@ -69,8 +69,8 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
             aria-current={k === f.kind ? "page" : undefined}
             className={
               k === f.kind
-                ? `${tabClass} bg-primary font-medium text-on-primary`
-                : `${tabClass} border border-line hover:bg-primary-soft`
+                ? `${tabClass} border-primary font-medium text-primary`
+                : `${tabClass} border-transparent text-muted hover:border-line-strong hover:text-foreground`
             }
           >
             {t.kinds[k]}
@@ -79,7 +79,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
       </nav>
 
       <Card>
-        <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6 lg:items-end" role="search">
+        <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6 lg:items-start" role="search">
           <input type="hidden" name="kind" value={f.kind} />
           <Field label={t.from}>
             <Input type="date" name="from" defaultValue={f.from} max={today} required dir="ltr" />
@@ -110,7 +110,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
           <Field label={t.file} hint={t.fileHint}>
             <Input name="file" defaultValue={f.file ?? ""} inputMode="numeric" pattern="\d{6}" maxLength={6} dir="ltr" />
           </Field>
-          <button type="submit" className={buttonClass.primary}>
+          <button type="submit" className={`${buttonClass.primary} lg:mt-[1.625rem]`}>
             {t.apply}
           </button>
         </form>
@@ -143,9 +143,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
       {result.kind === "punches" && !canSeePhotos && <p className="text-sm text-muted">{t.photosHidden}</p>}
 
       {result.rows.length === 0 ? (
-        <p className="text-muted" data-testid="report-empty">
-          {t.noRows}
-        </p>
+        <Empty data-testid="report-empty">{t.noRows}</Empty>
       ) : (
         <Table>
           <thead>
@@ -175,7 +173,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
                           {url ? (
                             <a href={url} target="_blank" rel="noreferrer">
                               {/* eslint-disable-next-line @next/next/no-img-element -- short-lived signed URL */}
-                              <img src={url} alt={t.photo} className="size-14 rounded object-cover" />
+                              <img src={url} alt={t.photo} className="size-14 rounded-lg border border-line object-cover" />
                             </a>
                           ) : (
                             "—"
@@ -237,7 +235,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
             placeholder={t.file}
             aria-label={t.file}
             dir="ltr"
-            className="max-w-48"
+            className="min-w-0 flex-1 sm:max-w-56 sm:flex-none"
           />
           <button type="submit" className={buttonClass.secondary}>
             {t.open}
@@ -254,7 +252,7 @@ function Cell({ col, href, danger, children }: { col: string; href: string; dang
   return (
     <td className={`${ltr ? "whitespace-nowrap" : ""} ${danger ? "text-danger" : ""}`}>
       {col === "name" ? (
-        <Link href={href} className="text-primary hover:underline">
+        <Link href={href} className="font-medium text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary">
           {children}
         </Link>
       ) : ltr ? (

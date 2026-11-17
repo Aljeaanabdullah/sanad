@@ -1,7 +1,7 @@
 "use client";
 
 import { startTransition, useActionState, useState } from "react";
-import { Alert, buttonClass, Field, Input } from "@/components/ui";
+import { Alert, buttonClass, Field, Input, Icon } from "@/components/ui";
 
 type FormState = { error?: string; ok?: boolean };
 
@@ -37,7 +37,7 @@ export function TerminateSteps({
   const ready = got.xlsx && got.pdf;
 
   const step = (format: "xlsx" | "pdf", label: string) => (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line p-4">
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-surface-2 p-4">
       <span className="font-medium">{label}</span>
       <a
         href={`/employees/${id}/export/${format}`}
@@ -46,7 +46,13 @@ export function TerminateSteps({
         className={got[format] ? buttonClass.secondary : buttonClass.primary}
         data-testid={`download-${format}`}
       >
-        {got[format] ? `✓ ${t.downloaded}` : t.download}
+        {got[format] ? (
+          <>
+            <Icon name="check" /> {t.downloaded}
+          </>
+        ) : (
+          t.download
+        )}
       </a>
     </div>
   );
@@ -56,7 +62,7 @@ export function TerminateSteps({
       {step("xlsx", t.step1)}
       {step("pdf", t.step2)}
       <form
-        className="flex flex-col gap-3 rounded-xl border border-danger p-4"
+        className="flex flex-col gap-3 rounded-xl border border-danger/50 bg-danger-soft/40 p-4"
         onSubmit={(e) => {
           e.preventDefault();
           const fd = new FormData(e.currentTarget);

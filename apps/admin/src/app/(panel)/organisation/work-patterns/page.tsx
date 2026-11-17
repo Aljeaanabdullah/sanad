@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getPrefs } from "@/lib/prefs";
 import { orgT } from "@/lib/i18n-org";
 import { intervalToMinutes, isRotation } from "@/lib/validation";
-import { buttonClass, Table } from "@/components/ui";
+import { buttonClass, Table, Icon } from "@/components/ui";
 
 type Row = {
   id: string;
@@ -47,7 +47,7 @@ export default async function WorkPatternsPage() {
     <div className="flex flex-col gap-4">
       <div>
         <Link href="/organisation/work-patterns/new" className={buttonClass.primary}>
-          + {o.newPattern}
+          <Icon name="plus" /> {o.newPattern}
         </Link>
       </div>
       <Table>
@@ -72,12 +72,12 @@ export default async function WorkPatternsPage() {
           )}
           {rows.map((p) => (
             <tr key={p.id}>
-              <td className="font-medium">{lang === "ar" ? p.name_ar : p.name_en}</td>
+              <td className="font-medium whitespace-nowrap">{lang === "ar" ? p.name_ar : p.name_en}</td>
               <td>{o.kinds[p.kind]}</td>
               <td>{schedule(p)}</td>
               <td>{p.employees[0]?.count ?? 0}</td>
               <td className="text-end">
-                <Link href={`/organisation/work-patterns/${p.id}`} className="text-primary hover:underline">
+                <Link href={`/organisation/work-patterns/${p.id}`} className="font-medium text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary">
                   {o.edit}
                 </Link>
               </td>

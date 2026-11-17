@@ -1,55 +1,335 @@
 @import "tailwindcss";
 
-/* Sanad palette: dark navy + gold (PRD 12). Dark mode is chosen by the user (cookie -> .dark on <html>). */
+/* Sanad panel identity: "sea glass" (PRD 12, owner decision 2026-11-17).
+   Colours come from the Kuwait Towers' enamel discs: deep sea teal, turquoise, and a misted ground.
+   Dark mode is chosen by the user (cookie -> .dark on <html>): the Gulf at night. */
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #f6f1e6;
+  --background: #eef4f3;
+  --background-warm: #f5f3ee;
+  --background-cool: #e6f1f0;
   --surface: #ffffff;
-  --foreground: #0b1a33;
-  --muted: #5b6b85;
-  --line: #e4dcc8;
-  --primary: #0b1a33;
-  --primary-soft: #f3e6c4;
-  --on-primary: #e6c878;
-  --accent: #c9a24b;
-  --danger: #b3413a;
-  --danger-soft: #fbe9e7;
+  --surface-2: #f4f9f8;
+  --foreground: #0f2a2e;
+  --muted: #536b6b;
+  --line: #d6e3e1;
+  --line-strong: #b4c9c6;
+  /* Edges of inputs must read at 3:1 against their surface (WCAG 1.4.11). */
+  --control-line: #6f8f8b;
+
+  --primary: #0e5a61;
+  --primary-hover: #0a484e;
+  --primary-soft: #e2f1ef;
+  --on-primary: #ffffff;
+  --accent: #1fa89c;
+
+  --danger: #b3332b;
+  --danger-soft: #fbebe8;
+  --ok: #1a7359;
+  --ok-soft: #e1f3ec;
+  --warn: #8f5407;
+  --warn-soft: #fbf0d8;
+  --info: #24627f;
+  --info-soft: #e3eff6;
+
+  --rail: #0d3b41;
+  --rail-ink: #c1dcd9;
+  --rail-muted: #a6cbc7;
+  --rail-hover: #134950;
+  --rail-on: #18555c;
+  --rail-on-ink: #ffffff;
+  --rail-dot: #5fd3c6;
+
+  /* The eight enamel discs: one fixed hue per attendance state, always shown with its word. */
+  --disc-scheduled: #0e5a61;
+  --disc-on-time: #2c9c7c;
+  --disc-late: #e0a030;
+  --disc-not-arrived: #e2705a;
+  --disc-absent: #b3332b;
+  --disc-leave: #7f9db5;
+  --disc-upcoming: #c3d0d0;
+  --disc-out: #2c6f93;
+
+  --elev-card: 0 1px 2px rgb(15 42 46 / 0.05);
+  --scroll-shade: rgb(15 42 46 / 0.16);
   color-scheme: light;
 }
 
 :root.dark {
-  --background: #0b1628;
-  --surface: #13274a;
-  --foreground: #f6f1e6;
-  --muted: #a9b6cc;
-  --line: #2a3f63;
-  --primary: #e6c878;
-  --primary-soft: #3a2f12;
-  --on-primary: #0b1a33;
-  --accent: #c9a24b;
-  --danger: #ff8a80;
-  --danger-soft: #3d1717;
+  --background: #0a1a1c;
+  --background-warm: #0c1b1b;
+  --background-cool: #081719;
+  --surface: #10262a;
+  --surface-2: #0c1f22;
+  --foreground: #e4f0ee;
+  --muted: #94aeab;
+  --line: #203c40;
+  --line-strong: #2f5459;
+  --control-line: #4a7d84;
+
+  --primary: #5fd3c6;
+  --primary-hover: #7fe0d5;
+  --primary-soft: #123a3d;
+  --on-primary: #062528;
+  --accent: #5fd3c6;
+
+  --danger: #ff9d91;
+  --danger-soft: #3b1b18;
+  --ok: #72d8b0;
+  --ok-soft: #11352b;
+  --warn: #f1ba63;
+  --warn-soft: #3a2c10;
+  --info: #8fc6e8;
+  --info-soft: #12303f;
+
+  --rail: #071416;
+  --rail-ink: #a9c7c4;
+  --rail-muted: #7da19f;
+  --rail-hover: #0e2427;
+  --rail-on: #123437;
+  --rail-on-ink: #ffffff;
+  --rail-dot: #5fd3c6;
+
+  --disc-scheduled: #5fd3c6;
+  --disc-on-time: #3fb892;
+  --disc-late: #eab044;
+  --disc-not-arrived: #ee806a;
+  --disc-absent: #d9483f;
+  --disc-leave: #86a6c0;
+  --disc-upcoming: #3f5558;
+  --disc-out: #4b93b8;
+
+  --elev-card: 0 1px 2px rgb(0 0 0 / 0.3);
+  --scroll-shade: rgb(0 0 0 / 0.55);
   color-scheme: dark;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-control-line: var(--control-line);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-primary-soft: var(--primary-soft);
   --color-on-primary: var(--on-primary);
-  --color-accent: var(--accent);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
-  --font-sans: var(--font-plex-arabic);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-rail: var(--rail);
+  --color-rail-ink: var(--rail-ink);
+  --color-rail-muted: var(--rail-muted);
+  --color-rail-hover: var(--rail-hover);
+  --color-rail-on: var(--rail-on);
+  --color-rail-on-ink: var(--rail-on-ink);
+  --color-rail-dot: var(--rail-dot);
+  --font-sans: var(--font-sanad), system-ui, sans-serif;
+  --radius-lg: 0.5625rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 0.875rem;
+  --shadow-card: var(--elev-card);
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-body {
-  background: var(--background);
+@layer base {
+  html {
+    /* The ground is never flat: warm sand at one corner, cool sea at the other. */
+    background:
+      linear-gradient(135deg, var(--background-warm) 0%, var(--background) 40%, var(--background-cool) 100%) fixed,
+      var(--background);
+    scrollbar-color: var(--line-strong) transparent;
+    scrollbar-width: thin;
+    /* Keyboard focus and in-page jumps never land under the sticky phone menu. */
+    scroll-padding-top: 4rem;
+  }
+
+  body {
+    color: var(--foreground);
+    font-family: var(--font-sanad), system-ui, sans-serif;
+    caret-color: var(--primary);
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 30%, transparent);
+    color: var(--foreground);
+  }
+
+  /* One visible focus ring everywhere, drawn from the palette. */
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  summary {
+    transition-property: color, background-color, border-color, box-shadow, opacity;
+    transition-duration: 160ms;
+    transition-timing-function: var(--ease-out-soft);
+  }
+
+  a {
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
+  }
+
+  button:not(:disabled),
+  summary,
+  [role="button"] {
+    cursor: pointer;
+  }
+
+  /* Numbers, times and file numbers line up in columns. */
+  table,
+  time,
+  [dir="ltr"] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--muted);
+    opacity: 1;
+  }
+
+  /* Native select arrow, drawn in the palette and placed on the inline end. */
+  select {
+    appearance: none;
+    background-image:
+      linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+    background-position:
+      calc(100% - 1.05rem) 50%,
+      calc(100% - 0.75rem) 50%;
+    background-size:
+      0.3rem 0.3rem,
+      0.3rem 0.3rem;
+    background-repeat: no-repeat;
+    padding-inline-end: 2rem;
+  }
+
+  [dir="rtl"] select {
+    background-position:
+      0.75rem 50%,
+      1.05rem 50%;
+  }
+
+  input[type="range"] {
+    accent-color: var(--primary);
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    accent-color: var(--primary);
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+@layer components {
+  /* Skeleton block for loading states. */
+  .skeleton {
+    border-radius: 0.5rem;
+    background: linear-gradient(90deg, var(--line) 0%, var(--surface-2) 50%, var(--line) 100%);
+    background-size: 200% 100%;
+    animation: skeleton-slide 1.4s ease-in-out infinite;
+  }
+
+  /* A wide table scrolls sideways inside its frame. A soft shade at an edge says "more this way";
+     it fades out when that edge is reached (the cover layers scroll with the content). */
+  .table-scroll {
+    background:
+      linear-gradient(to right, var(--surface) 40%, transparent) left / 2.5rem 100% no-repeat local,
+      linear-gradient(to left, var(--surface) 40%, transparent) right / 2.5rem 100% no-repeat local,
+      linear-gradient(to right, var(--scroll-shade), transparent) left / 0.875rem 100% no-repeat scroll,
+      linear-gradient(to left, var(--scroll-shade), transparent) right / 0.875rem 100% no-repeat scroll,
+      var(--surface);
+  }
+
+  /* An enamel disc: the unit of the identity. Used for state marks and the shift field. */
+  .disc {
+    display: inline-block;
+    flex: none;
+    width: 0.5625rem;
+    height: 0.5625rem;
+    border-radius: 9999px;
+    background: var(--disc, var(--line-strong));
+    /* A hairline edge keeps the pale hues readable as shapes on any surface. */
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--foreground) 24%, transparent);
+  }
+
+  .disc-field {
+    display: grid;
+    grid-template-columns: repeat(25, minmax(0, 1fr));
+    gap: 0.25rem;
+  }
+
+  .disc-field > i {
+    aspect-ratio: 1;
+    border-radius: 9999px;
+    background: var(--disc, var(--line));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--foreground) 24%, transparent);
+    transition: background-color 200ms var(--ease-out-soft);
+  }
+
+  @media (min-width: 64rem) {
+    .disc-field {
+      grid-template-columns: repeat(50, minmax(0, 1fr));
+      gap: 0.3125rem;
+    }
+  }
+}
+
+/* The map follows the dark theme: tiles are dimmed and its controls take the panel's surfaces.
+   Overlay circles keep their colours (red is danger, green is safe: PRD 12). */
+.dark .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.9) saturate(0.6);
+}
+
+.dark .leaflet-bar a,
+.dark .leaflet-control-attribution {
+  background: var(--surface);
   color: var(--foreground);
-  font-family: var(--font-plex-arabic), system-ui, sans-serif;
+  border-color: var(--line);
+}
+
+.dark .leaflet-control-attribution a {
+  color: var(--primary);
+}
+
+@keyframes skeleton-slide {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

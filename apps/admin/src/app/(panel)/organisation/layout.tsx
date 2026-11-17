@@ -4,8 +4,9 @@ import { getPrefs } from "@/lib/prefs";
 import { orgT } from "@/lib/i18n-org";
 import { NavLink } from "@/components/nav-link";
 
-const tabClass = "rounded-lg px-3 py-1.5 text-sm hover:bg-primary-soft";
-const activeTabClass = "rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-on-primary";
+const tabBase = "-mb-px border-b-2 px-3 py-2 text-sm whitespace-nowrap";
+const tabClass = `${tabBase} border-transparent text-muted hover:border-line-strong hover:text-foreground`;
+const activeTabClass = `${tabBase} border-primary font-medium text-primary`;
 
 export default async function OrganisationLayout({ children }: { children: ReactNode }) {
   await requireAdmin();
@@ -22,7 +23,7 @@ export default async function OrganisationLayout({ children }: { children: React
   return (
     <div className="flex flex-col gap-5">
       <h1 className="text-2xl font-bold">{o.title}</h1>
-      <nav aria-label={o.title} className="flex flex-wrap gap-2">
+      <nav aria-label={o.title} className="flex gap-1 overflow-x-auto border-b border-line [scrollbar-width:none]">
         {tabs.map(([href, label]) => (
           <NavLink key={href} href={href} className={tabClass} activeClassName={activeTabClass}>
             {label}

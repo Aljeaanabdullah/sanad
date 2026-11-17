@@ -40,13 +40,13 @@ export default async function EmergenciesPage() {
           <h1 className="text-2xl font-bold">{t.title}</h1>
           <p className="text-sm text-muted">{t.hint}</p>
         </div>
-        <Link href="/emergencies/new" className="rounded-lg bg-danger px-4 py-2 font-medium text-background hover:opacity-90" data-testid="launch-link">
+        <Link href="/emergencies/new" className="inline-flex min-h-11 items-center justify-center rounded-full bg-danger px-5 py-2 font-medium text-surface hover:opacity-90 active:scale-[0.98]" data-testid="launch-link">
           {t.launchNew}
         </Link>
       </div>
 
       {active.length > 0 && (
-        <Card className="border-danger">
+        <Card className="border-danger/50">
           <h2 className="mb-3 font-bold text-danger">{t.activeNow}</h2>
           <ul className="flex flex-col gap-2">
             {active.map((r) => (
@@ -101,7 +101,7 @@ export default async function EmergenciesPage() {
                   {formatKuwait(r.closed_at, lang, true)}
                 </td>
                 <td className="text-end">
-                  <Link href={`/emergencies/${r.id}`} className="text-primary hover:underline">
+                  <Link href={`/emergencies/${r.id}`} className="font-medium text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary">
                     {t.open}
                   </Link>
                 </td>

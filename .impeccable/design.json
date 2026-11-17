@@ -1,0 +1,868 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-17T12:00:00Z",
+  "title": "Design System: Sanad Panel",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Deep Sea Teal",
+        "canonical": "#0e5a61",
+        "dark": "#5fd3c6",
+        "tonalRamp": [
+          "oklch(15% 0.040 205)",
+          "oklch(27% 0.051 205)",
+          "oklch(39% 0.061 205)",
+          "oklch(51% 0.072 205)",
+          "oklch(63% 0.068 205)",
+          "oklch(75% 0.058 205)",
+          "oklch(86% 0.048 205)",
+          "oklch(95% 0.040 205)"
+        ]
+      },
+      "primary-hover": {
+        "role": "primary",
+        "displayName": "Deep Sea Teal, pressed",
+        "canonical": "#0a484e",
+        "dark": "#7fe0d5",
+        "tonalRamp": [
+          "oklch(15% 0.034 205)",
+          "oklch(27% 0.043 205)",
+          "oklch(39% 0.052 205)",
+          "oklch(51% 0.062 205)",
+          "oklch(63% 0.059 205)",
+          "oklch(75% 0.049 205)",
+          "oklch(86% 0.041 205)",
+          "oklch(95% 0.034 205)"
+        ]
+      },
+      "primary-soft": {
+        "role": "primary",
+        "displayName": "Sea Mist",
+        "canonical": "#e2f1ef",
+        "dark": "#123a3d",
+        "tonalRamp": [
+          "oklch(15% 0.012 187)",
+          "oklch(27% 0.015 187)",
+          "oklch(39% 0.018 187)",
+          "oklch(51% 0.021 187)",
+          "oklch(63% 0.020 187)",
+          "oklch(75% 0.017 187)",
+          "oklch(86% 0.014 187)",
+          "oklch(95% 0.012 187)"
+        ]
+      },
+      "on-primary": {
+        "role": "primary",
+        "displayName": "Ink on Primary",
+        "canonical": "#ffffff",
+        "dark": "#062528",
+        "tonalRamp": [
+          "oklch(15% 0.012 90)",
+          "oklch(27% 0.015 90)",
+          "oklch(39% 0.018 90)",
+          "oklch(51% 0.021 90)",
+          "oklch(63% 0.020 90)",
+          "oklch(75% 0.017 90)",
+          "oklch(86% 0.014 90)",
+          "oklch(95% 0.012 90)"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Turquoise",
+        "canonical": "#1fa89c",
+        "dark": "#5fd3c6",
+        "tonalRamp": [
+          "oklch(15% 0.064 186)",
+          "oklch(27% 0.081 186)",
+          "oklch(39% 0.098 186)",
+          "oklch(51% 0.116 186)",
+          "oklch(63% 0.110 186)",
+          "oklch(75% 0.093 186)",
+          "oklch(86% 0.077 186)",
+          "oklch(95% 0.064 186)"
+        ]
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Misted Sea",
+        "canonical": "#eef4f3",
+        "dark": "#0a1a1c",
+        "tonalRamp": [
+          "oklch(15% 0.012 185)",
+          "oklch(27% 0.015 185)",
+          "oklch(39% 0.018 185)",
+          "oklch(51% 0.021 185)",
+          "oklch(63% 0.020 185)",
+          "oklch(75% 0.017 185)",
+          "oklch(86% 0.014 185)",
+          "oklch(95% 0.012 185)"
+        ]
+      },
+      "background-warm": {
+        "role": "neutral",
+        "displayName": "Warm Sand",
+        "canonical": "#f5f3ee",
+        "dark": "#0c1b1b",
+        "tonalRamp": [
+          "oklch(15% 0.012 89)",
+          "oklch(27% 0.015 89)",
+          "oklch(39% 0.018 89)",
+          "oklch(51% 0.021 89)",
+          "oklch(63% 0.020 89)",
+          "oklch(75% 0.017 89)",
+          "oklch(86% 0.014 89)",
+          "oklch(95% 0.012 89)"
+        ]
+      },
+      "background-cool": {
+        "role": "neutral",
+        "displayName": "Cool Sea",
+        "canonical": "#e6f1f0",
+        "dark": "#081719",
+        "tonalRamp": [
+          "oklch(15% 0.012 190)",
+          "oklch(27% 0.015 190)",
+          "oklch(39% 0.018 190)",
+          "oklch(51% 0.021 190)",
+          "oklch(63% 0.020 190)",
+          "oklch(75% 0.017 190)",
+          "oklch(86% 0.014 190)",
+          "oklch(95% 0.012 190)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "White Surface",
+        "canonical": "#ffffff",
+        "dark": "#10262a",
+        "tonalRamp": [
+          "oklch(15% 0.012 90)",
+          "oklch(27% 0.015 90)",
+          "oklch(39% 0.018 90)",
+          "oklch(51% 0.021 90)",
+          "oklch(63% 0.020 90)",
+          "oklch(75% 0.017 90)",
+          "oklch(86% 0.014 90)",
+          "oklch(95% 0.012 90)"
+        ]
+      },
+      "surface-2": {
+        "role": "neutral",
+        "displayName": "Shallow Water",
+        "canonical": "#f4f9f8",
+        "dark": "#0c1f22",
+        "tonalRamp": [
+          "oklch(15% 0.012 183)",
+          "oklch(27% 0.015 183)",
+          "oklch(39% 0.018 183)",
+          "oklch(51% 0.021 183)",
+          "oklch(63% 0.020 183)",
+          "oklch(75% 0.017 183)",
+          "oklch(86% 0.014 183)",
+          "oklch(95% 0.012 183)"
+        ]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Deep Ink",
+        "canonical": "#0f2a2e",
+        "dark": "#e4f0ee",
+        "tonalRamp": [
+          "oklch(15% 0.019 208)",
+          "oklch(27% 0.025 208)",
+          "oklch(39% 0.030 208)",
+          "oklch(51% 0.035 208)",
+          "oklch(63% 0.033 208)",
+          "oklch(75% 0.028 208)",
+          "oklch(86% 0.023 208)",
+          "oklch(95% 0.019 208)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted Teal-Grey",
+        "canonical": "#536b6b",
+        "dark": "#94aeab",
+        "tonalRamp": [
+          "oklch(15% 0.016 196)",
+          "oklch(27% 0.021 196)",
+          "oklch(39% 0.025 196)",
+          "oklch(51% 0.030 196)",
+          "oklch(63% 0.028 196)",
+          "oklch(75% 0.024 196)",
+          "oklch(86% 0.020 196)",
+          "oklch(95% 0.016 196)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Line",
+        "canonical": "#d6e3e1",
+        "dark": "#203c40",
+        "tonalRamp": [
+          "oklch(15% 0.012 186)",
+          "oklch(27% 0.015 186)",
+          "oklch(39% 0.018 186)",
+          "oklch(51% 0.021 186)",
+          "oklch(63% 0.020 186)",
+          "oklch(75% 0.017 186)",
+          "oklch(86% 0.014 186)",
+          "oklch(95% 0.012 186)"
+        ]
+      },
+      "line-strong": {
+        "role": "neutral",
+        "displayName": "Strong Line",
+        "canonical": "#b4c9c6",
+        "dark": "#2f5459",
+        "tonalRamp": [
+          "oklch(15% 0.013 186)",
+          "oklch(27% 0.017 186)",
+          "oklch(39% 0.021 186)",
+          "oklch(51% 0.024 186)",
+          "oklch(63% 0.023 186)",
+          "oklch(75% 0.019 186)",
+          "oklch(86% 0.016 186)",
+          "oklch(95% 0.013 186)"
+        ]
+      },
+      "control-line": {
+        "role": "neutral",
+        "displayName": "Control Line",
+        "canonical": "#6f8f8b",
+        "dark": "#4a7d84",
+        "tonalRamp": [
+          "oklch(15% 0.020 186)",
+          "oklch(27% 0.026 186)",
+          "oklch(39% 0.031 186)",
+          "oklch(51% 0.036 186)",
+          "oklch(63% 0.034 186)",
+          "oklch(75% 0.029 186)",
+          "oklch(86% 0.024 186)",
+          "oklch(95% 0.020 186)"
+        ]
+      },
+      "rail": {
+        "role": "secondary",
+        "displayName": "Rail Teal",
+        "canonical": "#0d3b41",
+        "dark": "#071416",
+        "tonalRamp": [
+          "oklch(15% 0.028 208)",
+          "oklch(27% 0.036 208)",
+          "oklch(39% 0.044 208)",
+          "oklch(51% 0.051 208)",
+          "oklch(63% 0.049 208)",
+          "oklch(75% 0.041 208)",
+          "oklch(86% 0.034 208)",
+          "oklch(95% 0.028 208)"
+        ]
+      },
+      "rail-ink": {
+        "role": "secondary",
+        "displayName": "Rail Ink",
+        "canonical": "#c1dcd9",
+        "dark": "#a9c7c4",
+        "tonalRamp": [
+          "oklch(15% 0.017 189)",
+          "oklch(27% 0.021 189)",
+          "oklch(39% 0.026 189)",
+          "oklch(51% 0.030 189)",
+          "oklch(63% 0.029 189)",
+          "oklch(75% 0.024 189)",
+          "oklch(86% 0.020 189)",
+          "oklch(95% 0.017 189)"
+        ]
+      },
+      "rail-muted": {
+        "role": "secondary",
+        "displayName": "Rail Muted",
+        "canonical": "#a6cbc7",
+        "dark": "#7da19f",
+        "tonalRamp": [
+          "oklch(15% 0.026 189)",
+          "oklch(27% 0.033 189)",
+          "oklch(39% 0.040 189)",
+          "oklch(51% 0.046 189)",
+          "oklch(63% 0.044 189)",
+          "oklch(75% 0.037 189)",
+          "oklch(86% 0.031 189)",
+          "oklch(95% 0.026 189)"
+        ]
+      },
+      "rail-hover": {
+        "role": "secondary",
+        "displayName": "Rail Hover",
+        "canonical": "#134950",
+        "dark": "#0e2427",
+        "tonalRamp": [
+          "oklch(15% 0.032 208)",
+          "oklch(27% 0.041 208)",
+          "oklch(39% 0.050 208)",
+          "oklch(51% 0.058 208)",
+          "oklch(63% 0.055 208)",
+          "oklch(75% 0.047 208)",
+          "oklch(86% 0.039 208)",
+          "oklch(95% 0.032 208)"
+        ]
+      },
+      "rail-on": {
+        "role": "secondary",
+        "displayName": "Rail Current",
+        "canonical": "#18555c",
+        "dark": "#123437",
+        "tonalRamp": [
+          "oklch(15% 0.036 206)",
+          "oklch(27% 0.045 206)",
+          "oklch(39% 0.055 206)",
+          "oklch(51% 0.064 206)",
+          "oklch(63% 0.061 206)",
+          "oklch(75% 0.051 206)",
+          "oklch(86% 0.043 206)",
+          "oklch(95% 0.036 206)"
+        ]
+      },
+      "rail-on-ink": {
+        "role": "secondary",
+        "displayName": "Rail Current Ink",
+        "canonical": "#ffffff",
+        "dark": "#ffffff",
+        "tonalRamp": [
+          "oklch(15% 0.012 90)",
+          "oklch(27% 0.015 90)",
+          "oklch(39% 0.018 90)",
+          "oklch(51% 0.021 90)",
+          "oklch(63% 0.020 90)",
+          "oklch(75% 0.017 90)",
+          "oklch(86% 0.014 90)",
+          "oklch(95% 0.012 90)"
+        ]
+      },
+      "rail-dot": {
+        "role": "secondary",
+        "displayName": "Lit Disc",
+        "canonical": "#5fd3c6",
+        "dark": "#5fd3c6",
+        "tonalRamp": [
+          "oklch(15% 0.062 185)",
+          "oklch(27% 0.079 185)",
+          "oklch(39% 0.095 185)",
+          "oklch(51% 0.112 185)",
+          "oklch(63% 0.106 185)",
+          "oklch(75% 0.090 185)",
+          "oklch(86% 0.074 185)",
+          "oklch(95% 0.062 185)"
+        ]
+      },
+      "danger": {
+        "role": "tertiary",
+        "displayName": "Danger Red",
+        "canonical": "#b3332b",
+        "dark": "#ff9d91",
+        "tonalRamp": [
+          "oklch(15% 0.096 28)",
+          "oklch(27% 0.122 28)",
+          "oklch(39% 0.148 28)",
+          "oklch(51% 0.160 28)",
+          "oklch(63% 0.160 28)",
+          "oklch(75% 0.139 28)",
+          "oklch(86% 0.116 28)",
+          "oklch(95% 0.096 28)"
+        ]
+      },
+      "danger-soft": {
+        "role": "tertiary",
+        "displayName": "Danger Tint",
+        "canonical": "#fbebe8",
+        "dark": "#3b1b18",
+        "tonalRamp": [
+          "oklch(15% 0.012 30)",
+          "oklch(27% 0.015 30)",
+          "oklch(39% 0.018 30)",
+          "oklch(51% 0.021 30)",
+          "oklch(63% 0.020 30)",
+          "oklch(75% 0.017 30)",
+          "oklch(86% 0.014 30)",
+          "oklch(95% 0.012 30)"
+        ]
+      },
+      "ok": {
+        "role": "tertiary",
+        "displayName": "OK Green",
+        "canonical": "#1a7359",
+        "dark": "#72d8b0",
+        "tonalRamp": [
+          "oklch(15% 0.053 168)",
+          "oklch(27% 0.067 168)",
+          "oklch(39% 0.082 168)",
+          "oklch(51% 0.096 168)",
+          "oklch(63% 0.091 168)",
+          "oklch(75% 0.077 168)",
+          "oklch(86% 0.064 168)",
+          "oklch(95% 0.053 168)"
+        ]
+      },
+      "ok-soft": {
+        "role": "tertiary",
+        "displayName": "OK Tint",
+        "canonical": "#e1f3ec",
+        "dark": "#11352b",
+        "tonalRamp": [
+          "oklch(15% 0.012 171)",
+          "oklch(27% 0.016 171)",
+          "oklch(39% 0.019 171)",
+          "oklch(51% 0.022 171)",
+          "oklch(63% 0.021 171)",
+          "oklch(75% 0.018 171)",
+          "oklch(86% 0.015 171)",
+          "oklch(95% 0.012 171)"
+        ]
+      },
+      "warn": {
+        "role": "tertiary",
+        "displayName": "Warning Brown",
+        "canonical": "#8f5407",
+        "dark": "#f1ba63",
+        "tonalRamp": [
+          "oklch(15% 0.064 64)",
+          "oklch(27% 0.082 64)",
+          "oklch(39% 0.099 64)",
+          "oklch(51% 0.116 64)",
+          "oklch(63% 0.111 64)",
+          "oklch(75% 0.093 64)",
+          "oklch(86% 0.077 64)",
+          "oklch(95% 0.064 64)"
+        ]
+      },
+      "warn-soft": {
+        "role": "tertiary",
+        "displayName": "Warning Tint",
+        "canonical": "#fbf0d8",
+        "dark": "#3a2c10",
+        "tonalRamp": [
+          "oklch(15% 0.020 86)",
+          "oklch(27% 0.025 86)",
+          "oklch(39% 0.030 86)",
+          "oklch(51% 0.035 86)",
+          "oklch(63% 0.034 86)",
+          "oklch(75% 0.028 86)",
+          "oklch(86% 0.023 86)",
+          "oklch(95% 0.020 86)"
+        ]
+      },
+      "info": {
+        "role": "tertiary",
+        "displayName": "Info Blue",
+        "canonical": "#24627f",
+        "dark": "#8fc6e8",
+        "tonalRamp": [
+          "oklch(15% 0.045 232)",
+          "oklch(27% 0.057 232)",
+          "oklch(39% 0.070 232)",
+          "oklch(51% 0.082 232)",
+          "oklch(63% 0.078 232)",
+          "oklch(75% 0.066 232)",
+          "oklch(86% 0.054 232)",
+          "oklch(95% 0.045 232)"
+        ]
+      },
+      "info-soft": {
+        "role": "tertiary",
+        "displayName": "Info Tint",
+        "canonical": "#e3eff6",
+        "dark": "#12303f",
+        "tonalRamp": [
+          "oklch(15% 0.012 233)",
+          "oklch(27% 0.015 233)",
+          "oklch(39% 0.018 233)",
+          "oklch(51% 0.021 233)",
+          "oklch(63% 0.020 233)",
+          "oklch(75% 0.017 233)",
+          "oklch(86% 0.014 233)",
+          "oklch(95% 0.012 233)"
+        ]
+      },
+      "disc-scheduled": {
+        "role": "tertiary",
+        "displayName": "Disc: Teal (scheduled)",
+        "canonical": "#0e5a61",
+        "dark": "#5fd3c6",
+        "tonalRamp": [
+          "oklch(15% 0.040 205)",
+          "oklch(27% 0.051 205)",
+          "oklch(39% 0.061 205)",
+          "oklch(51% 0.072 205)",
+          "oklch(63% 0.068 205)",
+          "oklch(75% 0.058 205)",
+          "oklch(86% 0.048 205)",
+          "oklch(95% 0.040 205)"
+        ]
+      },
+      "disc-on-time": {
+        "role": "tertiary",
+        "displayName": "Disc: Sea Green (on time)",
+        "canonical": "#2c9c7c",
+        "dark": "#3fb892",
+        "tonalRamp": [
+          "oklch(15% 0.064 170)",
+          "oklch(27% 0.081 170)",
+          "oklch(39% 0.098 170)",
+          "oklch(51% 0.116 170)",
+          "oklch(63% 0.110 170)",
+          "oklch(75% 0.093 170)",
+          "oklch(86% 0.077 170)",
+          "oklch(95% 0.064 170)"
+        ]
+      },
+      "disc-late": {
+        "role": "tertiary",
+        "displayName": "Disc: Amber (late)",
+        "canonical": "#e0a030",
+        "dark": "#eab044",
+        "tonalRamp": [
+          "oklch(15% 0.082 76)",
+          "oklch(27% 0.104 76)",
+          "oklch(39% 0.127 76)",
+          "oklch(51% 0.149 76)",
+          "oklch(63% 0.141 76)",
+          "oklch(75% 0.119 76)",
+          "oklch(86% 0.099 76)",
+          "oklch(95% 0.082 76)"
+        ]
+      },
+      "disc-not-arrived": {
+        "role": "tertiary",
+        "displayName": "Disc: Coral (not arrived)",
+        "canonical": "#e2705a",
+        "dark": "#ee806a",
+        "tonalRamp": [
+          "oklch(15% 0.085 32)",
+          "oklch(27% 0.108 32)",
+          "oklch(39% 0.131 32)",
+          "oklch(51% 0.154 32)",
+          "oklch(63% 0.146 32)",
+          "oklch(75% 0.123 32)",
+          "oklch(86% 0.102 32)",
+          "oklch(95% 0.085 32)"
+        ]
+      },
+      "disc-absent": {
+        "role": "tertiary",
+        "displayName": "Disc: Deep Red (absent)",
+        "canonical": "#b3332b",
+        "dark": "#d9483f",
+        "tonalRamp": [
+          "oklch(15% 0.096 28)",
+          "oklch(27% 0.122 28)",
+          "oklch(39% 0.148 28)",
+          "oklch(51% 0.160 28)",
+          "oklch(63% 0.160 28)",
+          "oklch(75% 0.139 28)",
+          "oklch(86% 0.116 28)",
+          "oklch(95% 0.096 28)"
+        ]
+      },
+      "disc-leave": {
+        "role": "tertiary",
+        "displayName": "Disc: Grey-Blue (on leave)",
+        "canonical": "#7f9db5",
+        "dark": "#86a6c0",
+        "tonalRamp": [
+          "oklch(15% 0.028 243)",
+          "oklch(27% 0.036 243)",
+          "oklch(39% 0.044 243)",
+          "oklch(51% 0.051 243)",
+          "oklch(63% 0.049 243)",
+          "oklch(75% 0.041 243)",
+          "oklch(86% 0.034 243)",
+          "oklch(95% 0.028 243)"
+        ]
+      },
+      "disc-upcoming": {
+        "role": "tertiary",
+        "displayName": "Disc: Pale Grey (not started)",
+        "canonical": "#c3d0d0",
+        "dark": "#3f5558",
+        "tonalRamp": [
+          "oklch(15% 0.012 197)",
+          "oklch(27% 0.015 197)",
+          "oklch(39% 0.018 197)",
+          "oklch(51% 0.021 197)",
+          "oklch(63% 0.020 197)",
+          "oklch(75% 0.017 197)",
+          "oklch(86% 0.014 197)",
+          "oklch(95% 0.012 197)"
+        ]
+      },
+      "disc-out": {
+        "role": "tertiary",
+        "displayName": "Disc: Deep Blue (checked out)",
+        "canonical": "#2c6f93",
+        "dark": "#4b93b8",
+        "tonalRamp": [
+          "oklch(15% 0.051 236)",
+          "oklch(27% 0.065 236)",
+          "oklch(39% 0.078 236)",
+          "oklch(51% 0.092 236)",
+          "oklch(63% 0.087 236)",
+          "oklch(75% 0.074 236)",
+          "oklch(86% 0.061 236)",
+          "oklch(95% 0.051 236)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The wordmark in the rail; the count numerals in live tiles and employee dashboard tiles use the same size at weight 600."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "The one page title on each screen."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Buttons, field values, the user's name in the header."
+      },
+      "body-sm": {
+        "displayName": "Body small",
+        "purpose": "Tables, hints, tabs, alerts, field labels. The most used size."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Table column headers and the disc field legend."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Field hints, tile hints, badge text, the role line."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card",
+        "value": "0 1px 2px rgb(15 42 46 / 0.05)",
+        "purpose": "The only lifting shadow: cards, standalone tables, count tiles, the sign-in form. Dark: 0 1px 2px rgb(0 0 0 / 0.3)."
+      },
+      {
+        "name": "scroll-shade",
+        "value": "linear-gradient(to right, rgb(15 42 46 / 0.16), transparent) 14px wide",
+        "purpose": "Edge shade on a sideways-scrolling table; fades out when that edge is reached. Dark: rgb(0 0 0 / 0.55)."
+      },
+      {
+        "name": "disc-edge",
+        "value": "inset 0 0 0 1px color-mix(in srgb, var(--foreground) 24%, transparent)",
+        "purpose": "Hairline edge on every disc so pale hues read as shapes."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-soft",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Easing for every state transition."
+      },
+      {
+        "name": "state-transition",
+        "value": "160ms",
+        "purpose": "Colour, background, border, shadow and opacity on links, buttons and fields."
+      },
+      {
+        "name": "disc-fade",
+        "value": "200ms",
+        "purpose": "Disc field colour change when the board refreshes."
+      },
+      {
+        "name": "skeleton-slide",
+        "value": "1.4s ease-in-out infinite",
+        "purpose": "Loading skeleton tint slide."
+      },
+      {
+        "name": "press",
+        "value": "scale(0.98)",
+        "purpose": "Button press feedback."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "0.01ms",
+        "purpose": "prefers-reduced-motion collapses every transition and animation."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one main action of a form or screen.",
+      "html": "<button class=\"ds-btn-primary\">Apply</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; border-radius: 9999px; padding: 8px 16px; font-size: 1rem; font-weight: 500; white-space: nowrap; cursor: pointer; font-family: var(--font-sanad), 'Readex Pro', system-ui, sans-serif; transition: color 160ms cubic-bezier(0.16,1,0.3,1), background-color 160ms cubic-bezier(0.16,1,0.3,1), border-color 160ms cubic-bezier(0.16,1,0.3,1); padding: 8px 20px; border: none; background: var(--primary); color: var(--on-primary); } .ds-btn-primary:hover { background: var(--primary-hover); } .ds-btn-primary:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; } .ds-btn-primary:active { transform: scale(0.98); } @media (min-width: 640px) { .ds-btn-primary { min-height: 40px; } }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Any other action: refresh, retry, export, cancel.",
+      "html": "<button class=\"ds-btn-secondary\">Refresh now</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; border-radius: 9999px; padding: 8px 16px; font-size: 1rem; font-weight: 500; white-space: nowrap; cursor: pointer; font-family: var(--font-sanad), 'Readex Pro', system-ui, sans-serif; transition: color 160ms cubic-bezier(0.16,1,0.3,1), background-color 160ms cubic-bezier(0.16,1,0.3,1), border-color 160ms cubic-bezier(0.16,1,0.3,1); border: 1px solid var(--line-strong); background: var(--surface); color: var(--foreground); } .ds-btn-secondary:hover { border-color: var(--primary); background: var(--primary-soft); } .ds-btn-secondary:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; } .ds-btn-secondary:active { transform: scale(0.98); } @media (min-width: 640px) { .ds-btn-secondary { min-height: 40px; } }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Destructive or rejecting actions.",
+      "html": "<button class=\"ds-btn-danger\">Reject</button>",
+      "css": ".ds-btn-danger { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; border-radius: 9999px; padding: 8px 16px; font-size: 1rem; font-weight: 500; white-space: nowrap; cursor: pointer; font-family: var(--font-sanad), 'Readex Pro', system-ui, sans-serif; transition: color 160ms cubic-bezier(0.16,1,0.3,1), background-color 160ms cubic-bezier(0.16,1,0.3,1), border-color 160ms cubic-bezier(0.16,1,0.3,1); border: 1px solid color-mix(in srgb, var(--danger) 50%, transparent); background: var(--surface); color: var(--danger); } .ds-btn-danger:hover { border-color: var(--danger); background: var(--danger-soft); } .ds-btn-danger:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; } .ds-btn-danger:active { transform: scale(0.98); } @media (min-width: 640px) { .ds-btn-danger { min-height: 40px; } }"
+    },
+    {
+      "name": "Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Label above, field, optional hint below. Inputs and selects share one style.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">File number</span><input class=\"ds-input\" placeholder=\"710000\" dir=\"ltr\"><span class=\"ds-field-hint\">Six digits</span></label>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; max-width: 320px; font-family: var(--font-sanad), 'Readex Pro', system-ui, sans-serif; color: var(--foreground); } .ds-field-label { font-size: 0.875rem; font-weight: 500; } .ds-field-hint { font-size: 0.75rem; color: var(--muted); } .ds-input { width: 100%; min-height: 44px; border-radius: 9px; border: 1px solid var(--control-line); background: var(--surface-2); color: var(--foreground); padding: 8px 12px; font: inherit; font-variant-numeric: tabular-nums; transition: color 160ms cubic-bezier(0.16,1,0.3,1), background-color 160ms cubic-bezier(0.16,1,0.3,1), border-color 160ms cubic-bezier(0.16,1,0.3,1); } .ds-input::placeholder { color: var(--muted); } .ds-input:hover { border-color: color-mix(in srgb, var(--foreground) 60%, transparent); } .ds-input:focus-visible { border-color: var(--primary); background: var(--surface); outline: 2px solid var(--primary); outline-offset: 0; } @media (min-width: 640px) { .ds-input { min-height: 40px; } }"
+    },
+    {
+      "name": "State Badge",
+      "kind": "chip",
+      "refersTo": "badge-ok",
+      "description": "A disc and a word. Five tones: ok, warn, danger, info, off. Also used for audit-log actions.",
+      "html": "<span class=\"ds-badge ds-badge-ok\"><i></i>Approved</span> <span class=\"ds-badge ds-badge-warn\"><i></i>Late</span> <span class=\"ds-badge ds-badge-danger\"><i></i>Rejected</span> <span class=\"ds-badge ds-badge-info\"><i></i>Pending</span> <span class=\"ds-badge ds-badge-off\"><i></i>Inactive</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 9999px; padding: 2px 10px; font-size: 0.75rem; line-height: 1rem; font-weight: 500; white-space: nowrap; font-family: var(--font-sanad), 'Readex Pro', system-ui, sans-serif; } .ds-badge i { width: 6px; height: 6px; border-radius: 9999px; background: var(--ds-disc); flex: none; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--foreground) 24%, transparent); } .ds-badge-ok { background: var(--ok-soft); color: var(--ok); --ds-disc: var(--ok); } .ds-badge-warn { background: var(--warn-soft); color: var(--warn); --ds-disc: var(--disc-late); } .ds-badge-danger { background: var(--danger-soft); color: var(--danger); --ds-disc: var(--danger); } .ds-badge-info { background: var(--info-soft); color: var(--info); --ds-disc: var(--info); } .ds-badge-off { background: var(--surface-2); color: var(--muted); box-shadow: inset 0 0 0 1px var(--line); --ds-disc: var(--line-strong); }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "The white surface every block of a screen sits on.",
+      "html": "<section class=\"ds-card\"><h2>Shift now</h2><p>Each disc is about 1% of today's scheduled staff.</p></section>",
+      "css": ".ds-card { border-radius: 14px; border: 1px solid var(--line); background: var(--surface); color: var(--foreground); padding: 20px; box-shadow: var(--elev-card); font-family: var(--font-sanad), 'Readex Pro', system-ui, sans-serif; } .ds-card h2 { margin: 0 0 8px; font-size: 1rem; font-weight: 700; } .ds-card p { margin: 0; font-size: 0.875rem; color: var(--muted); }"
+    },
+    {
+      "name": "Rail Navigation",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Deep teal rail; the current page carries one lit disc, on phones too.",
+      "html": "<nav class=\"ds-rail\"><p class=\"ds-rail-mark\">سَنَد</p><a href=\"#\">Home</a><a href=\"#\" class=\"ds-rail-on\" aria-current=\"page\">Live board</a><a href=\"#\">Approvals</a><a href=\"#\">Reports</a></nav>",
+      "css": ".ds-rail { display: flex; flex-direction: column; gap: 2px; width: 240px; padding: 24px 12px 16px; background: var(--rail); font-family: var(--font-sanad), 'Readex Pro', system-ui, sans-serif; } .ds-rail-mark { margin: 0 12px 20px; font-size: 1.75rem; line-height: 2.25rem; font-weight: 700; color: var(--rail-on-ink); } .ds-rail a { display: flex; align-items: center; gap: 10px; border-radius: 9px; padding: 8px 12px; font-size: 0.9375rem; color: var(--rail-ink); text-decoration: none; transition: color 160ms cubic-bezier(0.16,1,0.3,1), background-color 160ms cubic-bezier(0.16,1,0.3,1), border-color 160ms cubic-bezier(0.16,1,0.3,1); } .ds-rail a:hover { background: var(--rail-hover); color: var(--rail-on-ink); } .ds-rail a:focus-visible { outline: 2px solid var(--rail-dot); outline-offset: 2px; } .ds-rail a.ds-rail-on { background: var(--rail-on); color: var(--rail-on-ink); font-weight: 500; } .ds-rail a.ds-rail-on::before { content: ''; width: 6px; height: 6px; border-radius: 9999px; background: var(--rail-dot); flex: none; }"
+    },
+    {
+      "name": "Underline Tabs",
+      "kind": "nav",
+      "refersTo": "tab",
+      "description": "Sub-navigation inside a section (organisation, reports).",
+      "html": "<nav class=\"ds-tabs\"><a href=\"#\" class=\"ds-tab-on\" aria-current=\"page\">Departments</a><a href=\"#\">Sites</a><a href=\"#\">Work patterns</a><a href=\"#\">Holidays</a></nav>",
+      "css": ".ds-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; font-family: var(--font-sanad), 'Readex Pro', system-ui, sans-serif; } .ds-tabs a { margin-bottom: -1px; border-bottom: 2px solid transparent; padding: 8px 12px; font-size: 0.875rem; white-space: nowrap; color: var(--muted); text-decoration: none; transition: color 160ms cubic-bezier(0.16,1,0.3,1), background-color 160ms cubic-bezier(0.16,1,0.3,1), border-color 160ms cubic-bezier(0.16,1,0.3,1); } .ds-tabs a:hover { border-bottom-color: var(--line-strong); color: var(--foreground); } .ds-tabs a:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; } .ds-tabs a.ds-tab-on { border-bottom-color: var(--primary); color: var(--primary); font-weight: 500; }"
+    },
+    {
+      "name": "Disc Field",
+      "kind": "custom",
+      "refersTo": "disc-field",
+      "description": "Signature: the shift as exactly 100 discs, one per 1% of scheduled staff, with a disc-and-word legend.",
+      "html": "<div class=\"ds-discs\"><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-on-time)\"></i><i style=\"--disc: var(--disc-late)\"></i><i style=\"--disc: var(--disc-late)\"></i><i style=\"--disc: var(--disc-late)\"></i><i style=\"--disc: var(--disc-late)\"></i><i style=\"--disc: var(--disc-late)\"></i><i style=\"--disc: var(--disc-late)\"></i><i style=\"--disc: var(--disc-late)\"></i><i style=\"--disc: var(--disc-late)\"></i><i style=\"--disc: var(--disc-late)\"></i><i style=\"--disc: var(--disc-not-arrived)\"></i><i style=\"--disc: var(--disc-not-arrived)\"></i><i style=\"--disc: var(--disc-not-arrived)\"></i><i style=\"--disc: var(--disc-not-arrived)\"></i><i style=\"--disc: var(--disc-not-arrived)\"></i><i style=\"--disc: var(--disc-not-arrived)\"></i><i style=\"--disc: var(--disc-not-arrived)\"></i><i style=\"--disc: var(--disc-absent)\"></i><i style=\"--disc: var(--disc-absent)\"></i><i style=\"--disc: var(--disc-absent)\"></i><i style=\"--disc: var(--disc-leave)\"></i><i style=\"--disc: var(--disc-leave)\"></i><i style=\"--disc: var(--disc-leave)\"></i><i style=\"--disc: var(--disc-leave)\"></i><i style=\"--disc: var(--disc-leave)\"></i><i style=\"--disc: var(--disc-out)\"></i><i style=\"--disc: var(--disc-out)\"></i><i style=\"--disc: var(--disc-out)\"></i><i style=\"--disc: var(--disc-out)\"></i><i style=\"--disc: var(--disc-upcoming)\"></i><i style=\"--disc: var(--disc-upcoming)\"></i><i style=\"--disc: var(--disc-upcoming)\"></i><i style=\"--disc: var(--disc-upcoming)\"></i><i style=\"--disc: var(--disc-upcoming)\"></i><i style=\"--disc: var(--disc-upcoming)\"></i><i style=\"--disc: var(--disc-upcoming)\"></i><i style=\"--disc: var(--disc-upcoming)\"></i><i style=\"--disc: var(--disc-upcoming)\"></i><i style=\"--disc: var(--disc-upcoming)\"></i><i style=\"--disc: var(--disc-upcoming)\"></i></div><ul class=\"ds-legend\"><li><i style=\"--disc: var(--disc-on-time)\"></i><span>On time</span><b>61%</b></li><li><i style=\"--disc: var(--disc-late)\"></i><span>Late</span><b>9%</b></li><li><i style=\"--disc: var(--disc-not-arrived)\"></i><span>Not arrived</span><b>7%</b></li><li><i style=\"--disc: var(--disc-absent)\"></i><span>Absent</span><b>3%</b></li><li><i style=\"--disc: var(--disc-leave)\"></i><span>On leave</span><b>5%</b></li><li><i style=\"--disc: var(--disc-out)\"></i><span>Checked out</span><b>4%</b></li><li><i style=\"--disc: var(--disc-upcoming)\"></i><span>Not started</span><b>11%</b></li></ul>",
+      "css": ".ds-discs { display: grid; grid-template-columns: repeat(25, minmax(0, 1fr)); gap: 4px; } @media (min-width: 1024px) { .ds-discs { grid-template-columns: repeat(50, minmax(0, 1fr)); gap: 5px; } } .ds-discs i { aspect-ratio: 1; border-radius: 9999px; background: var(--disc, var(--line)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--foreground) 24%, transparent); transition: background-color 200ms cubic-bezier(0.16,1,0.3,1); } .ds-legend { display: flex; flex-wrap: wrap; gap: 6px 24px; margin: 16px 0 0; padding: 0; list-style: none; font-size: 0.8125rem; font-family: var(--font-sanad), 'Readex Pro', system-ui, sans-serif; } .ds-legend li { display: flex; align-items: center; gap: 8px; color: var(--muted); } .ds-legend i { width: 9px; height: 9px; border-radius: 9999px; background: var(--disc); flex: none; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--foreground) 24%, transparent); } .ds-legend b { font-weight: 500; color: var(--foreground); font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Count Tile",
+      "kind": "custom",
+      "refersTo": "count-tile",
+      "description": "Signature: a disc, a state name and a count; the selected tile is outlined in primary. The employee dashboard reuses the anatomy as plain tiles.",
+      "html": "<div class=\"ds-tiles\"><a href=\"#\" class=\"ds-tile\"><span class=\"ds-tile-name\"><i style=\"--disc: var(--disc-on-time)\"></i>On time</span><span class=\"ds-tile-count\">612</span></a><a href=\"#\" class=\"ds-tile ds-tile-on\" aria-current=\"true\"><span class=\"ds-tile-name\"><i style=\"--disc: var(--disc-not-arrived)\"></i>Not arrived</span><span class=\"ds-tile-count ds-tile-danger\">74</span><span class=\"ds-tile-hint\">Shift started, no check-in yet</span></a></div>",
+      "css": ".ds-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 220px)); gap: 12px; font-family: var(--font-sanad), 'Readex Pro', system-ui, sans-serif; } .ds-tile { display: flex; flex-direction: column; gap: 2px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); padding: 12px 16px; box-shadow: var(--elev-card); text-decoration: none; color: var(--foreground); transition: color 160ms cubic-bezier(0.16,1,0.3,1), background-color 160ms cubic-bezier(0.16,1,0.3,1), border-color 160ms cubic-bezier(0.16,1,0.3,1); } .ds-tile:hover { border-color: var(--line-strong); background: var(--surface-2); } .ds-tile:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; } .ds-tile-on, .ds-tile-on:hover { border-color: var(--primary); background: var(--primary-soft); box-shadow: 0 0 0 1px var(--primary), var(--elev-card); } .ds-tile-name { display: flex; align-items: center; gap: 8px; font-size: 0.875rem; color: var(--muted); } .ds-tile-name i { width: 9px; height: 9px; border-radius: 9999px; background: var(--disc); flex: none; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--foreground) 24%, transparent); } .ds-tile-count { font-size: 1.75rem; line-height: 2.25rem; font-weight: 600; font-variant-numeric: tabular-nums; } .ds-tile-danger { color: var(--danger); } .ds-tile-hint { font-size: 0.75rem; color: var(--muted); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Sea Glass",
+    "overview": "**Creative North Star: \"Sea Glass\"**\n\nThe panel takes its colour from the enamel discs on the Kuwait Towers: deep sea teal, turquoise, and a misted ground. The unit of the identity is the disc, a small filled circle. A day's attendance is shown as a field of 100 discs, the current page in the menu carries one lit disc, every state badge starts with a disc, and an empty list shows three discs at rest. A supervisor sees the state of the shift before reading a number.\n\nThe panel is a working tool, so it is dense and calm. Surfaces are white cards with soft corners on a ground that drifts from warm sand to cool sea. Buttons are pills. There is one typeface, Readex Pro, for Arabic and Latin. Hierarchy comes from weight and colour, not from many sizes. Arabic (right-to-left) is the first language and English the second; both directions are built with logical properties so nothing flips wrongly. Dark mode is chosen by the user and reads as the Gulf at night: deep blue-green ground, turquoise primary.\n\nThis identity retires navy + gold for the panel, and it refuses the grey admin shell with a single blue accent.",
+    "keyCharacteristics": [
+      "The disc is the mark of state: in the shift field, the legend, the count tiles, badges, attendance history, the active menu item and empty states.",
+      "Deep teal rail on the inline start; white cards on a drifting sand-to-sea ground.",
+      "Pill buttons, 9px fields, 14px cards.",
+      "One typeface, three weights (400, 500, 700), tabular numerals for anything counted or timed.",
+      "State is always a disc plus a word, never colour alone.",
+      "Motion is limited to 160ms state transitions (200ms for the disc field); reduced motion removes it."
+    ],
+    "rules": [
+      {
+        "name": "The Disc And Word Rule",
+        "body": "A state is always shown as a disc plus a word in a fixed place. Colour alone never carries meaning.",
+        "section": "colors"
+      },
+      {
+        "name": "The Fixed Hue Rule",
+        "body": "The eight disc hues belong to the eight attendance states. Do not reuse them for decoration or for a different meaning.",
+        "section": "colors"
+      },
+      {
+        "name": "The Token Only Rule",
+        "body": "Screens use the named tokens, which change with the theme. A raw hex in a screen breaks dark mode. Two things are exempt on purpose: the disc sphere picture, whose colours are fixed because it always sits on rail teal, and the emergency map, whose red and green keep their safety meaning.",
+        "section": "colors"
+      },
+      {
+        "name": "The Rank By Weight Rule",
+        "body": "Inside a table every cell is the same size. Importance is shown with weight 500 and colour (a late count in `warn`, a name as a `primary` link), not with a bigger size.",
+        "section": "typography"
+      },
+      {
+        "name": "The Numbers Stay Left-To-Right Rule",
+        "body": "File numbers, times, dates and percentages are wrapped left-to-right and set in tabular numerals, in both languages, so columns line up and digits never flip. Arabic screens use Latin digits (locale `ar-KW-u-nu-latn`), and a time of day has one form everywhere: 24-hour, Kuwait time.",
+        "section": "typography"
+      },
+      {
+        "name": "The Border First Rule",
+        "body": "A surface is defined by its 1px `line` border; the shadow only softens the edge. Nothing lifts on hover. Hover changes the border and the fill.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Drifting Ground Rule",
+        "body": "The page ground is never a flat colour. It is the fixed sand-to-sea gradient set on the root element. Do not paint a flat background over it on a page.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do show every state as a disc plus a word, using the `Badge` tones or the eight disc hues.",
+      "Do keep the disc field at exactly 100 discs.",
+      "Do use the tokens (`primary`, `surface`, `line`, and so on) so light and dark both work.",
+      "Do use logical properties (inline start and end) so Arabic and English are both correct, and wrap file numbers, times and percentages left-to-right with tabular numerals.",
+      "Do format Arabic dates and numbers with Latin digits (`ar-KW-u-nu-latn`) and show every time of day in the one 24-hour form.",
+      "Do give each screen one headline (1.5rem, weight 700) and one primary pill button for the main action.",
+      "Do keep every control at least 44px tall under 640px (40px for buttons and fields and 36px for small pills from 640px), and keep the 2px `primary` focus ring visible.",
+      "Do put tables inside the shared table frame, and let a table inside a card run edge to edge.",
+      "Do give an input the `control-line` edge; `line` is for surfaces, not for controls.",
+      "Do use the shared icon set, and let back, previous and next mirror in Arabic.",
+      "Do add a loading skeleton only to a screen that can never redirect or answer \"not found\".",
+      "Do keep transitions to colour, border and opacity at 160ms with the soft ease-out, and honour reduced motion."
+    ],
+    "donts": [
+      "Don't bring back navy or gold in the panel; the owner retired that identity for the panel on 2026-11-17.",
+      "Don't build a grey shell with a single blue accent.",
+      "Don't show state with colour alone, and don't reuse a disc hue for decoration or a different meaning.",
+      "Don't write raw hex colours in a screen. The disc sphere and the emergency map are the only exemptions.",
+      "Don't change the emergency map's red and green; their safety meaning is fixed.",
+      "Don't paint a flat background over the drifting ground, or lift surfaces with heavier shadows on hover.",
+      "Don't add a second typeface, or make table text bigger to show importance.",
+      "Don't add page-load animation or moving decoration.",
+      "Don't invent a logo or official illustration; the wordmark is the name set in type until the owner approves a final logo.",
+      "Don't use the disc sphere as a logo, a badge or an icon, or place it beside the wordmark; it is the sign-in picture only.",
+      "Don't use a typed character (a plus sign, an arrow) where the icon set has a drawn icon."
+    ]
+  }
+}

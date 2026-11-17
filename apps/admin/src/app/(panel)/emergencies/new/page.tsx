@@ -3,7 +3,7 @@ import { requireEmergencyStaff } from "@/lib/emergency-auth";
 import { createClient } from "@/lib/supabase/server";
 import { getPrefs } from "@/lib/prefs";
 import { emgT } from "@/lib/i18n-emg";
-import { Card } from "@/components/ui";
+import { Card, Icon } from "@/components/ui";
 import { LaunchForm, type LaunchSite } from "./launch-form";
 
 // Launch an alert (PRD 8.3): hazard, danger building(s), safe building, targets, then a confirm step.
@@ -32,8 +32,8 @@ export default async function NewEmergencyPage() {
 
   return (
     <div className="flex max-w-3xl flex-col gap-5">
-      <Link href="/emergencies" className="text-sm text-primary hover:underline">
-        <span aria-hidden className="inline-block rtl:rotate-180">←</span> {t.back}
+      <Link href="/emergencies" className="inline-flex items-center gap-1.5 self-start text-sm text-muted hover:text-primary">
+        <Icon name="back" /> {t.back}
       </Link>
       <div>
         <h1 className="text-2xl font-bold">{t.launchTitle}</h1>

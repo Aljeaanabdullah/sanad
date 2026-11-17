@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { changePassword, type FormState } from "@/app/actions/auth";
 import { errorMessage, type Dictionary } from "@/lib/i18n";
 import { inputClass, primaryButtonClass } from "@/components/auth-card";
+import { Alert } from "@/components/ui";
 
 export function ChangePasswordForm({ t }: { t: Dictionary }) {
   const [state, action, pending] = useActionState<FormState, FormData>(changePassword, {});
@@ -37,9 +38,7 @@ export function ChangePasswordForm({ t }: { t: Dictionary }) {
       </label>
       <p className="text-xs text-muted">{t.passwordRules}</p>
       {state.error && (
-        <p role="alert" className="rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">
-          {errorMessage(t, state.error)}
-        </p>
+        <Alert kind="error">{errorMessage(t, state.error)}</Alert>
       )}
       <button type="submit" disabled={pending} className={primaryButtonClass}>
         {pending ? t.saving : t.save}

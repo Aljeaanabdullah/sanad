@@ -21,13 +21,9 @@ import {
   type AuditEntry,
 } from "@/lib/audit-log";
 import { loadPeople, queryAuditLog, type Person } from "@/lib/audit-log-query";
-import { Alert, Card, Field, Input, Select, Table, buttonClass } from "@/components/ui";
+import { Alert, Card, Field, Input, Select, Table, buttonClass, Empty, Badge, Icon } from "@/components/ui";
 
-const actionTone: Record<string, string> = {
-  insert: "bg-primary-soft text-primary",
-  update: "bg-line text-foreground",
-  delete: "bg-danger-soft text-danger",
-};
+const actionTone: Record<string, "ok" | "info" | "danger"> = { insert: "ok", update: "info", delete: "danger" };
 
 // System admin only (PRD 11, PLAN phase 12): who saw or changed any employee's data.
 export default async function AuditLogPage({ searchParams }: PageProps<"/audit-log">) {
@@ -41,20 +37,21 @@ export default async function AuditLogPage({ searchParams }: PageProps<"/audit-l
   const result = await queryAuditLog(supabase, filters, PAGE_SIZE);
   const { actors, subjects } = await loadPeople(supabase, result.rows);
 
-  const locale = ar ? "ar-KW" : "en-GB";
+  const locale = ar ? "ar-KW-u-nu-latn" : "en-GB";
   const dateTime = new Intl.DateTimeFormat(locale, {
     dateStyle: "medium",
     timeStyle: "medium",
+    hourCycle: "h23",
     timeZone: "Asia/Kuwait",
   });
   const nameOf = (p: Person) => (ar ? p.nameAr : p.nameEn) || p.nameAr || p.nameEn;
-  const navClass = "rounded-lg border border-line px-3 py-1.5 text-sm hover:bg-primary-soft";
+  const navClass = "inline-flex min-h-11 items-center rounded-full border border-line-strong bg-surface px-3 py-1 text-sm whitespace-nowrap hover:border-primary hover:bg-primary-soft sm:min-h-9";
   const rows = result.rows;
   const first = rows[0]?.id;
   const last = rows.at(-1)?.id;
 
   const who = (e: AuditEntry) => {
-    if (!e.actor_user_id) return <span className="text-muted">{t.system}</span>;
+    if (!e.actor_user_id) return <span className="whitespace-nowrap text-muted">{t.system}</span>;
     const p = actors.get(e.actor_user_id);
     if (!p) {
       return (
@@ -151,7 +148,7 @@ export default async function AuditLogPage({ searchParams }: PageProps<"/audit-l
               </Select>
             </Field>
             <label className="flex items-center gap-2 self-end pb-2 text-sm">
-              <input type="checkbox" name="system" value="1" defaultChecked={!!filters.system} className="size-4 accent-[var(--accent)]" />
+              <input type="checkbox" name="system" value="1" defaultChecked={!!filters.system} className="shrink-0" />
               {t.systemOnly}
             </label>
           </div>
@@ -182,9 +179,7 @@ export default async function AuditLogPage({ searchParams }: PageProps<"/audit-l
       {result.noEmployee && <Alert kind="error">{t.noEmployee}</Alert>}
 
       {rows.length === 0 ? (
-        <p className="text-muted" data-testid="audit-empty">
-          {t.empty}
-        </p>
+        <Empty data-testid="audit-empty">{t.empty}</Empty>
       ) : (
         <Table>
           <thead>
@@ -210,21 +205,20 @@ export default async function AuditLogPage({ searchParams }: PageProps<"/audit-l
                   </td>
                   <td>{who(e)}</td>
                   <td>
-                    <span
-                      className={`whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ${actionTone[e.action] ?? "bg-primary-soft text-accent"}`}
-                    >
-                      {actionLabel(t, e.action)}
-                    </span>
+                    <Badge tone={actionTone[e.action] ?? "off"}>{actionLabel(t, e.action)}</Badge>
                   </td>
                   <td className="whitespace-nowrap">{tableLabel(t, e.table_name)}</td>
                   <td>{record(e)}</td>
-                  <td className="min-w-64">
+                  <td className="min-w-64 whitespace-normal!">
                     <details className="group">
-                      <summary className="cursor-pointer marker:text-accent">{summarize(t, e)}</summary>
+                      <summary className="flex cursor-pointer list-none items-start gap-1.5 hover:text-primary [&::-webkit-details-marker]:hidden">
+                        <Icon name="next" className="mt-1 text-muted ltr:group-open:rotate-90 rtl:group-open:-rotate-90" />
+                        <span>{summarize(t, e)}</span>
+                      </summary>
                       {diff.length === 0 ? (
                         <p className="mt-2 text-xs text-muted">{t.noChanges}</p>
                       ) : (
-                        <dl className="mt-2 grid gap-1.5 rounded-lg border border-line bg-background p-3 text-xs">
+                        <dl className="mt-2 grid gap-1.5 rounded-lg border border-line bg-surface-2 p-3 text-xs">
                           {diff.map((d) => (
                             <div key={d.key} className="grid gap-1 sm:grid-cols-[10rem_1fr]">
                               <dt className="font-medium text-muted">{fieldLabel(t, d.key)}</dt>
@@ -232,11 +226,9 @@ export default async function AuditLogPage({ searchParams }: PageProps<"/audit-l
                                 {e.action === "update" ? (
                                   <>
                                     <del className="text-danger decoration-danger/60">{formatValue(t, d.before)}</del>{" "}
-                                    <span aria-hidden className="inline-block text-accent rtl:rotate-180">
-                                      →
-                                    </span>
+                                    <Icon name="next" className="text-muted" />
                                     <span className="sr-only">{t.after}</span>{" "}
-                                    <ins className="text-primary no-underline">{formatValue(t, d.after)}</ins>
+                                    <ins className="font-medium text-ok no-underline">{formatValue(t, d.after)}</ins>
                                   </>
                                 ) : (
                                   formatValue(t, e.action === "delete" ? d.before : d.after)
@@ -294,7 +286,7 @@ function PersonCell({
   href?: string;
 }) {
   const label = href ? (
-    <Link href={href} className="font-medium text-primary hover:underline">
+    <Link href={href} className="font-medium text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary">
       {name}
     </Link>
   ) : (

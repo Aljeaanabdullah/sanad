@@ -61,9 +61,9 @@ export async function AttendanceHistory({
   });
   const rows = ((data ?? []) as Row[]).slice().reverse();
   const now = new Date();
-  const locale = lang === "ar" ? "ar-KW" : "en-GB";
+  const locale = lang === "ar" ? "ar-KW-u-nu-latn" : "en-GB";
   const dayFmt = new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
-  const timeFmt = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kuwait" });
+  const timeFmt = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "Asia/Kuwait" });
   const time = (s: string | null) => (s ? timeFmt.format(new Date(s)) : "—");
   const late = rows.filter((r) => r.arrival === "late").length;
   const absent = rows.filter((r) => r.arrival === "absent").length;
@@ -80,39 +80,52 @@ export async function AttendanceHistory({
         <thead>
           <tr>
             <th>{t.day}</th>
-            <th>{t.shift}</th>
+            <th>{t.status}</th>
+            <th className="max-sm:hidden">{t.shift}</th>
             <th>{t.checkIn}</th>
             <th>{t.checkOut}</th>
-            <th>{t.status}</th>
           </tr>
         </thead>
         <tbody data-testid="attendance-rows">
           {rows.map((r) => {
-            const notes: { text: string; bad?: boolean }[] = [];
-            if (r.kind !== "work") notes.push({ text: t.kinds[r.kind] });
-            else if (r.arrival === "late") notes.push({ text: t.lateBy(r.late_minutes), bad: true });
-            else if (r.arrival === "pending" && r.shift_start && new Date(r.shift_start) > now) notes.push({ text: t.upcoming });
-            else if (r.arrival) notes.push({ text: t.arrival[r.arrival], bad: r.arrival === "absent" });
-            if (r.departure === "missing") notes.push({ text: t.departure.missing, bad: true });
-            if (r.early_leave_minutes > 0) notes.push({ text: t.earlyBy(r.early_leave_minutes) });
+            // Each note is a disc and a word, in the live board's hues.
+            const notes: { text: string; disc: string; tone?: string }[] = [];
+            if (r.kind !== "work") notes.push({ text: t.kinds[r.kind], disc: "[--disc:var(--disc-upcoming)]" });
+            else if (r.arrival === "late") notes.push({ text: t.lateBy(r.late_minutes), disc: "[--disc:var(--disc-late)]", tone: "text-warn" });
+            else if (r.arrival === "pending" && r.shift_start && new Date(r.shift_start) > now)
+              notes.push({ text: t.upcoming, disc: "[--disc:var(--disc-upcoming)]" });
+            else if (r.arrival === "absent") notes.push({ text: t.arrival.absent, disc: "[--disc:var(--disc-absent)]", tone: "text-danger" });
+            else if (r.arrival === "on_time") notes.push({ text: t.arrival.on_time, disc: "[--disc:var(--disc-on-time)]" });
+            else if (r.arrival) notes.push({ text: t.arrival[r.arrival], disc: "[--disc:var(--disc-not-arrived)]" });
+            if (r.departure === "missing") notes.push({ text: t.departure.missing, disc: "[--disc:var(--disc-not-arrived)]", tone: "text-danger" });
+            if (r.early_leave_minutes > 0) notes.push({ text: t.earlyBy(r.early_leave_minutes), disc: "[--disc:var(--disc-late)]" });
             return (
               <tr key={r.day} className={r.kind === "work" ? "" : "text-muted"}>
                 <td className="whitespace-nowrap">{dayFmt.format(new Date(`${r.day}T00:00:00Z`))}</td>
-                <td className="whitespace-nowrap">{r.shift_start ? `${time(r.shift_start)} – ${time(r.shift_end)}` : "—"}</td>
-                <td>
-                  {time(r.check_in_at)}
-                  {r.check_in_corrected && <span className="block text-xs text-primary">{t.corrected}</span>}
-                </td>
-                <td>
-                  {time(r.check_out_at)}
-                  {r.check_out_corrected && <span className="block text-xs text-primary">{t.corrected}</span>}
-                </td>
                 <td>
                   {notes.map((n, i) => (
-                    <span key={i} className={`block ${n.bad ? "text-danger" : ""}`}>
-                      {n.text}
+                    <span key={i} className={`flex items-center gap-2 whitespace-nowrap ${n.tone ?? ""}`}>
+                      <i className={`disc ${n.disc}`} aria-hidden />
+                      <span>{n.text}</span>
                     </span>
                   ))}
+                </td>
+                <td className="whitespace-nowrap max-sm:hidden">
+                  {r.shift_start ? (
+                    <span dir="ltr">
+                      {time(r.shift_start)} – {time(r.shift_end)}
+                    </span>
+                  ) : (
+                    "—"
+                  )}
+                </td>
+                <td>
+                  <span dir="ltr">{time(r.check_in_at)}</span>
+                  {r.check_in_corrected && <span className="block text-xs text-info">{t.corrected}</span>}
+                </td>
+                <td>
+                  <span dir="ltr">{time(r.check_out_at)}</span>
+                  {r.check_out_corrected && <span className="block text-xs text-info">{t.corrected}</span>}
                 </td>
               </tr>
             );

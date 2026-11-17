@@ -5,8 +5,18 @@ import { createClient } from "@/lib/supabase/server";
 import { getPrefs } from "@/lib/prefs";
 import { homeT } from "@/lib/i18n-home";
 import { bonusSummary, QUICK_LINK_HREF, quickLinksFor, todaySummary } from "@/lib/home";
-import { groupLive, type LiveRow } from "@/lib/reports";
-import { Card } from "@/components/ui";
+import { DISC_BUCKETS, discShares, groupLive, type DiscBucket, type LiveRow } from "@/lib/reports";
+import { Badge, Card } from "@/components/ui";
+
+// One enamel hue per state, as on the live board (globals.css).
+const DISC: Record<DiscBucket, string> = {
+  on_time: "[--disc:var(--disc-on-time)]",
+  late: "[--disc:var(--disc-late)]",
+  not_arrived: "[--disc:var(--disc-not-arrived)]",
+  absent: "[--disc:var(--disc-absent)]",
+  leave: "[--disc:var(--disc-leave)]",
+  upcoming: "[--disc:var(--disc-upcoming)]",
+};
 
 // Home of the web panel: today's attendance, what waits for the signed-in user, and shortcuts.
 // Every read goes through the signed-in user's client, so RLS and the role checks in the
@@ -29,7 +39,9 @@ export default async function DashboardPage() {
     supabase.from("bonus_lists").select("month").order("month", { ascending: false }).limit(1).maybeSingle(),
   ]);
 
-  const today = live.error ? null : todaySummary(groupLive((live.data ?? []) as LiveRow[]).counts);
+  const counts = live.error ? null : groupLive((live.data ?? []) as LiveRow[]).counts;
+  const today = counts ? todaySummary(counts) : null;
+  const shares = counts ? discShares(counts, 50) : null;
   const employeeCount = employees.error ? null : (employees.count ?? 0);
   const pending = inbox.error ? null : ((inbox.data ?? []) as unknown[]).length;
   const openEmergencies = emergencies && !emergencies.error ? ((emergencies.data ?? []) as { id: string; is_drill: boolean }[]) : null;
@@ -100,17 +112,15 @@ export default async function DashboardPage() {
                 / {n(today.scheduled)} {t.scheduled}
               </span>
             </p>
-            <div className="flex h-3 overflow-hidden rounded-full bg-line" aria-hidden>
-              <span className="bg-primary" style={{ width: `${today.shares.onTime}%` }} />
-              <span className="bg-accent" style={{ width: `${today.shares.late}%` }} />
-              <span className="bg-danger" style={{ width: `${today.shares.missing}%` }} />
+            <div className="disc-field" aria-hidden data-testid="home-disc-field">
+              {DISC_BUCKETS.flatMap((b) => Array.from({ length: shares?.[b] ?? 0 }, (_, i) => <i key={`${b}-${i}`} className={DISC[b]} />))}
             </div>
             <ul className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-5">
-              <Stat swatch="bg-primary" label={t.onTime} value={n(today.onTime)} href="/live?group=on_time" />
-              <Stat swatch="bg-accent" label={t.late} value={n(today.late)} href="/live?group=late" />
-              <Stat swatch="bg-danger" label={t.missing} value={n(today.missing)} href="/live?group=not_arrived" />
-              <Stat swatch="bg-line" label={t.leave} value={n(today.leave)} href="/live?group=leave" />
-              <Stat swatch="bg-line" label={t.upcoming} value={n(today.upcoming)} href="/live?group=upcoming" />
+              <Stat swatch={DISC.on_time} label={t.onTime} value={n(today.onTime)} href="/live?group=on_time" />
+              <Stat swatch={DISC.late} label={t.late} value={n(today.late)} href="/live?group=late" />
+              <Stat swatch={DISC.not_arrived} label={t.missing} value={n(today.missing)} href="/live?group=not_arrived" />
+              <Stat swatch={DISC.leave} label={t.leave} value={n(today.leave)} href="/live?group=leave" />
+              <Stat swatch={DISC.upcoming} label={t.upcoming} value={n(today.upcoming)} href="/live?group=upcoming" />
             </ul>
           </>
         )}
@@ -133,7 +143,7 @@ export default async function DashboardPage() {
             <Unavailable text={t.unavailable} />
           ) : (
             <>
-              <Big tone={pending ? "text-accent" : undefined}>{n(pending)}</Big>
+              <Big tone={pending ? "text-warn" : undefined}>{n(pending)}</Big>
               <p className="text-sm text-muted">{pending ? t.approvalsSome : t.approvalsNone}</p>
             </>
           )}
@@ -166,11 +176,7 @@ export default async function DashboardPage() {
             <>
               <p className="flex flex-wrap items-center gap-2">
                 <span className="text-xl font-bold">{monthLabel(bonus.month)}</span>
-                <span
-                  className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${bonus.locked ? "bg-primary-soft text-primary" : "bg-line text-muted"}`}
-                >
-                  {bonus.locked ? t.bonusLocked : t.bonusDraft}
-                </span>
+                <Badge tone={bonus.locked ? "ok" : "off"}>{bonus.locked ? t.bonusLocked : t.bonusDraft}</Badge>
               </p>
               <p className="text-sm text-muted">{t.bonusEligible(n(bonus.eligible), n(bonus.total))}</p>
             </>
@@ -190,7 +196,7 @@ export default async function DashboardPage() {
                 <Link
                   href={QUICK_LINK_HREF[k]}
                   data-testid={`home-link-${k}`}
-                  className="group flex h-full items-center justify-between gap-4 rounded-2xl border border-line bg-surface px-5 py-4 transition-colors hover:border-accent hover:bg-primary-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  className="group flex h-full items-center justify-between gap-4 rounded-2xl border border-line bg-surface px-5 py-4 shadow-card transition-colors hover:border-primary hover:bg-primary-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 >
                   <span className="flex flex-col gap-0.5">
                     <span className="font-bold">{title}</span>
@@ -224,8 +230,8 @@ function Tile({
   danger?: boolean;
   children: ReactNode;
 }) {
-  const border = danger ? "border-danger" : highlight ? "border-accent" : "border-line";
-  const cls = `flex h-full flex-col gap-1 rounded-2xl border ${border} bg-surface p-5`;
+  const border = danger ? "border-danger" : highlight ? "border-warn/60" : "border-line";
+  const cls = `flex h-full flex-col gap-1 rounded-2xl border ${border} bg-surface p-4 shadow-card sm:p-5`;
   const body = (
     <>
       <p className="flex items-center justify-between gap-2 text-sm font-medium text-muted">
@@ -263,7 +269,7 @@ function Stat({ swatch, label, value, href }: { swatch: string; label: string; v
     <li>
       <Link href={href} className="group flex flex-col gap-0.5 rounded-lg focus-visible:outline-2 focus-visible:outline-primary">
         <span className="flex items-center gap-2 text-sm text-muted group-hover:text-foreground">
-          <span className={`size-2.5 shrink-0 rounded-full ${swatch}`} aria-hidden />
+          <i className={`disc ${swatch}`} aria-hidden />
           {label}
         </span>
         <span className="text-2xl font-bold tabular-nums">{value}</span>

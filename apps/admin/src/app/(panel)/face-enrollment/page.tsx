@@ -32,7 +32,7 @@ export default async function FaceEnrollmentPage({ searchParams }: PageProps<"/f
     ? await supabase.rpc("face_enrollment_status", { p_employee_id: emp.id })
     : { data: null };
   const s = status?.[0];
-  const date = new Intl.DateTimeFormat(lang === "ar" ? "ar-KW" : "en-GB", { dateStyle: "medium", timeZone: "Asia/Kuwait" });
+  const date = new Intl.DateTimeFormat(lang === "ar" ? "ar-KW-u-nu-latn" : "en-GB", { dateStyle: "medium", timeZone: "Asia/Kuwait" });
 
   return (
     <div className="flex max-w-3xl flex-col gap-5">
@@ -47,7 +47,7 @@ export default async function FaceEnrollmentPage({ searchParams }: PageProps<"/f
           placeholder={t.search}
           aria-label={t.search}
           dir="ltr"
-          className="max-w-48"
+          className="min-w-0 flex-1 sm:max-w-56 sm:flex-none"
         />
         <button type="submit" className={buttonClass.secondary}>
           {t.find}

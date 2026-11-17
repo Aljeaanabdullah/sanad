@@ -26,7 +26,7 @@ export function AskBox({
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap gap-2">
         {labels.quick.map((k) => (
-          <button key={k} type="button" className="rounded-full border border-accent px-3 py-1 text-sm hover:bg-primary-soft" onClick={() => ask(k)}>
+          <button key={k} type="button" className="rounded-full border border-line-strong bg-surface px-3 py-1 text-sm hover:border-primary hover:bg-primary-soft" onClick={() => ask(k)}>
             {k}
           </button>
         ))}
@@ -52,7 +52,7 @@ export function AskBox({
         </button>
       </form>
       {answer && (
-        <p data-testid="ask-answer" className="whitespace-pre-line rounded-xl border border-accent bg-primary-soft px-4 py-3 text-sm">
+        <p data-testid="ask-answer" className="whitespace-pre-line rounded-xl border border-primary/25 bg-primary-soft px-4 py-3 text-sm">
           {answer}
         </p>
       )}
