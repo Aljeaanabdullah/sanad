@@ -348,6 +348,9 @@ The shift as a field of discs inside a card. It is always exactly 100 discs, one
 ### Count Tile (signature)
 A link styled as a small card (14px corners, card shadow, 12px padding, 16px at the sides from 640px): a disc and the state's name in muted 0.875rem, then the count at 1.75rem weight 600 in tabular numerals, then an optional hint (hidden on phones). A count above zero for late, absent or not-arrived takes its `warn` or `danger` ink. The selected tile has a `primary` border plus a 1px `primary` ring and a `primary-soft` fill. Tiles sit four across from 1024px and two across below, with a 10px to 12px gap. The employee dashboard uses the same anatomy for its monthly figures (label in muted 0.875rem, figure at 1.75rem weight 600, `danger` ink for a bad figure), as plain tiles that are not links.
 
+### Logo
+The owner approved the Sanad logo on 2026-11-17: a handshake, drawn as one flat glyph (3:2, wide). Sources are in `apps/admin/public/brand/` (`sanad-logo.svg` in primary teal, `sanad-logo-white.svg` for dark grounds); in the panel it is the `SanadLogo` component, drawn in `currentColor`. It sits before the wordmark: white on the rail (44px wide on desktop, 32px on phones) and on the sign-in brand side (64px), `primary` above the narrow sign-in form (48px). The favicon and home-screen icons (`src/app/icon.png`, `apple-icon.png`) are the white glyph on primary teal `#0e5a61`. Keep its proportions, keep clear space of a quarter of its width around it, and never place it on the disc sphere.
+
 ### Disc Sphere
 The identity's one picture: a sphere built from a 19 by 19 grid of small discs in eight fixed sea hues, in slanted bands like the towers' sequins. It appears in one place: large and cropped at the bottom inline-end corner of the brand panel of the sign-in and change-password screens, which shows from 1024px. It is a picture, not a logo: it never sits beside the wordmark and is never used as a badge or an icon. It is decoration only and always sits on rail teal.
 
@@ -388,6 +391,6 @@ The map sits in a 12px-cornered frame with a `line` border and is its own stacki
 - **Don't** paint a flat background over the drifting ground, or lift surfaces with heavier shadows on hover.
 - **Don't** add a second typeface, or make table text bigger to show importance.
 - **Don't** add page-load animation or moving decoration.
-- **Don't** invent a logo or official illustration; the wordmark is the name set in type until the owner approves a final logo.
+- **Don't** invent another logo or official illustration; the handshake (see Logo) is the only mark. Never stretch, recolour outside the tokens or redraw it.
 - **Don't** use the disc sphere as a logo, a badge or an icon, or place it beside the wordmark; it is the sign-in picture only.
 - **Don't** use a typed character (a plus sign, an arrow) where the icon set has a drawn icon.

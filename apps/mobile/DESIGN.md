@@ -11,10 +11,15 @@ precise details, not decoration. Arabic first (RTL), English second; light and d
 - Warnings (late, missing check-out) use the `warn` amber tone, never turquoise. Status badges carry a small disc and a word, like the panel.
 - Font: **Readex Pro** (400 / 500 / 600 / 700), the web panel's one typeface, for Arabic and Latin (phase S7, owner decision 2026-11-17; it replaces Tajawal). Digits that are times, dates or counts use `<Txt numeric>` (left-to-right).
 
+## Logo (owner decision 2026-11-17)
+- The Sanad logo is a **handshake**, one flat glyph (3:2, wide). Sources in `assets/brand/` (`sanad-logo.svg` teal, `sanad-logo-white.svg` white, `sanad-app-icon.png`); the app uses `assets/brand/logo-mark.png` (white, tinted at runtime) through `BrandMark` (`size` = width, height follows; never stretched).
+- White on rail teal: the sign-in band and setup screen (next to the wordmark), the side menu, and the middle of the Sanad button. On a light surface tint it `primary`.
+- App icon: white glyph on `#0e5a61`. Android adaptive icon: the glyph inside the 66% safe zone on a `#0e5a61` background; the monochrome and notification icon are the same glyph. Splash: the white glyph on rail teal `#0d3b41`.
+
 ## Navigation (PRD 18.2, phase S7, owner decision 2026-11-17)
 - **No bottom tab bar.** Section roots (Home `/`, Requests `/requests`, Reports `/reports`, Account and settings `/more`) show the **three-line menu button** on the reading start of the header; pushed screens show Back instead.
 - **Side menu** (`components/nav/SideMenu.tsx`): the mobile twin of the web rail, in rail teal. It slides in from the right in Arabic and from the left in English and lists every section in groups: Home, Requests, Reports, My dashboard · Employee of the month (`/ideal-employee`), Ideas box (`/ideas`), Notifications, Emergency, Ask Sanad · Approvals and Employee record (staff only) · Account and settings. The current item has the `railOn` fill and one lit `railDot` disc, as in the panel. Back or a tap outside closes it; reduced motion removes the slide. From one section to another the screen is replaced, Home pops back to Home, anything else is pushed.
-- **The Sanad button** (`components/nav/SanadButton.tsx`): one 64dp round button at the bottom centre over the section roots, above the safe area. A rail-teal disc ringed with twelve small enamel discs (the towers' sequins) and the «س» mark, standing on a ring of the screen ground. It opens the assistant; label «اسأل سَنَد» with a hint. `Screen` leaves room under the last card for it (`SANAD_BUTTON_ROOM`), and the snackbar shows above it.
+- **The Sanad button** (`components/nav/SanadButton.tsx`): one 64dp round button at the bottom centre over the section roots, above the safe area. A rail-teal disc ringed with twelve small enamel discs (the towers' sequins) and the handshake logo, standing on a ring of the screen ground. It opens the assistant; label «اسأل سَنَد» with a hint. `Screen` leaves room under the last card for it (`SANAD_BUTTON_ROOM`), and the snackbar shows above it.
 - Menu items and their order are in `src/lib/nav.ts` (`menuGroups`, `navAction`); labels are the `menu_*` keys in `strings.json`.
 
 ## Tokens (`src/lib/theme.ts`)

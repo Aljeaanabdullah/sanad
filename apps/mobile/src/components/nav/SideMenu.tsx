@@ -74,7 +74,7 @@ export function SideMenu({ open, pathname, onClose, onGo }: { open: boolean; pat
       >
         <Row justify="space-between" style={{ paddingHorizontal: space.lg }}>
           <Row gap={space.sm}>
-            <BrandMark size={40} />
+            <BrandMark size={48} />
             <Wordmark size="title" />
           </Row>
           <IconButton icon="close" label={t('menu_close')} onPress={onClose} color={brand.onRail} />

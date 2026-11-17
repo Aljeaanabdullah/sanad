@@ -4,6 +4,7 @@ import { getPrefs } from "@/lib/prefs";
 import { signOut } from "@/app/actions/auth";
 import { chromeButtonClass, PrefsButtons } from "@/components/prefs-buttons";
 import { NavLink } from "@/components/nav-link";
+import { SanadLogo } from "@/components/sanad-logo";
 import type { Dictionary } from "@/lib/i18n";
 
 type NavKey = keyof Dictionary["nav"];
@@ -47,7 +48,10 @@ export default async function PanelLayout({ children }: { children: ReactNode })
     <div className="flex min-h-full flex-1 flex-col md:flex-row">
       <aside className="sticky top-0 z-30 flex items-center bg-rail text-rail-ink md:h-dvh md:w-60 md:shrink-0 md:flex-col md:items-stretch md:overflow-y-auto dark:md:border-e dark:md:border-line [&_:focus-visible]:outline-rail-dot">
         <div className="shrink-0 py-2 ps-4 pe-2 md:px-6 md:pt-6 md:pb-5">
-          <p className="text-xl font-bold text-rail-on-ink md:text-[1.75rem] md:leading-9">{t.appName}</p>
+          <p className="flex items-center gap-2 text-xl font-bold text-rail-on-ink md:gap-2.5 md:text-[1.75rem] md:leading-9">
+            <SanadLogo className="w-8 shrink-0 md:w-11" />
+            {t.appName}
+          </p>
           <p className="hidden text-xs text-rail-muted md:block">{t.panelTitle}</p>
         </div>
         <nav aria-label={t.panelTitle} className="min-w-0 flex-1">

@@ -1,6 +1,6 @@
 // The Sanad button (PRD 18.2, owner decision 2026-11-17): one round button at the bottom centre that
 // opens the assistant. It is a deep-teal disc ringed with small enamel discs like the Kuwait Towers'
-// sequins, with the «س» mark in its middle, and a ring of the screen ground so it stands off the content.
+// sequins, with the Sanad handshake logo in its middle, and a ring of the screen ground so it stands off the content.
 import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSettings } from '../../lib/settings';
