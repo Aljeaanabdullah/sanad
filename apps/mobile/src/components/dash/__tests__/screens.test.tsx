@@ -212,14 +212,11 @@ it('reports calendar renders the month and day details', async () => {
 
 afterEach(() => jest.useRealTimers());
 
-it('more shows staff links only to staff', async () => {
+it('account and settings shows the profile without the old links', async () => {
   const More = require('../../../app/(app)/(tabs)/more').default;
-  const { unmount } = await render(wrap(<More />));
-  expect(screen.getByText('719000')).toBeTruthy();
-  expect(screen.queryByTestId('more-approvals')).toBeNull();
-  await unmount();
-  mockRole = 'supervisor';
   await render(wrap(<More />));
-  expect(screen.getByTestId('more-approvals')).toBeTruthy();
-  expect(screen.getByTestId('more-lookup')).toBeTruthy();
+  expect(screen.getByText('719000')).toBeTruthy();
+  expect(screen.getByText('حسابي والإعدادات')).toBeTruthy();
+  // The links moved to the side menu (components/nav/__tests__).
+  expect(screen.queryByTestId('more-approvals')).toBeNull();
 });

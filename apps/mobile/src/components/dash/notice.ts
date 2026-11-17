@@ -74,7 +74,7 @@ export function noticeView(n: Notice, t: T): NoticeView {
       const reason = str(d.reason);
       return {
         icon: 'trophy-outline',
-        tone: ok ? 'ok' : 'accent',
+        tone: ok ? 'ok' : 'warn',
         title: `${t('notice_bonus')} ${month}`.trim(),
         body: ok ? t('dash_eligible') : `${t('dash_not_eligible')}${reason ? `: ${reason}` : ''}`,
         href: valid ? `/dashboard?month=${m}` : '/dashboard',

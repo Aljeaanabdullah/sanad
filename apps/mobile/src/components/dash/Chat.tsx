@@ -1,13 +1,43 @@
 // Chat pieces for "Ask Sanad": a message bubble and the input bar. The kit's Field has a label above
 // it, which a chat bar does not want, so the bar is drawn here with the same tokens.
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useState, type ReactNode } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { Animated, Easing, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useSettings } from '../../lib/settings';
-import { brand, fonts, radius, space, TOUCH, type } from '../../lib/theme';
-import { Icon, Row, Txt, useDir } from '../ui';
+import { fonts, radius, space, TOUCH, type } from '../../lib/theme';
+import { SanadMark, useReduceMotion } from '../nav/SanadMark';
+import { Row, Txt, useDir } from '../ui';
 
-export function ChatBubble({ mine, text, children, testID }: { mine: boolean; text: string; children?: ReactNode; testID?: string }) {
+/** Three dots that bounce one after another, like typing (static with reduce motion). */
+export function TypingDots() {
+  const reduce = useReduceMotion();
+  const dots = useRef([0, 1, 2].map(() => new Animated.Value(0))).current;
+  useEffect(() => {
+    if (reduce) return;
+    const hop = (v: Animated.Value) =>
+      Animated.sequence([
+        Animated.timing(v, { toValue: 1, duration: 220, easing: Easing.out(Easing.quad), useNativeDriver: true }),
+        Animated.timing(v, { toValue: 0, duration: 260, easing: Easing.in(Easing.quad), useNativeDriver: true }),
+      ]);
+    const loop = Animated.loop(Animated.sequence([Animated.stagger(140, dots.map(hop)), Animated.delay(220)]));
+    loop.start();
+    return () => loop.stop();
+  }, [reduce, dots]);
+  const hues = ['#1fa89c', '#5fd3c6', '#a8ece4'];
+  return (
+    <View testID="typing-dots" style={{ flexDirection: 'row', gap: 6, paddingVertical: 4 }}>
+      {dots.map((v, i) => (
+        <Animated.View
+          key={i}
+          style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: hues[i], transform: [{ translateY: v.interpolate({ inputRange: [0, 1], outputRange: [0, -6] }) }] }}
+        />
+      ))}
+    </View>
+  );
+}
+
+/** One message. Sanad's replies carry the Sanad bot; while `thinking` its antenna pulses and the bubble shows typing dots. */
+export function ChatBubble({ mine, text, children, testID, thinking }: { mine: boolean; text: string; children?: ReactNode; testID?: string; thinking?: boolean }) {
   const { c, t } = useSettings();
   const d = useDir();
   // Mine sits on the reading end, Sanad's replies on the reading start.
@@ -16,9 +46,7 @@ export function ChatBubble({ mine, text, children, testID }: { mine: boolean; te
     <View testID={testID} style={{ alignSelf: side, maxWidth: '86%' }} accessible accessibilityLabel={mine ? `${t('asst_you')}: ${text}` : `${t('app_name')}: ${text}`}>
       <Row gap={space.sm} align="flex-end">
         {!mine ? (
-          <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: brand.rail, alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name="sparkles-outline" size={16} color={brand.railDot} />
-          </View>
+          <SanadMark size={32} state={thinking ? 'thinking' : 'still'} testID={thinking ? 'sanad-thinking' : undefined} />
         ) : null}
         <View
           style={{
@@ -32,7 +60,15 @@ export function ChatBubble({ mine, text, children, testID }: { mine: boolean; te
             gap: space.sm,
           }}
         >
-          <Txt tone={mine ? 'onPrimary' : 'default'}>{text}</Txt>
+          {/* While thinking: typing dots, with the words small under them. */}
+          {thinking ? (
+            <View style={{ gap: 2 }}>
+              <TypingDots />
+              <Txt variant="caption" tone="muted">{text}</Txt>
+            </View>
+          ) : (
+            <Txt tone={mine ? 'onPrimary' : 'default'}>{text}</Txt>
+          )}
           {children}
         </View>
       </Row>

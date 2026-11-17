@@ -17,7 +17,7 @@ export default function SetupScreen() {
     <View style={{ flex: 1, backgroundColor: brand.rail }}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} bounces={false}>
         <View style={{ flex: 1, minHeight: 260, alignItems: 'center', justifyContent: 'center', paddingTop: insets.top + space.xl, paddingBottom: space.xl, paddingHorizontal: space.xl, gap: space.sm }}>
-          <BrandMark size={72} />
+          <BrandMark size={120} />
           <Wordmark />
           <Text style={[type.body, { fontFamily: fonts.medium, color: MUTED_ON_RAIL, textAlign: 'center' }]}>{t('auth_purpose')}</Text>
         </View>

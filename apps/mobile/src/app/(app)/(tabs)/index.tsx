@@ -1,4 +1,4 @@
-// Home tab (PRD 18.2): greeting, the punch card, the period / bonus summary, shortcuts and today's
+// Home tab (PRD 18.2): greeting, the punch card, the period / bonus summary and today's
 // punches. Every block loads on its own, so one failing call never blanks the screen.
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
@@ -8,7 +8,6 @@ import { EmergencyBanner } from '../../../components/emergency/EmergencyBanner';
 import { BonusSummary } from '../../../components/home/BonusSummary';
 import { NotifyCard } from '../../../components/home/NotifyCard';
 import { PunchCard } from '../../../components/home/PunchCard';
-import { QuickActions } from '../../../components/home/QuickActions';
 import { TodayPunches } from '../../../components/home/TodayPunches';
 import { Header, IconButton, Screen } from '../../../components/ui';
 import { currentShift, loadDashboard, todayPunches, unreadNotificationCount, type PunchEntry, type ShiftInfo } from '../../../lib/api';
@@ -95,7 +94,6 @@ export default function Home() {
         <EmergencyBanner />
         <NotifyCard />
         <BonusSummary dash={dash} onOpen={() => router.push('/dashboard')} onRetry={loadDash} />
-        <QuickActions />
         <TodayPunches punches={punches} onRetry={loadPunches} />
       </Screen>
     </>

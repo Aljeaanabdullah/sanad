@@ -45,9 +45,9 @@ One system that joins verified attendance (face + geofence + bound device), leav
 
 ## Brand Commitments
 
-- Name: سَنَد (Sanad). The wordmark is the Arabic name set in type; the logo is temporary until a final one is approved (PRD section 12).
+- Name: سَنَد (Sanad). The wordmark is the Arabic name set in type, next to the logo: the Sanad bot, a friendly robot head the owner chose on 2026-11-17, replacing the handshake (PRD section 12).
 - The navy + gold identity (owner decision 2026-11-16) is retired for the panel by the owner's decision of 2026-11-17: a new identity, professional and soft, at the level of global product companies.
-- The mobile app keeps navy + gold for now and will move to the new identity later, in a separate task (owner answer, 2026-11-17).
+- The mobile app moves to the same identity in phase S7 (owner decision 2026-11-17): the same colours and font, a side menu instead of the bottom tab bar, and a round Sanad button that opens the assistant.
 - Emergency map: red and green keep their safety meaning.
 - Voice: simple, direct words. No marketing language inside the panel.
 
@@ -55,7 +55,7 @@ One system that joins verified attendance (face + geofence + bound device), leav
 
 - Requirements: docs/PRD.md. Phases: docs/PLAN.md.
 - The running panel: https://sanad-ten-alpha.vercel.app
-- No final logo, no brand illustrations, no photography. None may be invented as if official.
+- One logo only (the Sanad bot) and one illustration (the bot at its laptop, for the assistant's welcome); no photography. Nothing else may be invented as if official.
 
 ## Product Principles
 

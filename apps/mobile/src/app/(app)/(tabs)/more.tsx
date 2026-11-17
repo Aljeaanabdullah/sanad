@@ -1,5 +1,6 @@
-// More tab: my profile, links (dashboard, assistant, notifications; approvals and employee lookup for
-// supervisors, HR and the admin, as in the old app), language and theme, privacy text, version, sign out.
+// Account and settings (was the "More" tab): my profile, language and theme, privacy text, version,
+// sign out. The links it used to list (dashboard, assistant, notifications, and approvals / employee
+// lookup for staff) are in the side menu now (components/nav, phase S7, owner decision 2026-11-17).
 import * as Application from 'expo-application';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
@@ -54,21 +55,9 @@ export default function MoreScreen() {
       },
     ]);
 
-  const links: { key: string; icon: Parameters<typeof ListRow>[0]['icon']; title: string; subtitle: string; href: string }[] = [
-    { key: 'dashboard', icon: 'stats-chart-outline', title: t('dash_title'), subtitle: t('more_dashboard_hint'), href: '/dashboard' },
-    { key: 'assistant', icon: 'chatbubbles-outline', title: t('assistant_title'), subtitle: t('more_assistant_hint'), href: '/assistant' },
-    { key: 'notifications', icon: 'notifications-outline', title: t('notifications'), subtitle: t('more_notifications_hint'), href: '/notifications' },
-    ...(staff
-      ? [
-          { key: 'approvals', icon: 'checkmark-done-outline' as const, title: t('approvals'), subtitle: t('more_approvals_hint'), href: '/approvals' },
-          { key: 'lookup', icon: 'people-outline' as const, title: t('employee_record'), subtitle: t('more_lookup_hint'), href: '/lookup' },
-        ]
-      : []),
-  ];
-
   return (
     <>
-      <Header title={t('tab_more')} big />
+      <Header title={t('menu_settings')} big />
       <Screen>
         <Card testID="profile-card">
           <Row gap={space.md}>
@@ -89,22 +78,6 @@ export default function MoreScreen() {
             </View>
           </Row>
         </Card>
-
-        <Section title={t('more_services')}>
-          <Card padded={false}>
-            {links.map((l, i) => (
-              <ListRow
-                key={l.key}
-                testID={`more-${l.key}`}
-                icon={l.icon}
-                title={l.title}
-                subtitle={l.subtitle}
-                onPress={() => router.push(l.href)}
-                last={i === links.length - 1}
-              />
-            ))}
-          </Card>
-        </Section>
 
         <Section title={t('settings')}>
           <Card>

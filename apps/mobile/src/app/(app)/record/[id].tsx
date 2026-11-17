@@ -113,7 +113,7 @@ export default function MonthRecord() {
               <>
                 {totals ? (
                   <Row gap={space.sm}>
-                    <StatTile value={totals.late} label={t('dash_late')} tone={totals.late ? 'accent' : 'default'} icon="alarm-outline" />
+                    <StatTile value={totals.late} label={t('dash_late')} tone={totals.late ? 'warn' : 'default'} icon="alarm-outline" />
                     <StatTile value={totals.absent} label={t('dash_absent')} tone={totals.absent ? 'danger' : 'default'} icon="close-circle-outline" />
                     <StatTile value={totals.missing} label={t('dash_missing_checkout')} tone={totals.missing ? 'danger' : 'default'} icon="log-out-outline" />
                   </Row>

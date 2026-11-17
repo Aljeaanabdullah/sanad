@@ -16,6 +16,8 @@ export const brand = {
   turquoise: '#1fa89c',
   /** Deep ink that sits on turquoise and on light fills in dark mode. */
   ink: '#062528',
+  /** Current-item fill in the side menu (the web's rail-on). */
+  railOn: '#18555c',
   /** Fixed raised surface for the snackbar (reads on both themes). */
   snack: '#0d3b41',
 };
@@ -109,25 +111,39 @@ export function statusTints(c: Palette): Record<StatusTone, { bg: string; fg: st
       };
 }
 
+/** Readex Pro, the web panel's one typeface, for Arabic and Latin (phase S7, owner decision 2026-11-17). */
 export const fonts = {
-  regular: 'Tajawal_400Regular',
-  medium: 'Tajawal_500Medium',
-  bold: 'Tajawal_700Bold',
-  black: 'Tajawal_800ExtraBold',
+  regular: 'ReadexPro_400Regular',
+  medium: 'ReadexPro_500Medium',
+  semibold: 'ReadexPro_600SemiBold',
+  bold: 'ReadexPro_700Bold',
+  /** Readex Pro has no 800; the display weight is the 700 cut. */
+  black: 'ReadexPro_700Bold',
 };
 
 /** Spacing scale (dp). Screens use 16 side gutters; cards 16 padding; sections 24 apart. */
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as const;
 /** Corner radii: inputs/chips 10, cards 14, sheets/hero 24, pills full (buttons, badges, chips). */
 export const radius = { sm: 10, md: 14, lg: 24, pill: 999 } as const;
-/** Type scale: size / line height. Tajawal needs generous line height for Arabic. */
+/** Type scale: size / line height. Readex Pro is wide, so the big sizes are a step smaller than with Tajawal. */
 export const type = {
-  display: { fontSize: 34, lineHeight: 44 },
-  title: { fontSize: 22, lineHeight: 30 },
-  heading: { fontSize: 17, lineHeight: 26 },
+  display: { fontSize: 30, lineHeight: 42 },
+  title: { fontSize: 21, lineHeight: 30 },
+  heading: { fontSize: 16, lineHeight: 25 },
   body: { fontSize: 15, lineHeight: 24 },
   label: { fontSize: 13, lineHeight: 20 },
   caption: { fontSize: 12, lineHeight: 18 },
 } as const;
 /** Minimum touch target (Android 48dp). */
 export const TOUCH = 48;
+/** The round Sanad button at the bottom centre: its disc, the ring of screen ground around it, and its lift above the safe area. */
+export const SANAD_BUTTON = 64;
+export const SANAD_BUTTON_HALO = 4;
+export const SANAD_BUTTON_LIFT = space.md;
+/** Height the button takes above the safe-area inset (84). */
+export const SANAD_BUTTON_TOP = SANAD_BUTTON_LIFT + SANAD_BUTTON + SANAD_BUTTON_HALO * 2;
+/**
+ * Room every screen leaves at the bottom (above the safe-area inset) where the button floats, so the
+ * last row can always scroll fully above it with a clear gap (100).
+ */
+export const SANAD_BUTTON_ROOM = SANAD_BUTTON_TOP + space.lg;

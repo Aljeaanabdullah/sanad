@@ -185,7 +185,7 @@ components:
 
 # Design System: Sanad Panel
 
-Scope: this file covers the web panel (`apps/admin`) only. The mobile app (`apps/mobile`) keeps its older navy + gold identity for now and has its own `apps/mobile/DESIGN.md`. Everything here was read from the shipped panel code (`apps/admin/src/app/globals.css` and `apps/admin/src/components/ui.tsx`), not from a plan, and was refreshed after the review fixes of the same day. The owner chose this identity on 2026-11-17; it replaces navy + gold for the panel.
+Scope: this file covers the web panel (`apps/admin`) only. The mobile app (`apps/mobile`) uses the same identity since phase S7 (owner decision 2026-11-17: same colour tokens and Readex Pro) and has its own `apps/mobile/DESIGN.md` for its components and navigation. Everything here was read from the shipped panel code (`apps/admin/src/app/globals.css` and `apps/admin/src/components/ui.tsx`), not from a plan, and was refreshed after the review fixes of the same day. The owner chose this identity on 2026-11-17; it replaces navy + gold for the panel.
 
 ## Overview
 
@@ -348,6 +348,9 @@ The shift as a field of discs inside a card. It is always exactly 100 discs, one
 ### Count Tile (signature)
 A link styled as a small card (14px corners, card shadow, 12px padding, 16px at the sides from 640px): a disc and the state's name in muted 0.875rem, then the count at 1.75rem weight 600 in tabular numerals, then an optional hint (hidden on phones). A count above zero for late, absent or not-arrived takes its `warn` or `danger` ink. The selected tile has a `primary` border plus a 1px `primary` ring and a `primary-soft` fill. Tiles sit four across from 1024px and two across below, with a 10px to 12px gap. The employee dashboard uses the same anatomy for its monthly figures (label in muted 0.875rem, figure at 1.75rem weight 600, `danger` ink for a bad figure), as plain tiles that are not links.
 
+### Logo
+The owner chose the Sanad logo on 2026-11-17: **the Sanad bot**, a friendly robot head (white shell, dark visor with two turquoise ring eyes, a small smile, teal ears, an antenna with the turquoise disc), replacing the handshake chosen earlier that day. It is drawn by `tools/sanad-bot` (`sbot.py` from the coordinator, `build.py` for canvases and layers, `render.mjs` for PNGs) in the sea-glass palette. In the panel it is the `SanadLogo` component (`public/brand/sanad-bot.svg`, full colour, never recoloured or stretched): before the wordmark on the rail (44px wide on desktop, 32px on phones), on the sign-in brand side (64px) and above the narrow sign-in form (48px). The favicon (`src/app/icon.png`, rounded) and the Apple touch icon (`apple-icon.png`, full bleed) are the head on rail teal. Keep clear space of a quarter of its width around it, and never place it on the disc sphere.
+
 ### Disc Sphere
 The identity's one picture: a sphere built from a 19 by 19 grid of small discs in eight fixed sea hues, in slanted bands like the towers' sequins. It appears in one place: large and cropped at the bottom inline-end corner of the brand panel of the sign-in and change-password screens, which shows from 1024px. It is a picture, not a logo: it never sits beside the wordmark and is never used as a badge or an icon. It is decoration only and always sits on rail teal.
 
@@ -388,6 +391,6 @@ The map sits in a 12px-cornered frame with a `line` border and is its own stacki
 - **Don't** paint a flat background over the drifting ground, or lift surfaces with heavier shadows on hover.
 - **Don't** add a second typeface, or make table text bigger to show importance.
 - **Don't** add page-load animation or moving decoration.
-- **Don't** invent a logo or official illustration; the wordmark is the name set in type until the owner approves a final logo.
+- **Don't** invent another logo or official illustration; the Sanad bot (see Logo) is the only mark. Never stretch, recolour or redraw it outside `tools/sanad-bot`.
 - **Don't** use the disc sphere as a logo, a badge or an icon, or place it beside the wordmark; it is the sign-in picture only.
 - **Don't** use a typed character (a plus sign, an arrow) where the icon set has a drawn icon.

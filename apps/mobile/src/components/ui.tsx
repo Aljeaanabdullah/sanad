@@ -19,8 +19,9 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useNav } from '../lib/nav';
 import { useSettings } from '../lib/settings';
-import { brand, fonts, radius, space, statusTints, TOUCH, type, type Palette, type StatusTone } from '../lib/theme';
+import { brand, fonts, radius, SANAD_BUTTON_ROOM, space, statusTints, TOUCH, type, type Palette, type StatusTone } from '../lib/theme';
 
 export type IconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -74,7 +75,7 @@ export function Txt({
 }: {
   variant?: Variant;
   tone?: Tone;
-  weight?: 'regular' | 'medium' | 'bold' | 'black';
+  weight?: 'regular' | 'medium' | 'semibold' | 'bold' | 'black';
   center?: boolean;
   numeric?: boolean;
   numberOfLines?: number;
@@ -143,23 +144,29 @@ export function Screen({ children, scroll = true, padded = true, refreshControl,
   footer?: ReactNode;
 }) {
   const { c } = useSettings();
+  // Where the round Sanad button floats, leave room under the last card for it.
+  const nav = useNav();
   const insets = useSafeAreaInsets();
   const pad = padded ? { paddingHorizontal: space.lg, paddingTop: space.lg } : null;
+  // Space below the content (or below a footer form) that nothing may cover: the safe area, plus the
+  // Sanad button's room where it floats, so the last row and the footer always sit above the button.
+  const under = insets.bottom + (nav?.sanadButton ? SANAD_BUTTON_ROOM : 0);
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       {scroll ? (
         <ScrollView
-          contentContainerStyle={[pad, { paddingBottom: (footer ? space.lg : insets.bottom + space.xl), gap: space.lg }, contentStyle]}
+          testID="screen-scroll"
+          contentContainerStyle={[pad, { paddingBottom: footer ? space.lg : under + (nav?.sanadButton ? 0 : space.xl), gap: space.lg }, contentStyle]}
           refreshControl={refreshControl}
           keyboardShouldPersistTaps="handled"
         >
           {children}
         </ScrollView>
       ) : (
-        <View style={[{ flex: 1 }, pad, contentStyle]}>{children}</View>
+        <View style={[{ flex: 1 }, pad, !footer && nav?.sanadButton ? { paddingBottom: under } : null, contentStyle]}>{children}</View>
       )}
       {footer ? (
-        <View style={{ paddingHorizontal: space.lg, paddingTop: space.md, paddingBottom: insets.bottom + space.md, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.line, backgroundColor: c.bg }}>
+        <View testID="screen-footer" style={{ paddingHorizontal: space.lg, paddingTop: space.md, paddingBottom: under + (nav?.sanadButton ? 0 : space.md), borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.line, backgroundColor: c.bg }}>
           {footer}
         </View>
       ) : null}
@@ -169,7 +176,8 @@ export function Screen({ children, scroll = true, padded = true, refreshControl,
 
 /**
  * Top app bar. Rail teal in both themes (the Sanad header, like the panel's rail). `back` shows a system-style back button;
- * `actions` go on the reading end. Pass `big` on tab roots for the large greeting header.
+ * without it, inside the app, the three-line button on the reading start opens the side menu (components/nav).
+ * `actions` go on the reading end. Pass `big` on section roots for the large greeting header.
  */
 export function Header({ title, subtitle, back, actions, big, children }: {
   title: string;
@@ -180,6 +188,8 @@ export function Header({ title, subtitle, back, actions, big, children }: {
   /** Extra content inside the teal band (e.g. the punch card on Home). */
   children?: ReactNode;
 }) {
+  const { t } = useSettings();
+  const nav = useNav();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const d = useDir();
@@ -188,6 +198,8 @@ export function Header({ title, subtitle, back, actions, big, children }: {
       <Row gap={space.sm} style={{ minHeight: TOUCH }}>
         {back ? (
           <IconButton icon={d.back} label="back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} color={brand.onRail} />
+        ) : nav ? (
+          <IconButton icon="menu" label={t('menu_open')} onPress={nav.openMenu} color={brand.onRail} testID="menu-button" />
         ) : null}
         <View style={{ flex: 1 }}>
           <Text
@@ -379,10 +391,11 @@ export function Button({ label, onPress, kind = 'primary', icon, loading, disabl
 }
 
 /** A 48dp icon-only button; `label` is a strings.json key or plain text for screen readers. */
-export function IconButton({ icon, label, onPress, color, badge }: { icon: IconName; label: string; onPress: () => void; color?: string; badge?: number }) {
+export function IconButton({ icon, label, onPress, color, badge, testID }: { icon: IconName; label: string; onPress: () => void; color?: string; badge?: number; testID?: string }) {
   const { c, t } = useSettings();
   return (
     <Pressable
+      testID={testID}
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={label === 'back' ? t('back') : label}
@@ -633,7 +646,8 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
           accessibilityLiveRegion="polite"
           pointerEvents="none"
           style={{
-            position: 'absolute', left: space.lg, right: space.lg, bottom: insets.bottom + 72,
+            // Above form footers and above the round Sanad button.
+            position: 'absolute', left: space.lg, right: space.lg, bottom: insets.bottom + SANAD_BUTTON_ROOM + space.sm,
             opacity: anim, transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }],
           }}
         >

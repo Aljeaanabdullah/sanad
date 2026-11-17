@@ -1,8 +1,8 @@
-// Sanad brand pieces for the sign-in flow only (setup and login): the temporary logo
-// (the letter «س» in a diamond, PRD 12), the wordmark, and a language toggle for the teal band.
-// Sea glass: turquoise (the towers' lit disc) on rail teal, like the panel's sign-in brand side.
+// Sanad brand pieces: the logo (the Sanad bot's head, owner decision 2026-11-17, PRD 12), the
+// wordmark, and a language toggle for the teal band. The full-colour head sits on rail teal here and
+// in the side menu; the animated head on the Sanad button is components/nav/SanadMark.
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Pressable, Text, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSettings } from '../../lib/settings';
 import { brand, fonts, radius, space, TOUCH, type } from '../../lib/theme';
@@ -10,32 +10,30 @@ import { Row, useDir } from '../ui';
 
 const MUTED_ON_RAIL = brand.railInk; // same as the Header subtitle
 
-/** The «س» in a turquoise diamond. */
-export function BrandMark({ size = 56 }: { size?: number }) {
+const LOGO = require('../../../assets/bot/head.png');
+/** The head's box is a little wider than tall (tools/sanad-bot). */
+const LOGO_RATIO = 409 / 480;
+
+/**
+ * The Sanad logo (the bot's head, full colour). `size` is its width; the height follows, never stretched.
+ * `decorative` hides it from screen readers (inside a labelled control).
+ */
+export function BrandMark({ size = 56, decorative }: { size?: number; decorative?: boolean }) {
   const { t } = useSettings();
-  const side = size / Math.SQRT2; // the rotated square fits inside `size`
   return (
-    <View accessible accessibilityRole="image" accessibilityLabel={t('auth_logo_label')} style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-      <View
-        style={{
-          position: 'absolute',
-          width: side,
-          height: side,
-          borderRadius: Math.max(4, side * 0.18),
-          borderWidth: 2,
-          borderColor: brand.railDot,
-          backgroundColor: 'rgba(95,211,198,0.12)',
-          transform: [{ rotate: '45deg' }],
-        }}
-      />
-      <Text style={{ fontFamily: fonts.black, fontSize: size * 0.42, lineHeight: size * 0.6, color: brand.railDot, includeFontPadding: false }}>
-        {t('auth_logo_letter')}
-      </Text>
-    </View>
+    <Image
+      source={LOGO}
+      resizeMode="contain"
+      accessible={!decorative}
+      accessibilityRole={decorative ? undefined : 'image'}
+      accessibilityLabel={decorative ? undefined : t('auth_logo_label')}
+      importantForAccessibility={decorative ? 'no-hide-descendants' : 'auto'}
+      style={{ width: size, height: Math.round(size * LOGO_RATIO) }}
+    />
   );
 }
 
-/** «سَنَد» in white on the teal band, Tajawal 800. */
+/** «سَنَد» in white on the teal band, Readex Pro 700. */
 export function Wordmark({ size = 'display' }: { size?: 'display' | 'title' }) {
   const { t } = useSettings();
   const big = size === 'display';
@@ -89,7 +87,7 @@ export function LoginHero({ folded }: { folded?: boolean }) {
         <LangToggle />
       </Row>
       <Row gap={space.sm} style={{ marginTop: folded ? 0 : space.sm }}>
-        <BrandMark size={folded ? 40 : 52} />
+        <BrandMark size={folded ? 44 : 60} />
         <Wordmark size="title" />
       </Row>
       {folded ? null : (

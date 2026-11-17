@@ -20,7 +20,7 @@
     "android": {
       "package": "com.sanad.hr",
       "adaptiveIcon": {
-        "backgroundColor": "#0d3b41",
+        "backgroundColor": "#0e5a61",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"

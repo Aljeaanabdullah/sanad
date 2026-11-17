@@ -2,12 +2,12 @@
 // first launch -> setup; signed out -> login; wrong phone -> blocked; first sign-in -> change password;
 // no consent yet -> consent; then the app.
 import {
-  Tajawal_400Regular,
-  Tajawal_500Medium,
-  Tajawal_700Bold,
-  Tajawal_800ExtraBold,
+  ReadexPro_400Regular,
+  ReadexPro_500Medium,
+  ReadexPro_600SemiBold,
+  ReadexPro_700Bold,
   useFonts,
-} from '@expo-google-fonts/tajawal';
+} from '@expo-google-fonts/readex-pro';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -25,7 +25,7 @@ I18nManager.allowRTL(false);
 I18nManager.forceRTL(false);
 
 export default function RootLayout() {
-  const [loaded, fontError] = useFonts({ Tajawal_400Regular, Tajawal_500Medium, Tajawal_700Bold, Tajawal_800ExtraBold });
+  const [loaded, fontError] = useFonts({ ReadexPro_400Regular, ReadexPro_500Medium, ReadexPro_600SemiBold, ReadexPro_700Bold });
   return (
     <SafeAreaProvider>
       <SettingsProvider>
