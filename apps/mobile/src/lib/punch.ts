@@ -33,6 +33,12 @@ export type PunchBody = {
     mock_location: boolean;
     rooted: boolean;
     biometric: { passed: true; type: BiometricType };
+    /**
+     * Pilot metric (phase 13): milliseconds from the employee's press of the punch button (or "try again")
+     * until just before this request is sent. Phone clock, not signed, a measure only: the server stores
+     * it in client_report and decides nothing with it.
+     */
+    attempt_ms?: number;
   };
   photo: string;
   /** PRD 4.7: the nonce from the server and the phone key's signature (base64 DER) over signingPayload(). */
@@ -75,6 +81,40 @@ export function signingPayload(body: PunchBody, nonce: string, photoSha256: stri
     body.report.mock_location ? '1' : '0',
     body.report.rooted ? '1' : '0',
   ].join('\n');
+}
+
+/** Longest attempt_ms we send (10 minutes); a longer try is sent as this value. */
+export const ATTEMPT_MS_MAX = 10 * 60 * 1000;
+/** A press time passed from Home is trusted only when it is this recent at screen open. */
+export const PRESS_MAX_AGE_MS = 60 * 1000;
+
+/**
+ * Whole milliseconds from [startedAt] to [now], at most ATTEMPT_MS_MAX. Null when there is no start or the
+ * phone clock went backwards (nothing is sent then).
+ */
+export function attemptMs(startedAt: number | null | undefined, now: number): number | null {
+  if (typeof startedAt !== 'number' || !Number.isFinite(startedAt) || !Number.isFinite(now)) return null;
+  const ms = Math.round(now - startedAt);
+  if (ms < 0) return null;
+  return Math.min(ms, ATTEMPT_MS_MAX);
+}
+
+/**
+ * The press time Home passed in the route (`at`, epoch ms). Used only when it is a recent past time;
+ * otherwise (missing, old, in the future, a restored screen) the screen open time [now] is used.
+ */
+export function pressedAt(param: string | string[] | undefined, now: number): number {
+  const raw = Array.isArray(param) ? param[0] : param;
+  const at = raw ? Number(raw) : NaN;
+  return Number.isFinite(at) && at <= now && now - at <= PRESS_MAX_AGE_MS ? at : now;
+}
+
+/** The body with report.attempt_ms set (or left out when [ms] is null). Not part of the signed text. */
+export function withAttemptMs(body: PunchBody, ms: number | null): PunchBody {
+  const report = { ...body.report };
+  if (ms === null) delete report.attempt_ms;
+  else report.attempt_ms = ms;
+  return { ...body, report };
 }
 
 /** The server wants bare base64, not a data: URL. */

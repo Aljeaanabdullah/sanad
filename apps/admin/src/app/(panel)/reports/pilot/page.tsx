@@ -7,8 +7,10 @@ import { pilotT } from "@/lib/i18n-pilot";
 import { kuwaitDate } from "@/lib/reports";
 import { loadPilotMetrics } from "@/lib/export-pilot";
 import {
+  clientTimes,
   fillDays,
   firstOkVerdict,
+  fullTimeVerdict,
   parsePilotFilters,
   percent,
   pilotQuery,
@@ -123,13 +125,15 @@ function Metrics({ m, t, n }: { m: PilotMetrics; t: ReturnType<typeof pilotT>; n
   const firstOk = share(m.first_ok, m.tries);
   const verdict = firstOkVerdict(firstOk);
   const tone = verdict === "none" ? "off" : verdict;
+  const { client, full } = clientTimes(m);
+  const fullVerdict = fullTimeVerdict(full);
   const days = fillDays(m);
   const maxDay = Math.max(1, ...days.map((d) => d.accepted + d.rejected));
   const maxReason = Math.max(1, ...m.reasons.map((r) => r.n));
 
   return (
     <>
-      <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4" data-testid="pilot-stats">
+      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5" data-testid="pilot-stats">
         <Tile label={t.attempts} value={n(m.attempts)}>
           {t.attemptsSub(n(m.accepted), n(m.rejected))}
           <br />
@@ -140,6 +144,20 @@ function Metrics({ m, t, n }: { m: PilotMetrics; t: ReturnType<typeof pilotT>; n
             <Badge tone={tone}>{t.verdict[verdict]}</Badge>
           </span>
           {t.firstOkSub(n(m.first_ok), n(m.tries))}. {t.firstOkTarget}
+        </Tile>
+        <Tile label={t.fullTime} value={seconds(full.p50, t.sec)} testId="pilot-full-time">
+          {full.n > 0 ? (
+            <>
+              <span className="mb-1 block">
+                <Badge tone={fullVerdict === "none" ? "off" : fullVerdict}>{t.fullVerdict[fullVerdict]}</Badge>
+              </span>
+              {t.fullTimeSub(seconds(full.p90, t.sec), seconds(client.p50, t.sec), seconds(m.server_ms.p50, t.sec), n(full.n))}
+              <br />
+              {t.fullTimeUnder(percent(share(full.under_10s, full.n)))}
+            </>
+          ) : (
+            t.fullTimeNone
+          )}
         </Tile>
         <Tile label={t.serverTime} value={seconds(m.server_ms.p50, t.sec)}>
           {t.serverTimeSub(seconds(m.server_ms.p90, t.sec), n(m.server_ms.n))}

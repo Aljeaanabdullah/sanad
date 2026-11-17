@@ -1,5 +1,7 @@
 import { hasKey, makeT } from '../i18n';
 import {
+  ATTEMPT_MS_MAX,
+  attemptMs,
   base64Bytes,
   biometricErrorKey,
   biometricTypeOf,
@@ -17,6 +19,7 @@ import {
   parsePunchResult,
   photoTooBig,
   PHOTO_MAX_BYTES,
+  pressedAt,
   reasonKey,
   recentCount,
   reportProblems,
@@ -26,6 +29,7 @@ import {
   signingPayload,
   stepStates,
   stripDataUrl,
+  withAttemptMs,
   type ShiftLike,
 } from '../punch';
 import a from '../strings-a.json';
@@ -358,5 +362,47 @@ describe('signingPayload (PRD 4.7)', () => {
   });
   it('the signature is optional in the body (old builds / no key yet)', () => {
     expect(body.signature).toBeUndefined();
+  });
+});
+
+describe('attempt time (pilot metric, report.attempt_ms)', () => {
+  const body = buildPunchBody({
+    deviceId: 'dev-1',
+    location: { lat: 29.37, lng: 47.97, accuracy: 12.5 },
+    report: { vpn: false, mockLocation: false, rooted: false },
+    biometric: 'face',
+    photo: '/9j/abc',
+  });
+
+  it('is whole milliseconds from the press to now', () => {
+    expect(attemptMs(1000, 8400.4)).toBe(7400);
+    expect(attemptMs(5000, 5000)).toBe(0);
+  });
+  it('is capped at 10 minutes', () => {
+    expect(ATTEMPT_MS_MAX).toBe(600000);
+    expect(attemptMs(0, 3_600_000)).toBe(600000);
+  });
+  it('is not sent when there is no start or the clock went backwards', () => {
+    expect(attemptMs(null, 1000)).toBeNull();
+    expect(attemptMs(undefined, 1000)).toBeNull();
+    expect(attemptMs(Number.NaN, 1000)).toBeNull();
+    expect(attemptMs(2000, 1000)).toBeNull();
+  });
+  it('uses the press time from Home only when it is recent', () => {
+    const now = 1_700_000_000_000;
+    expect(pressedAt(String(now - 300), now)).toBe(now - 300);
+    expect(pressedAt([String(now - 300)], now)).toBe(now - 300);
+    expect(pressedAt(undefined, now)).toBe(now);
+    expect(pressedAt('abc', now)).toBe(now);
+    expect(pressedAt(String(now - 61_000), now)).toBe(now);
+    expect(pressedAt(String(now + 5000), now)).toBe(now);
+  });
+  it('is added to the report as an integer, and left out when null', () => {
+    expect(withAttemptMs(body, 6200).report.attempt_ms).toBe(6200);
+    expect(withAttemptMs(withAttemptMs(body, 6200), null).report).not.toHaveProperty('attempt_ms');
+    expect(body.report).not.toHaveProperty('attempt_ms');
+  });
+  it('is not part of the signed text (the signature made before it is added stays valid)', () => {
+    expect(signingPayload(withAttemptMs(body, 6200), 'abc', 'h')).toBe(signingPayload(body, 'abc', 'h'));
   });
 });

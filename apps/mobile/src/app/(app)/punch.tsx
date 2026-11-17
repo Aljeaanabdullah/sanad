@@ -14,6 +14,7 @@ import { signPunch } from '../../lib/deviceKey';
 import { hm, longDate } from '../../lib/dates';
 import { hasKey } from '../../lib/i18n';
 import {
+  attemptMs,
   biometricErrorKey,
   buildPunchBody,
   canRetry,
@@ -21,10 +22,12 @@ import {
   isStale,
   looksLikeJpeg,
   minutesUntil,
+  pressedAt,
   reasonKey,
   reportProblems,
   resultMinutes,
   stepStates,
+  withAttemptMs,
   type BiometricType,
   type GeoPoint,
   type PhoneReport,
@@ -42,7 +45,7 @@ type Problem = { step: StepId; key: string; vars?: Record<string, string | numbe
 export default function PunchScreen() {
   const { t, c, lang } = useSettings();
   const router = useRouter();
-  const { next } = useLocalSearchParams<{ next?: string }>();
+  const { next, at } = useLocalSearchParams<{ next?: string; at?: string }>();
   const [camPerm, requestCam] = useCameraPermissions();
 
   const [step, setStep] = useState<StepId>('checks');
@@ -61,6 +64,11 @@ export default function PunchScreen() {
   /** The review photo taken in the photo step, signed and sent after Face ID / fingerprint. */
   const photoRef = useRef<string | null>(null);
   const askedCamera = useRef(false);
+  /**
+   * Pilot metric: when this try started (epoch ms): the press on Home, or "try again" after an answer.
+   * Fixing a problem on the way (location, Face ID retry) is part of the same try. Sent as report.attempt_ms.
+   */
+  const triedAt = useRef<number>(pressedAt(at, Date.now()));
 
   useEffect(() => {
     alive.current = true;
@@ -189,7 +197,7 @@ export default function PunchScreen() {
     const body = await runBiometric(id, ch, photo);
     if (!body || id !== run.current || !alive.current) return;
     setStep('sending');
-    const result = await Phone.sendPunch(body);
+    const result = await Phone.sendPunch(withAttemptMs(body, attemptMs(triedAt.current, Date.now())));
     if (id !== run.current || !alive.current) return;
     setOutcome(result);
   }, [start, runBiometric]);
@@ -220,6 +228,12 @@ export default function PunchScreen() {
     }
   }, [fail, signAndSend]);
 
+  /** A new try after an answer: the pilot clock starts again. */
+  const tryAgain = () => {
+    triedAt.current = Date.now();
+    start('checks');
+  };
+
   const act = (a: Action) => {
     if (a === 'settings') return Phone.openSettings();
     if (a === 'request') return start('checks');
@@ -249,7 +263,7 @@ export default function PunchScreen() {
         <Screen
           footer={
             <View style={{ gap: space.sm }}>
-              {canRetry(outcome) ? <Button label={t('punch_try_again')} icon="refresh" onPress={() => start('checks')} /> : null}
+              {canRetry(outcome) ? <Button label={t('punch_try_again')} icon="refresh" onPress={tryAgain} /> : null}
               <Button label={t('punch_back_home')} kind={canRetry(outcome) ? 'secondary' : 'primary'} onPress={() => router.back()} testID="punch-done" />
             </View>
           }
