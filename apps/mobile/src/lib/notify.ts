@@ -7,6 +7,8 @@ export const NOTIFICATION_KINDS = [
   'sup_not_in', 'sup_absent', 'sup_missing_checkout', 'sup_failed_verification',
   'request_decided', 'request_to_approve', 'leave_recorded', 'penalty_recorded', 'bonus_list',
   'late', 'emergency_alert',
+  // S9: the ideal employee of the month was announced (sent to every employee).
+  'ideal_employee',
 ] as const;
 
 import { emergencyRouteFor } from './emergencyNotification';
@@ -32,6 +34,8 @@ export function routeFor(kind: string, data: Record<string, unknown> | null | un
     }
     case 'request_to_approve':
       return '/approvals';
+    case 'ideal_employee':
+      return '/ideal-employee';
     case 'late':
       return '/reports';
     case 'leave_recorded':
