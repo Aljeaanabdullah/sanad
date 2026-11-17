@@ -4,7 +4,7 @@ import { SMOKE, smokeAuthFile, smokePassword, type SmokeRole } from "./local-env
 // Web panel smoke tests (phase 13) on the LOCAL database seeded by global-setup.ts:
 // sign-in page, the menu of each role, employees search, approvals (department scope), reports, emergencies.
 
-const nav = (page: Page) => page.getByRole("navigation", { name: "لوحة الإدارة" }).first();
+const nav = (page: Page) => page.getByRole("navigation", { name: "لوحة التحكم" }).first();
 const navLinks = async (page: Page) =>
   (await nav(page).getByRole("link").allTextContents()).map((s) => s.trim()).filter(Boolean);
 
