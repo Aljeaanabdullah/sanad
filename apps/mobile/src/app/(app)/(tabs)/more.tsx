@@ -153,6 +153,7 @@ export default function MoreScreen() {
                 <Txt tone="muted">{t('consent_body_sanad')}</Txt>
               </View>
             ) : null}
+            <ListRow testID="more-diagnostics" icon="pulse-outline" title={t('diag_open')} subtitle={t('diag_open_sub')} onPress={() => router.push('/diagnostics')} />
             <ListRow icon="information-circle-outline" title={t('more_version')} trailing={<Txt numeric tone="muted">{appVersion()}</Txt>} last />
           </Card>
         </Section>

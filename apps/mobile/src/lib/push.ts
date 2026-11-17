@@ -7,6 +7,7 @@ import * as Notifications from 'expo-notifications';
 import { Linking, Platform } from 'react-native';
 import type { Lang } from './i18n';
 import type { PermissionInfo } from './notify';
+import { note } from './net';
 import { supabase } from './supabase';
 
 /** Same ids as the server (send-push CHANNEL_NORMAL / CHANNEL_EMERGENCY). */
@@ -70,31 +71,53 @@ export const isPhone = () => Device.isDevice && (Platform.OS === 'android' || Pl
 
 export type RegisterResult = 'registered' | 'no_permission' | 'unsupported' | 'unavailable' | 'failed';
 
-/** Sends this phone's token to the server (after sign-in, on every app start, and when the language changes). */
-export async function registerPush(lang: Lang): Promise<RegisterResult> {
+// What this app run already sent (token + language). Android's getDevicePushTokenAsync also fires the
+// push-token listener with the same token every time, so without this check the listener and
+// registerPush call each other forever (thousands of RPCs that starve every other request).
+let sentKey: string | null = null;
+
+/**
+ * Sends this phone's token to the server (after sign-in, on every app start, when the language changes,
+ * and when the token listener gives a new token). The same token and language go out once per app run.
+ */
+export async function registerPush(lang: Lang, knownToken?: string): Promise<RegisterResult> {
   if (!isPhone()) return 'unsupported';
   const perm = await getPermission();
   if (perm?.status !== 'granted') return 'no_permission';
   let token: string;
-  try {
-    await setupChannels();
-    token = (await Notifications.getDevicePushTokenAsync()).data as string;
-  } catch {
-    return 'unavailable'; // e.g. a build without Firebase (google-services.json)
+  if (typeof knownToken === 'string') {
+    token = knownToken;
+  } else {
+    try {
+      await setupChannels();
+      token = (await Notifications.getDevicePushTokenAsync()).data as string;
+    } catch {
+      return 'unavailable'; // e.g. a build without Firebase (google-services.json)
+    }
   }
   if (typeof token !== 'string' || token.length < 20) return 'unavailable';
+  const key = `${token}|${lang}`;
+  if (sentKey === key) {
+    note('push token: already sent', 'skipped');
+    return 'registered';
+  }
+  sentKey = key; // set before the call: a listener firing meanwhile does not send it again
   const { error } = await supabase.rpc('register_push_token', {
     p_token: token,
     p_platform: Platform.OS === 'ios' ? 'ios' : 'android',
     p_lang: lang,
   });
-  if (error) return 'failed';
+  if (error) {
+    if (sentKey === key) sentKey = null; // try again next time
+    return 'failed';
+  }
   await AsyncStorage.setItem(TOKEN_KEY, token).catch(() => {});
   return 'registered';
 }
 
 /** Before sign-out: this phone stops getting the account's notifications. */
 export async function unregisterPush(): Promise<void> {
+  sentKey = null; // the next sign-in sends the token again
   const token = await AsyncStorage.getItem(TOKEN_KEY).catch(() => null);
   if (!token) return;
   await supabase.rpc('unregister_push_token', { p_token: token }).then(() => {}, () => {});

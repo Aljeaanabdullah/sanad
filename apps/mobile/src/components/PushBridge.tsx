@@ -16,8 +16,9 @@ export function PushBridge() {
 
   useEffect(() => {
     registerPush(lang).catch(() => {});
-    const sub = Notifications.addPushTokenListener(() => {
-      registerPush(lang).catch(() => {});
+    // Use the token the event carries: asking for it again would fire this listener again (a loop on Android).
+    const sub = Notifications.addPushTokenListener((t) => {
+      registerPush(lang, typeof t.data === 'string' ? t.data : undefined).catch(() => {});
     });
     return () => sub.remove();
   }, [lang]);
