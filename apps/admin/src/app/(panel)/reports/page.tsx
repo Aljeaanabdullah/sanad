@@ -3,6 +3,7 @@ import { requireStaff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getPrefs } from "@/lib/prefs";
 import { repT } from "@/lib/i18n-rep";
+import { pilotT } from "@/lib/i18n-pilot";
 import {
   filterQuery,
   KIND_COLUMNS,
@@ -25,6 +26,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
   const me = await requireStaff();
   const { lang } = await getPrefs();
   const t = repT(lang);
+  const pt = pilotT(lang);
   const ar = lang === "ar";
   const today = kuwaitDate();
   const { filters: f, error } = parseReportFilters(await searchParams, today);
@@ -221,6 +223,14 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
           )}
         </div>
       )}
+
+      <Card>
+        <h2 className="mb-1 font-bold">{pt.linkTitle}</h2>
+        <p className="mb-3 text-sm text-muted">{pt.linkHint}</p>
+        <Link href="/reports/pilot" className={buttonClass.secondary} data-testid="pilot-link">
+          {t.open}
+        </Link>
+      </Card>
 
       <Card>
         <h2 className="mb-1 font-bold">{t.monthly}</h2>
