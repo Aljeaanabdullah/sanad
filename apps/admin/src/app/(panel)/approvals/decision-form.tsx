@@ -33,7 +33,7 @@ export function DecisionForm({
         <textarea name="note" maxLength={1000} rows={2} className={inputClass} />
       </label>
       {state.error && <Alert kind="error">{errors[state.error] ?? errors.generic}</Alert>}
-      <div className="flex gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:flex">
         <button type="submit" value="approve" disabled={pending} className={buttonClass.primary}>
           {labels.approve}
         </button>

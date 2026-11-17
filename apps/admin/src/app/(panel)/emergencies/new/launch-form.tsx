@@ -14,7 +14,7 @@ export type LaunchSite = { id: string; name: string; lat: number; lng: number; r
 
 const HAZARDS: Hazard[] = ["fire", "gas_leak", "other"];
 const MODES: TargetMode[] = ["present", "site", "department"];
-const solidDanger = "rounded-lg bg-danger px-4 py-2 font-medium text-background hover:opacity-90 disabled:opacity-60";
+const solidDanger = "inline-flex min-h-11 items-center justify-center rounded-full bg-danger px-5 py-2 font-medium text-surface hover:opacity-90 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60";
 
 /** Two steps: choose, then confirm with the number of people who will be alerted. */
 export function LaunchForm({
@@ -163,13 +163,13 @@ export function LaunchForm({
             <legend className="mb-1 text-sm font-medium">{t.danger}</legend>
             <span className="text-xs text-muted">{t.dangerHint}</span>
             {buildings.map((b) => (
-              <label key={b.id} className="flex min-h-11 items-center gap-2 rounded-lg border border-line px-3">
+              <label key={b.id} className="flex min-h-11 items-center gap-2 px-3 py-2 rounded-lg border border-line bg-surface-2 hover:border-line-strong has-checked:border-primary has-checked:bg-primary-soft">
                 <input
                   type="checkbox"
                   checked={danger.includes(b.id)}
                   disabled={b.id === safe}
                   onChange={() => setDanger((d) => toggle(d, b.id))}
-                  className="size-4 accent-[var(--danger)]"
+                  className="shrink-0 accent-danger"
                 />
                 {b.name}
               </label>
@@ -179,14 +179,14 @@ export function LaunchForm({
             <legend className="mb-1 text-sm font-medium">{t.safe}</legend>
             <span className="text-xs text-muted">&nbsp;</span>
             {buildings.map((b) => (
-              <label key={b.id} className="flex min-h-11 items-center gap-2 rounded-lg border border-line px-3">
+              <label key={b.id} className="flex min-h-11 items-center gap-2 px-3 py-2 rounded-lg border border-line bg-surface-2 hover:border-line-strong has-checked:border-primary has-checked:bg-primary-soft">
                 <input
                   type="radio"
                   name="safe"
                   checked={safe === b.id}
                   disabled={danger.includes(b.id)}
                   onChange={() => setSafe(b.id)}
-                  className="size-4 accent-[#2e7d32]"
+                  className="shrink-0 accent-ok"
                 />
                 {b.name}
               </label>
@@ -202,8 +202,8 @@ export function LaunchForm({
       <fieldset className="flex flex-col gap-2">
         <legend className="mb-1 text-sm font-medium">{t.targets}</legend>
         {MODES.map((m) => (
-          <label key={m} className="flex min-h-11 items-center gap-2 rounded-lg border border-line px-3">
-            <input type="radio" name="mode" checked={mode === m} onChange={() => setMode(m)} className="size-4 accent-[var(--primary)]" />
+          <label key={m} className="flex min-h-11 items-center gap-2 px-3 py-2 rounded-lg border border-line bg-surface-2 hover:border-line-strong has-checked:border-primary has-checked:bg-primary-soft">
+            <input type="radio" name="mode" checked={mode === m} onChange={() => setMode(m)} className="shrink-0" />
             {t.modes[m]}
           </label>
         ))}

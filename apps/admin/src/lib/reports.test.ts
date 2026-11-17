@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   chunkRange,
   filterQuery,
+  discShares,
   groupLive,
   KIND_COLUMNS,
   kuwaitDate,
@@ -54,6 +55,31 @@ describe("live board buckets", () => {
   it("gives zero for every bucket when nobody is scheduled", () => {
     const { counts } = groupLive([]);
     expect(Object.values(counts).every((n) => n === 0)).toBe(true);
+  });
+});
+
+describe("disc field shares", () => {
+  const none = { on_time: 0, late: 0, not_arrived: 0, absent: 0, leave: 0, upcoming: 0 };
+
+  it("always adds up to the number of discs", () => {
+    const shares = discShares({ on_time: 2871, late: 214, not_arrived: 96, absent: 41, leave: 132, upcoming: 58 });
+    expect(Object.values(shares).reduce((a, b) => a + b, 0)).toBe(100);
+    expect(shares).toEqual({ on_time: 84, late: 6, not_arrived: 3, absent: 1, leave: 4, upcoming: 2 });
+  });
+
+  it("gives a state with anyone in it at least one disc", () => {
+    const shares = discShares({ ...none, on_time: 3400, absent: 2 });
+    expect(shares.absent).toBe(1);
+    expect(shares.on_time).toBe(99);
+  });
+
+  it("is empty when nobody is scheduled", () => {
+    expect(discShares(none)).toEqual(none);
+  });
+
+  it("splits thirds without losing a disc", () => {
+    const shares = discShares({ ...none, on_time: 1, late: 1, absent: 1 });
+    expect(Object.values(shares).reduce((a, b) => a + b, 0)).toBe(100);
   });
 });
 

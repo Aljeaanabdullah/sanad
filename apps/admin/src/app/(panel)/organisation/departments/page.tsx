@@ -50,7 +50,7 @@ export default async function DepartmentsPage() {
           )}
           {rows.map((d) => (
             <tr key={d.id}>
-              <td className="font-medium">{lang === "ar" ? d.name_ar : d.name_en}</td>
+              <td className="font-medium whitespace-nowrap">{lang === "ar" ? d.name_ar : d.name_en}</td>
               <td>
                 {d.supervisor ? (
                   <>
@@ -65,7 +65,7 @@ export default async function DepartmentsPage() {
               </td>
               <td>{d.members[0]?.count ?? 0}</td>
               <td className="text-end">
-                <Link href={`/organisation/departments/${d.id}`} className="text-primary hover:underline">
+                <Link href={`/organisation/departments/${d.id}`} className="font-medium text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary">
                   {o.edit}
                 </Link>
               </td>
@@ -78,7 +78,7 @@ export default async function DepartmentsPage() {
         <h2 className="mb-4 font-bold">{o.newDepartment}</h2>
         <ActionForm action={createDepartment} submitLabel={o.add} savedLabel={o.saved} errors={o.errors} testId="new-department" resetOnSuccess>
           <Field label={o.nameAr}>
-            <Input name="name_ar" required maxLength={100} />
+            <Input name="name_ar" dir="rtl" required maxLength={100} />
           </Field>
           <Field label={o.nameEn}>
             <Input name="name_en" required maxLength={100} dir="ltr" />

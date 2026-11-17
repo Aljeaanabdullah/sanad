@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getPrefs } from "@/lib/prefs";
 import { orgT } from "@/lib/i18n-org";
 import { ActionForm, DeleteButton } from "@/components/action-form";
-import { Card, Field, Input, Table } from "@/components/ui";
+import { Card, Field, Input, Table, Icon } from "@/components/ui";
 import { createHoliday, deleteHoliday } from "../actions";
 
 export default async function HolidaysPage({ searchParams }: PageProps<"/organisation/holidays">) {
@@ -21,7 +21,7 @@ export default async function HolidaysPage({ searchParams }: PageProps<"/organis
     .lte("holiday_date", `${year}-12-31`)
     .order("holiday_date");
   const rows = data ?? [];
-  const fmt = new Intl.DateTimeFormat(lang === "ar" ? "ar-KW" : "en-GB", {
+  const fmt = new Intl.DateTimeFormat(lang === "ar" ? "ar-KW-u-nu-latn" : "en-GB", {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -32,14 +32,14 @@ export default async function HolidaysPage({ searchParams }: PageProps<"/organis
     <div className="grid gap-5 lg:grid-cols-[1fr_20rem]">
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3">
-          <Link href={`?year=${year - 1}`} className="rounded-lg border border-line px-3 py-1 hover:bg-primary-soft" aria-label={`${year - 1}`}>
-            {lang === "ar" ? "→" : "←"}
+          <Link href={`?year=${year - 1}`} className="inline-flex min-h-11 items-center rounded-full border border-line-strong bg-surface px-3 py-1 text-sm whitespace-nowrap hover:border-primary hover:bg-primary-soft sm:min-h-9" aria-label={`${year - 1}`}>
+            <Icon name="prev" />
           </Link>
           <span className="text-lg font-bold" dir="ltr">
             {year}
           </span>
-          <Link href={`?year=${year + 1}`} className="rounded-lg border border-line px-3 py-1 hover:bg-primary-soft" aria-label={`${year + 1}`}>
-            {lang === "ar" ? "←" : "→"}
+          <Link href={`?year=${year + 1}`} className="inline-flex min-h-11 items-center rounded-full border border-line-strong bg-surface px-3 py-1 text-sm whitespace-nowrap hover:border-primary hover:bg-primary-soft sm:min-h-9" aria-label={`${year + 1}`}>
+            <Icon name="next" />
           </Link>
         </div>
         <Table>
@@ -63,7 +63,7 @@ export default async function HolidaysPage({ searchParams }: PageProps<"/organis
             {rows.map((h) => (
               <tr key={h.id}>
                 <td>{fmt.format(new Date(`${h.holiday_date}T00:00:00Z`))}</td>
-                <td className="font-medium">{lang === "ar" ? h.name_ar : h.name_en}</td>
+                <td className="font-medium whitespace-nowrap">{lang === "ar" ? h.name_ar : h.name_en}</td>
                 <td className="text-end">
                   <DeleteButton
                     action={deleteHoliday.bind(null, h.id)}
@@ -85,7 +85,7 @@ export default async function HolidaysPage({ searchParams }: PageProps<"/organis
             <Input name="holiday_date" type="date" required dir="ltr" />
           </Field>
           <Field label={o.nameAr}>
-            <Input name="name_ar" required maxLength={100} />
+            <Input name="name_ar" dir="rtl" required maxLength={100} />
           </Field>
           <Field label={o.nameEn}>
             <Input name="name_en" required maxLength={100} dir="ltr" />

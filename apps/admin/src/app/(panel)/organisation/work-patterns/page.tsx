@@ -72,12 +72,12 @@ export default async function WorkPatternsPage() {
           )}
           {rows.map((p) => (
             <tr key={p.id}>
-              <td className="font-medium">{lang === "ar" ? p.name_ar : p.name_en}</td>
+              <td className="font-medium whitespace-nowrap">{lang === "ar" ? p.name_ar : p.name_en}</td>
               <td>{o.kinds[p.kind]}</td>
               <td>{schedule(p)}</td>
               <td>{p.employees[0]?.count ?? 0}</td>
               <td className="text-end">
-                <Link href={`/organisation/work-patterns/${p.id}`} className="text-primary hover:underline">
+                <Link href={`/organisation/work-patterns/${p.id}`} className="font-medium text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary">
                   {o.edit}
                 </Link>
               </td>

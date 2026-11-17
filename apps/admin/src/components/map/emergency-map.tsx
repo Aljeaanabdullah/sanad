@@ -6,7 +6,7 @@ import { KUWAIT_CENTER, type MapCircle, type MapPoint } from "./types";
 // Swap this import to change map provider (see types.ts).
 const MapCanvas = dynamic(() => import("./map-canvas-leaflet"), {
   ssr: false,
-  loading: () => <div className="h-96 w-full animate-pulse rounded-xl bg-line" />,
+  loading: () => <div className="h-96 w-full skeleton rounded-xl" />,
 });
 
 /** Read-only emergency map: danger buildings red, the safe building green, response points as dots. */

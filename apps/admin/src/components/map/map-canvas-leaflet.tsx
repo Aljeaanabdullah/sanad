@@ -44,7 +44,7 @@ export default function LeafletMapCanvas({ value, context = [], fallbackCenter, 
       center={[center.lat, center.lng]}
       zoom={zoom}
       scrollWheelZoom
-      className={`${heightClass} w-full rounded-xl border border-line`}
+      className={`${heightClass} isolate z-0 w-full rounded-xl border border-line`}
       style={{ cursor: onPick ? "crosshair" : undefined }}
     >
       <TileLayer

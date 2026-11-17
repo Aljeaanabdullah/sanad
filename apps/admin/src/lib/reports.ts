@@ -70,6 +70,39 @@ export function groupLive<T extends Pick<LiveRow, "status" | "checked_out">>(row
   return { counts, lists };
 }
 
+/** The six states that split "scheduled" with no overlap, in the order the disc field draws them. */
+export const DISC_BUCKETS = ["on_time", "late", "not_arrived", "absent", "leave", "upcoming"] as const satisfies readonly LiveBucket[];
+export type DiscBucket = (typeof DISC_BUCKETS)[number];
+
+/**
+ * Shares the disc field's discs between the six states, so the shift reads at a glance (live board).
+ * Largest-remainder rounding, always summing to `discs`; a state that has anyone in it gets at least one disc,
+ * so a handful of absences never disappears. Nobody scheduled -> every share is 0.
+ */
+export function discShares(counts: Record<DiscBucket, number>, discs = 100): Record<DiscBucket, number> {
+  const total = DISC_BUCKETS.reduce((sum, b) => sum + counts[b], 0);
+  const shares = Object.fromEntries(DISC_BUCKETS.map((b) => [b, 0])) as Record<DiscBucket, number>;
+  if (total <= 0) return shares;
+  const exact = DISC_BUCKETS.map((b) => ({ b, value: (counts[b] / total) * discs }));
+  for (const e of exact) shares[e.b] = Math.floor(e.value);
+  let left = discs - DISC_BUCKETS.reduce((sum, b) => sum + shares[b], 0);
+  for (const e of [...exact].sort((x, y) => (y.value % 1) - (x.value % 1))) {
+    if (left <= 0) break;
+    shares[e.b] += 1;
+    left -= 1;
+  }
+  for (const b of DISC_BUCKETS) {
+    if (counts[b] > 0 && shares[b] === 0) {
+      const largest = DISC_BUCKETS.reduce((m, x) => (shares[x] > shares[m] ? x : m), DISC_BUCKETS[0]);
+      if (shares[largest] > 1) {
+        shares[largest] -= 1;
+        shares[b] = 1;
+      }
+    }
+  }
+  return shares;
+}
+
 export function isLiveBucket(v: string): v is LiveBucket {
   return (LIVE_BUCKETS as readonly string[]).includes(v);
 }

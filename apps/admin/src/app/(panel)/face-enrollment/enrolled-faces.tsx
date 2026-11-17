@@ -2,7 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { faceT } from "@/lib/i18n-face";
 import type { Lang } from "@/lib/i18n";
-import { buttonClass, Card } from "@/components/ui";
+import { buttonClass, Card, Empty, Icon } from "@/components/ui";
 
 const PAGE_SIZE = 20;
 
@@ -37,7 +37,7 @@ export async function EnrolledFaces({ lang, page }: { lang: Lang; page: number }
     : { data: [] };
   const urlFor = new Map((signed ?? []).map((s) => [s.path, s.signedUrl]));
   const name = (n: { full_name_ar: string; full_name_en: string } | null) => (n ? (lang === "ar" ? n.full_name_ar : n.full_name_en) : "—");
-  const date = new Intl.DateTimeFormat(lang === "ar" ? "ar-KW" : "en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kuwait" });
+  const date = new Intl.DateTimeFormat(lang === "ar" ? "ar-KW-u-nu-latn" : "en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kuwait" });
   const pages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
 
   return (
@@ -46,12 +46,12 @@ export async function EnrolledFaces({ lang, page }: { lang: Lang; page: number }
         <h1 className="text-2xl font-bold">{t.reviewTitle}</h1>
         <p className="text-sm text-muted">{t.reviewIntro}</p>
       </div>
-      {rows.length === 0 && <p className="text-muted">{t.empty}</p>}
+      {rows.length === 0 && <Empty>{t.empty}</Empty>}
       <div className="grid gap-4 md:grid-cols-2">
         {rows.map((r) => (
           <Card key={r.employee_id} className="flex flex-col gap-3">
             <div>
-              <Link href={`/employees/${r.employee_id}`} className="font-bold text-primary hover:underline">
+              <Link href={`/employees/${r.employee_id}`} className="font-bold text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary">
                 {name(r.employee)}
               </Link>{" "}
               <span className="text-muted" dir="ltr">
@@ -75,16 +75,16 @@ export async function EnrolledFaces({ lang, page }: { lang: Lang; page: number }
       {pages > 1 && (
         <div className="flex justify-center gap-3">
           {page > 1 && (
-            <Link href={`?page=${page - 1}`} className={buttonClass.secondary}>
-              ←
+            <Link href={`?page=${page - 1}`} className={buttonClass.secondary} aria-label={`${page - 1} / ${pages}`}>
+              <Icon name="prev" />
             </Link>
           )}
           <span className="text-sm text-muted">
             {page} / {pages}
           </span>
           {page < pages && (
-            <Link href={`?page=${page + 1}`} className={buttonClass.secondary}>
-              →
+            <Link href={`?page=${page + 1}`} className={buttonClass.secondary} aria-label={`${page + 1} / ${pages}`}>
+              <Icon name="next" />
             </Link>
           )}
         </div>

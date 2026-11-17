@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getPrefs } from "@/lib/prefs";
 import { empT } from "@/lib/i18n-emp";
 import { ActionForm } from "@/components/action-form";
-import { Card } from "@/components/ui";
+import { Card, Icon } from "@/components/ui";
 import { createEmployee } from "../actions";
 import { EmployeeFields } from "../employee-fields";
 
@@ -18,8 +18,8 @@ export default async function NewEmployeePage() {
 
   return (
     <div className="flex max-w-3xl flex-col gap-5">
-      <Link href="/employees" className="text-sm text-primary hover:underline">
-        <span aria-hidden className="inline-block rtl:rotate-180">←</span> {e.back}
+      <Link href="/employees" className="inline-flex items-center gap-1.5 self-start text-sm text-muted hover:text-primary">
+        <Icon name="back" /> {e.back}
       </Link>
       <Card>
         <h1 className="mb-4 text-xl font-bold">{e.newEmployee}</h1>

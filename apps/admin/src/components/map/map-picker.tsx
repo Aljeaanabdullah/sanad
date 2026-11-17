@@ -8,7 +8,7 @@ import { KUWAIT_CENTER, type MapCircle } from "./types";
 // Swap this import to change map provider (see types.ts).
 const MapCanvas = dynamic(() => import("./map-canvas-leaflet"), {
   ssr: false,
-  loading: () => <div className="h-80 w-full animate-pulse rounded-xl bg-line" />,
+  loading: () => <div className="h-80 w-full skeleton rounded-xl" />,
 });
 
 /**
@@ -80,7 +80,7 @@ export function MapPicker({
         step={5}
         value={Number.isFinite(radiusN) ? radiusN : defaultRadius}
         onChange={(e) => setRadius(e.target.value)}
-        className="accent-primary"
+        className="shrink-0"
       />
     </div>
   );

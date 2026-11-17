@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans_Arabic } from "next/font/google";
+import { Readex_Pro } from "next/font/google";
 import { getPrefs } from "@/lib/prefs";
 import "./globals.css";
 
-const plexArabic = IBM_Plex_Sans_Arabic({
-  variable: "--font-plex-arabic",
+// One soft, rounded face for Arabic and Latin (identity "sea glass", PRD 12).
+const sanadSans = Readex_Pro({
+  variable: "--font-sanad",
   subsets: ["arabic", "latin"],
-  weight: ["400", "500", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -20,7 +21,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang={lang}
       dir={dir}
-      className={`${plexArabic.variable} ${theme === "dark" ? "dark" : ""} h-full antialiased`}
+      className={`${sanadSans.variable} ${theme === "dark" ? "dark" : ""} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

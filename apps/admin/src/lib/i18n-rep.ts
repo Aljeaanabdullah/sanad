@@ -8,6 +8,8 @@ const ar = {
   lastUpdated: "آخر تحديث",
   refreshNow: "تحديث الآن",
   refreshing: "جاري التحديث…",
+  shiftNow: "حالة الوردية الآن",
+  discHint: (n: string) => `كل قرص ≈ 1% من المجدولين اليوم (${n})`,
   leaveType: "نوع الإجازة",
   shiftTime: "الوردية",
   buckets: {
@@ -116,6 +118,8 @@ const en: typeof ar = {
   lastUpdated: "Last updated",
   refreshNow: "Refresh now",
   refreshing: "Refreshing…",
+  shiftNow: "The shift right now",
+  discHint: (n: string) => `Each disc ≈ 1% of today's scheduled staff (${n})`,
   leaveType: "Leave type",
   shiftTime: "Shift",
   buckets: {

@@ -3,7 +3,7 @@ import { requireStaff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getPrefs } from "@/lib/prefs";
 import { reqT } from "@/lib/i18n-req";
-import { Badge, Card } from "@/components/ui";
+import { Badge, Card, Empty } from "@/components/ui";
 import { decideRequest } from "./actions";
 import { DecisionForm } from "./decision-form";
 
@@ -36,10 +36,10 @@ export default async function ApprovalsPage() {
   const supabase = await createClient();
   const { data } = await supabase.rpc("approval_inbox");
   const rows = (data ?? []) as InboxRow[];
-  const locale = lang === "ar" ? "ar-KW" : "en-GB";
+  const locale = lang === "ar" ? "ar-KW-u-nu-latn" : "en-GB";
   const day = new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
-  const dateTime = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kuwait" });
-  const time = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kuwait" });
+  const dateTime = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short", hourCycle: "h23", timeZone: "Asia/Kuwait" });
+  const time = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "Asia/Kuwait" });
   const ar = lang === "ar";
 
   return (
@@ -48,7 +48,7 @@ export default async function ApprovalsPage() {
         <h1 className="text-2xl font-bold">{t.approvalsTitle}</h1>
         <p className="text-sm text-muted">{t.approvalsHint}</p>
       </div>
-      {rows.length === 0 && <p className="text-muted" data-testid="inbox-empty">{t.inboxEmpty}</p>}
+      {rows.length === 0 && <Empty data-testid="inbox-empty">{t.inboxEmpty}</Empty>}
       {rows.map((r) => (
         <Card key={r.id}>
           <div data-testid="inbox-item" className="flex flex-col gap-3">
@@ -57,7 +57,7 @@ export default async function ApprovalsPage() {
               <Badge tone="ok">{t.statuses[r.status]}</Badge>
             </div>
             <p>
-              <Link href={`/records/${r.employee_id}`} className="font-medium text-primary hover:underline">
+              <Link href={`/records/${r.employee_id}`} className="font-medium text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary">
                 {ar ? r.full_name_ar : r.full_name_en}
               </Link>{" "}
               · <span dir="ltr">{r.file_number}</span>

@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getPrefs } from "@/lib/prefs";
 import { dashT } from "@/lib/i18n-dash";
 import { bonusOf, MONTH_RE, shiftMonth, type DashboardData } from "@/lib/sanad-dashboard";
-import { Alert, Badge, Card, Table } from "@/components/ui";
+import { Alert, Badge, Card, Table, Icon, Empty } from "@/components/ui";
 import { AskBox } from "./ask-box";
 
 // Sanad phase S1 (PRD 18): any employee's dashboard, exactly as they see it on the phone. View only.
@@ -28,8 +28,8 @@ export default async function EmployeeDashboardPage({ params, searchParams }: Pa
     const msg = error.code === "42501" ? t.errors.not_allowed : t.errors.generic;
     return (
       <div className="flex max-w-4xl flex-col gap-5">
-        <Link href={`/records/${id}`} className="text-sm text-primary hover:underline">
-          <span aria-hidden className="inline-block rtl:rotate-180">←</span> {t.back}
+        <Link href={`/records/${id}`} className="inline-flex items-center gap-1.5 self-start text-sm text-muted hover:text-primary">
+          <Icon name="back" /> {t.back}
         </Link>
         <Alert kind="error">{msg}</Alert>
       </div>
@@ -46,8 +46,8 @@ export default async function EmployeeDashboardPage({ params, searchParams }: Pa
     return `${dd}/${m}`;
   };
   const statusText = b.eligible == null ? t.pending : b.eligible ? t.eligible : t.notEligible;
-  const statusClass = b.eligible == null ? "text-muted" : b.eligible ? "text-emerald-700 dark:text-emerald-300" : "text-danger";
-  const navClass = "rounded-lg border border-line px-3 py-1.5 text-sm hover:bg-primary-soft";
+  const statusClass = b.eligible == null ? "text-muted" : b.eligible ? "text-ok" : "text-danger";
+  const navClass = "inline-flex min-h-11 items-center rounded-full border border-line-strong bg-surface px-3 py-1 text-sm whitespace-nowrap hover:border-primary hover:bg-primary-soft sm:min-h-9";
   const a = d.attendance;
   const tiles: [string, number, boolean][] = [
     [t.present, a.present, false],
@@ -58,11 +58,11 @@ export default async function EmployeeDashboardPage({ params, searchParams }: Pa
 
   return (
     <div className="flex max-w-4xl flex-col gap-5">
-      <Link href={`/records/${id}`} className="text-sm text-primary hover:underline">
-        <span aria-hidden className="inline-block rtl:rotate-180">←</span> {t.back}
+      <Link href={`/records/${id}`} className="inline-flex items-center gap-1.5 self-start text-sm text-muted hover:text-primary">
+        <Icon name="back" /> {t.back}
       </Link>
 
-      <p data-testid="view-only" className="rounded-xl bg-primary-soft px-4 py-2 text-sm">
+      <p data-testid="view-only" className="rounded-lg border border-info/20 bg-info-soft px-4 py-2 text-sm text-info">
         {t.viewOnly}
       </p>
 
@@ -81,7 +81,7 @@ export default async function EmployeeDashboardPage({ params, searchParams }: Pa
         </Link>
         <div className="flex flex-col">
           <span className="font-bold">
-            {t.listOf} {d.month}
+            {t.listOf} <span dir="ltr">{d.month}</span>
           </span>
           <span className="text-xs text-muted" dir="ltr">
             {t.period}: {dm(d.period.from)} – {dm(d.period.to)}
@@ -96,9 +96,9 @@ export default async function EmployeeDashboardPage({ params, searchParams }: Pa
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {tiles.map(([label, value, bad]) => (
-          <div key={label} className="rounded-2xl border border-line bg-surface p-4 text-center">
-            <div className={`text-2xl font-bold ${bad ? "text-danger" : ""}`}>{value}</div>
-            <div className="text-xs text-muted">{label}</div>
+          <div key={label} className="flex flex-col gap-0.5 rounded-2xl border border-line bg-surface p-3 shadow-card sm:p-4">
+            <div className="text-sm text-muted">{label}</div>
+            <div className={`text-[1.75rem] leading-9 font-semibold tabular-nums ${bad ? "text-danger" : ""}`}>{value}</div>
           </div>
         ))}
       </div>
@@ -107,10 +107,10 @@ export default async function EmployeeDashboardPage({ params, searchParams }: Pa
         {a.late_minutes > 0 && ` · ${t.lateMinutes}: ${a.late_minutes}`}
       </p>
 
-      <Card className="border-accent">
+      <Card className="border-primary/40">
         <div className="mb-2 flex items-center gap-2">
           <h2 className="font-bold">{t.bonus}</h2>
-          <span className="rounded-full bg-primary-soft px-2.5 py-0.5 text-xs">
+          <span className="rounded-full bg-primary-soft px-2.5 py-0.5 text-xs font-medium text-primary">
             {b.source === "estimate" && !d.period.complete ? t.sources.estimateToday : t.sources[b.source]}
           </span>
         </div>
@@ -131,7 +131,7 @@ export default async function EmployeeDashboardPage({ params, searchParams }: Pa
       <Card>
         <h2 className="mb-3 font-bold">{t.leaves}</h2>
         {d.leaves.length === 0 ? (
-          <p className="text-sm text-muted">{t.none}</p>
+          <Empty>{t.none}</Empty>
         ) : (
           <Table>
             <thead>
@@ -162,7 +162,7 @@ export default async function EmployeeDashboardPage({ params, searchParams }: Pa
       <Card>
         <h2 className="mb-3 font-bold">{t.penalties}</h2>
         {d.penalties.length === 0 ? (
-          <p className="text-sm text-muted">{t.none}</p>
+          <Empty>{t.none}</Empty>
         ) : (
           <Table>
             <thead>

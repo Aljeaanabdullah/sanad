@@ -49,7 +49,7 @@ export function EmployeeFields({
         <Input name="phone" inputMode="tel" dir="ltr" defaultValue={defaults.phone?.replace(/^\+965/, "") ?? ""} />
       </Field>
       <Field label={e.nameAr}>
-        <Input name="full_name_ar" required maxLength={120} defaultValue={defaults.full_name_ar} />
+        <Input name="full_name_ar" dir="rtl" required maxLength={120} defaultValue={defaults.full_name_ar} />
       </Field>
       <Field label={e.nameEn}>
         <Input name="full_name_en" required maxLength={120} dir="ltr" defaultValue={defaults.full_name_en} />

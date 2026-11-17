@@ -28,7 +28,7 @@ export function AutoRefresh({ seconds, label, busyLabel }: { seconds: number; la
       type="button"
       onClick={() => startTransition(() => router.refresh())}
       disabled={pending}
-      className="rounded-lg border border-line px-3 py-1.5 text-sm hover:bg-primary-soft disabled:opacity-60"
+      className="inline-flex min-h-11 items-center sm:min-h-9 rounded-full border border-line-strong bg-surface px-3 py-1 text-sm whitespace-nowrap hover:border-primary hover:bg-primary-soft disabled:opacity-60"
       data-testid="live-refresh"
     >
       {pending ? busyLabel : label}

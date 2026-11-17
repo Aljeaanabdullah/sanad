@@ -32,7 +32,7 @@ export default async function RecordsPage({ searchParams }: PageProps<"/records"
           placeholder={t.search}
           aria-label={t.search}
           dir="ltr"
-          className="max-w-48"
+          className="min-w-0 flex-1 sm:max-w-56 sm:flex-none"
         />
         <button type="submit" className={buttonClass.secondary}>
           {t.find}

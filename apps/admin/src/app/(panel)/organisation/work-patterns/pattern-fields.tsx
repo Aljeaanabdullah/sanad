@@ -42,7 +42,7 @@ export function PatternFields({ o, defaults }: { o: OrgText; defaults: PatternDe
     <>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label={o.nameAr}>
-          <Input name="name_ar" defaultValue={defaults.name_ar} required maxLength={100} />
+          <Input name="name_ar" dir="rtl" defaultValue={defaults.name_ar} required maxLength={100} />
         </Field>
         <Field label={o.nameEn}>
           <Input name="name_en" defaultValue={defaults.name_en} required maxLength={100} dir="ltr" />
@@ -87,8 +87,8 @@ export function PatternFields({ o, defaults }: { o: OrgText; defaults: PatternDe
           <legend className="mb-1.5 text-sm font-medium">{o.weeklyOffDays}</legend>
           <div className="flex flex-wrap gap-3">
             {([7, 1, 2, 3, 4, 5, 6] as const).map((d) => (
-              <label key={d} className="flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-sm">
-                <input type="checkbox" name="weekly_off_days" value={d} defaultChecked={defaults.weekly_off_days.includes(d)} className="accent-primary" />
+              <label key={d} className="flex min-h-10 items-center gap-2 px-3 py-1.5 text-sm rounded-lg border border-line bg-surface-2 hover:border-line-strong has-checked:border-primary has-checked:bg-primary-soft">
+                <input type="checkbox" name="weekly_off_days" value={d} defaultChecked={defaults.weekly_off_days.includes(d)} className="shrink-0" />
                 {o.weekdays[d]}
               </label>
             ))}

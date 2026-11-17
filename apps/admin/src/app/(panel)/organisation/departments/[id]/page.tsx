@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getPrefs } from "@/lib/prefs";
 import { orgT } from "@/lib/i18n-org";
 import { ActionForm, DeleteButton } from "@/components/action-form";
-import { Card, Field, Input, Select } from "@/components/ui";
+import { Card, Field, Input, Select, Icon } from "@/components/ui";
 import { deleteDepartment, updateDepartment } from "../../actions";
 
 export default async function DepartmentPage({ params }: PageProps<"/organisation/departments/[id]">) {
@@ -27,8 +27,8 @@ export default async function DepartmentPage({ params }: PageProps<"/organisatio
 
   return (
     <div className="flex max-w-2xl flex-col gap-5">
-      <Link href="/organisation/departments" className="text-sm text-primary hover:underline">
-        <span aria-hidden className="inline-block rtl:rotate-180">←</span> {o.back}
+      <Link href="/organisation/departments" className="inline-flex items-center gap-1.5 self-start text-sm text-muted hover:text-primary">
+        <Icon name="back" /> {o.back}
       </Link>
       <Card>
         <h2 className="mb-4 text-lg font-bold">{lang === "ar" ? dep.name_ar : dep.name_en}</h2>
@@ -40,7 +40,7 @@ export default async function DepartmentPage({ params }: PageProps<"/organisatio
           testId="edit-department"
         >
           <Field label={o.nameAr}>
-            <Input name="name_ar" defaultValue={dep.name_ar} required maxLength={100} />
+            <Input name="name_ar" dir="rtl" defaultValue={dep.name_ar} required maxLength={100} />
           </Field>
           <Field label={o.nameEn}>
             <Input name="name_en" defaultValue={dep.name_en} required maxLength={100} dir="ltr" />

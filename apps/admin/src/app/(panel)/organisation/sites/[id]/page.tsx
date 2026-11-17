@@ -5,7 +5,7 @@ import { getPrefs } from "@/lib/prefs";
 import { orgT } from "@/lib/i18n-org";
 import { ActionForm, DeleteButton } from "@/components/action-form";
 import { MapPicker } from "@/components/map/map-picker";
-import { Badge, buttonClass, Card, Field, Input, Table } from "@/components/ui";
+import { Badge, buttonClass, Card, Field, Input, Table, Icon } from "@/components/ui";
 import { createBuilding, deleteBuilding, deleteSite, setSiteActive, updateSite } from "../../actions";
 
 export default async function SitePage({ params }: PageProps<"/organisation/sites/[id]">) {
@@ -40,8 +40,8 @@ export default async function SitePage({ params }: PageProps<"/organisation/site
 
   return (
     <div className="flex max-w-3xl flex-col gap-5">
-      <Link href="/organisation/sites" className="text-sm text-primary hover:underline">
-        <span aria-hidden className="inline-block rtl:rotate-180">←</span> {o.back}
+      <Link href="/organisation/sites" className="inline-flex items-center gap-1.5 self-start text-sm text-muted hover:text-primary">
+        <Icon name="back" /> {o.back}
       </Link>
 
       <Card>
@@ -58,7 +58,7 @@ export default async function SitePage({ params }: PageProps<"/organisation/site
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label={o.nameAr}>
-              <Input name="name_ar" defaultValue={site.name_ar} required maxLength={100} />
+              <Input name="name_ar" dir="rtl" defaultValue={site.name_ar} required maxLength={100} />
             </Field>
             <Field label={o.nameEn}>
               <Input name="name_en" defaultValue={site.name_en} required maxLength={100} dir="ltr" />
@@ -97,7 +97,7 @@ export default async function SitePage({ params }: PageProps<"/organisation/site
             )}
             {(buildings ?? []).map((b) => (
               <tr key={b.id}>
-                <td className="font-medium">{name(b)}</td>
+                <td className="font-medium whitespace-nowrap">{name(b)}</td>
                 <td dir="ltr" className="text-start">
                   {b.radius_m}
                 </td>
@@ -125,7 +125,7 @@ export default async function SitePage({ params }: PageProps<"/organisation/site
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label={o.nameAr}>
-              <Input name="name_ar" required maxLength={100} />
+              <Input name="name_ar" dir="rtl" required maxLength={100} />
             </Field>
             <Field label={o.nameEn}>
               <Input name="name_en" required maxLength={100} dir="ltr" />

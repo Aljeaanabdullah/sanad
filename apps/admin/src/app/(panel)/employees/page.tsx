@@ -2,7 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getPrefs } from "@/lib/prefs";
 import { empT } from "@/lib/i18n-emp";
-import { Alert, Badge, buttonClass, Input, Select, Table } from "@/components/ui";
+import { Alert, Badge, buttonClass, Input, Select, Table, Icon, linkClass } from "@/components/ui";
 
 const PAGE_SIZE = 50;
 
@@ -78,13 +78,13 @@ export default async function EmployeesPage({ searchParams }: PageProps<"/employ
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">{e.title}</h1>
         <Link href="/employees/new" className={buttonClass.primary}>
-          + {e.newEmployee}
+          <Icon name="plus" /> {e.newEmployee}
         </Link>
       </div>
 
       {terminated && <Alert kind="success">{e.terminated(terminated)}</Alert>}
 
-      <form className="grid gap-3 rounded-2xl border border-line bg-surface p-4 sm:grid-cols-2 lg:grid-cols-7" role="search">
+      <form className="grid gap-3 rounded-2xl border border-line bg-surface p-4 shadow-card sm:grid-cols-2 lg:grid-cols-7" role="search">
         <Input name="q" defaultValue={q} placeholder={e.search} aria-label={e.search} className="lg:col-span-2" />
         <Select name="department" defaultValue={dep} aria-label={e.department}>
           <option value="">{e.allDepartments}</option>
@@ -155,9 +155,13 @@ export default async function EmployeesPage({ searchParams }: PageProps<"/employ
               <td dir="ltr" className="text-start tabular-nums">
                 {r.file_number}
               </td>
-              <td className="font-medium">{lang === "ar" ? r.full_name_ar : r.full_name_en}</td>
-              <td>{r.department ? name(r.department) : <span className="text-muted">—</span>}</td>
-              <td>{e.roles[r.role]}</td>
+              <td className="whitespace-nowrap">
+                <Link href={`/employees/${r.id}`} className={linkClass}>
+                  {lang === "ar" ? r.full_name_ar : r.full_name_en}
+                </Link>
+              </td>
+              <td className="whitespace-nowrap">{r.department ? name(r.department) : <span className="text-muted">—</span>}</td>
+              <td className="whitespace-nowrap">{e.roles[r.role]}</td>
               <td>
                 {!r.is_active ? (
                   <Badge tone="off">{e.statuses.suspended}</Badge>
@@ -168,7 +172,7 @@ export default async function EmployeesPage({ searchParams }: PageProps<"/employ
                 )}
               </td>
               <td className="text-end">
-                <Link href={`/employees/${r.id}`} className="text-primary hover:underline">
+                <Link href={`/employees/${r.id}`} className="font-medium text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary">
                   {e.open}
                 </Link>
               </td>

@@ -15,7 +15,7 @@ import {
 } from "@/lib/emergency";
 import { DeleteButton } from "@/components/action-form";
 import { EmergencyMap } from "@/components/map/emergency-map";
-import { Alert, buttonClass, Card, Table } from "@/components/ui";
+import { Alert, buttonClass, Card, Table, Icon } from "@/components/ui";
 import { closeEmergency, resendPush } from "../actions";
 import { AutoRefresh } from "./auto-refresh";
 
@@ -52,17 +52,17 @@ export default async function EmergencyBoardPage({ params }: PageProps<"/emergen
     }));
 
   const tiles: { label: string; value: number; cls: string }[] = [
-    { label: t.counters.arrived, value: c.arrived, cls: "text-[#2e7d32] dark:text-[#7fd1a8]" },
+    { label: t.counters.arrived, value: c.arrived, cls: "text-ok" },
     { label: t.counters.safeElsewhere, value: c.safeElsewhere, cls: "text-primary" },
     { label: t.counters.unknown, value: c.unknown, cls: "text-danger" },
-    { label: t.counters.flagged, value: c.flagged, cls: "text-[#b26a00] dark:text-[#e6a100]" },
+    { label: t.counters.flagged, value: c.flagged, cls: "text-warn" },
   ];
 
   return (
     <div className="flex max-w-5xl flex-col gap-5">
       {active && <AutoRefresh seconds={10} />}
-      <Link href="/emergencies" className="text-sm text-primary hover:underline">
-        <span aria-hidden className="inline-block rtl:rotate-180">←</span> {t.back}
+      <Link href="/emergencies" className="inline-flex items-center gap-1.5 self-start text-sm text-muted hover:text-primary">
+        <Icon name="back" /> {t.back}
       </Link>
 
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -103,7 +103,7 @@ export default async function EmergencyBoardPage({ params }: PageProps<"/emergen
 
       <section aria-label={t.boardTitle} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {tiles.map((tile) => (
-          <div key={tile.label} className="rounded-2xl border border-line bg-surface p-4">
+          <div key={tile.label} className="rounded-2xl border border-line bg-surface p-4 shadow-card">
             <p className={`text-4xl font-bold tabular-nums ${tile.cls}`} dir="ltr">
               {tile.value}
             </p>
@@ -134,7 +134,7 @@ export default async function EmergencyBoardPage({ params }: PageProps<"/emergen
       <PeopleList title={t.listSafe} people={peopleWith(board.people, "safe_elsewhere")} lang={lang} tone="ok" />
 
       {active && (
-        <Card className="flex flex-col gap-3 border-danger">
+        <Card className="flex flex-col gap-3 border-danger/50">
           <DeleteButton action={closeEmergency.bind(null, id)} label={t.close} confirmText={t.closeConfirm} errors={t.errors} />
         </Card>
       )}
@@ -159,7 +159,7 @@ function PeopleList({
   const name = (p: BoardPerson) => (lang === "ar" ? p.name_ar : p.name_en);
   const dept = (p: BoardPerson) => (lang === "ar" ? p.department_ar : p.department_en) ?? "";
   return (
-    <details open={open} className="rounded-2xl border border-line bg-surface p-5">
+    <details open={open} className="rounded-2xl border border-line bg-surface p-4 shadow-card sm:p-5">
       <summary className={`cursor-pointer font-bold ${tone === "danger" && people.length > 0 ? "text-danger" : ""}`}>
         {title} <span dir="ltr">({people.length})</span>
       </summary>
@@ -184,22 +184,22 @@ function PeopleList({
               </tr>
             )}
             {people.map((p) => (
-              <tr key={p.employee_id} className={p.outside_safe ? "bg-[#fff4d6] dark:bg-[#3a2f12]" : undefined}>
+              <tr key={p.employee_id} className={p.outside_safe ? "bg-warn-soft" : undefined}>
                 <td dir="ltr" className="text-start">
                   {p.file_number}
                 </td>
-                <td className="font-medium">
+                <td className="font-medium whitespace-nowrap">
                   {name(p)}
                   {p.outside_safe && (
-                    <span className="ms-2 rounded-full bg-[#e6a100] px-2 py-0.5 text-xs font-medium text-[#0b1a33]">{t.flaggedBadge}</span>
+                    <span className="ms-2 rounded-full bg-surface px-2 py-0.5 text-xs font-medium text-warn ring-1 ring-inset ring-warn/40">{t.flaggedBadge}</span>
                   )}
                   {p.no_location && (
-                    <span className="ms-2 rounded-full bg-line px-2 py-0.5 text-xs text-muted">{t.noLocationBadge}</span>
+                    <span className="ms-2 rounded-full bg-surface-2 px-2 py-0.5 text-xs text-muted ring-1 ring-inset ring-line">{t.noLocationBadge}</span>
                   )}
                 </td>
                 <td dir="ltr" className="text-start">
                   {p.phone ? (
-                    <a href={`tel:${p.phone}`} className="text-primary hover:underline">
+                    <a href={`tel:${p.phone}`} className="font-medium text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary">
                       {p.phone}
                     </a>
                   ) : (

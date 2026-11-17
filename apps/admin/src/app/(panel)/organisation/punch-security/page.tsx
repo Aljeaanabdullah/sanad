@@ -25,8 +25,8 @@ export default async function PunchSecurityPage() {
   const withKey = (attested.count ?? 0) + (unattested.count ?? 0);
 
   const toggle = (name: keyof typeof s, label: string, hint: string) => (
-    <label className="flex items-start gap-3 rounded-lg border border-line px-3 py-2">
-      <input type="checkbox" name={name} defaultChecked={s[name]} className="mt-1 size-4 accent-primary" />
+    <label className="flex items-start gap-3 px-3 py-2.5 rounded-lg border border-line bg-surface-2 hover:border-line-strong has-checked:border-primary has-checked:bg-primary-soft">
+      <input type="checkbox" name={name} defaultChecked={s[name]} className="mt-1 shrink-0" />
       <span className="flex flex-col">
         <span className="font-medium">{label}</span>
         <span className="text-sm text-muted">{hint}</span>

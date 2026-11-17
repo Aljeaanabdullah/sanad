@@ -4,7 +4,7 @@ import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getPrefs } from "@/lib/prefs";
 import { empT } from "@/lib/i18n-emp";
-import { Card } from "@/components/ui";
+import { Card, Icon } from "@/components/ui";
 import { terminateEmployee } from "../../actions";
 import { TerminateSteps } from "./terminate-steps";
 
@@ -21,8 +21,8 @@ export default async function TerminatePage({ params }: PageProps<"/employees/[i
 
   return (
     <div className="flex max-w-2xl flex-col gap-5">
-      <Link href={`/employees/${id}`} className="text-sm text-primary hover:underline">
-        <span aria-hidden className="inline-block rtl:rotate-180">←</span> {lang === "ar" ? emp.full_name_ar : emp.full_name_en}
+      <Link href={`/employees/${id}`} className="inline-flex items-center gap-1.5 self-start text-sm text-muted hover:text-primary">
+        <Icon name="back" /> {lang === "ar" ? emp.full_name_ar : emp.full_name_en}
       </Link>
       <Card>
         <h1 className="mb-2 text-xl font-bold">

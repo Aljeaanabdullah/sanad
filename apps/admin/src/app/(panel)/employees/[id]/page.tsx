@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getPrefs } from "@/lib/prefs";
 import { empT } from "@/lib/i18n-emp";
 import { ActionForm, DeleteButton } from "@/components/action-form";
-import { Badge, buttonClass, Card, Field, Input, Select } from "@/components/ui";
+import { Badge, buttonClass, Card, Field, Input, Select, Icon } from "@/components/ui";
 import { setActive, setPassword, setRole, setSites, unbindDevice, updateEmployee } from "../actions";
 import { EmployeeFields } from "../employee-fields";
 import { AttendanceHistory } from "@/components/attendance-history";
@@ -41,12 +41,12 @@ export default async function EmployeePage({ params }: PageProps<"/employees/[id
   const locked = isSelf || isAdmin;
   const lockedNote = isSelf ? e.yourAccount : e.errors.admin_account;
   const name = (o: { name_ar: string; name_en: string }) => (lang === "ar" ? o.name_ar : o.name_en);
-  const date = new Intl.DateTimeFormat(lang === "ar" ? "ar-KW" : "en-GB", { dateStyle: "medium", timeZone: "Asia/Kuwait" });
+  const date = new Intl.DateTimeFormat(lang === "ar" ? "ar-KW-u-nu-latn" : "en-GB", { dateStyle: "medium", timeZone: "Asia/Kuwait" });
 
   return (
     <div className="flex max-w-3xl flex-col gap-5">
-      <Link href="/employees" className="text-sm text-primary hover:underline">
-        <span aria-hidden className="inline-block rtl:rotate-180">←</span> {e.back}
+      <Link href="/employees" className="inline-flex items-center gap-1.5 self-start text-sm text-muted hover:text-primary">
+        <Icon name="back" /> {e.back}
       </Link>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -148,8 +148,8 @@ export default async function EmployeePage({ params }: PageProps<"/employees/[id
         <ActionForm action={setSites.bind(null, id)} submitLabel={e.saveSites} savedLabel={e.saved} errors={e.errors} testId="sites">
           <div className="flex flex-col gap-2">
             {(sites ?? []).map((s) => (
-              <label key={s.id} className="flex items-center gap-3 rounded-lg border border-line px-3 py-2">
-                <input type="checkbox" name="site_id" value={s.id} defaultChecked={enabledIds.has(s.id)} className="size-4 accent-primary" />
+              <label key={s.id} className="flex min-h-11 items-center gap-3 px-3 py-2 rounded-lg border border-line bg-surface-2 hover:border-line-strong has-checked:border-primary has-checked:bg-primary-soft">
+                <input type="checkbox" name="site_id" value={s.id} defaultChecked={enabledIds.has(s.id)} className="shrink-0" />
                 <span>{name(s)}</span>
                 {!s.is_active && <Badge tone="off">{e.inactiveSite}</Badge>}
               </label>

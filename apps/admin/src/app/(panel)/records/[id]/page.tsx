@@ -6,7 +6,7 @@ import { getPrefs } from "@/lib/prefs";
 import { reqT } from "@/lib/i18n-req";
 import { dashT } from "@/lib/i18n-dash";
 import { AttendanceHistory } from "@/components/attendance-history";
-import { Badge, Card, Table } from "@/components/ui";
+import { Badge, Card, Table, Icon, Empty } from "@/components/ui";
 
 const MONTH = /^(\d{4})-(\d{2})$/;
 type Named = { name_ar: string; name_en: string } | null;
@@ -72,20 +72,20 @@ export default async function RecordPage({ params, searchParams }: PageProps<"/r
     : { data: [] };
   const urlOf = new Map((signed ?? []).map((s) => [s.path, s.signedUrl]));
 
-  const locale = ar ? "ar-KW" : "en-GB";
+  const locale = ar ? "ar-KW-u-nu-latn" : "en-GB";
   const monthName = new Intl.DateTimeFormat(locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(
     new Date(`${month}-01T00:00:00Z`),
   );
-  const dateTime = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kuwait" });
+  const dateTime = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short", hourCycle: "h23", timeZone: "Asia/Kuwait" });
   const day = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: "UTC" });
-  const time = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kuwait" });
+  const time = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "Asia/Kuwait" });
   const dept = emp.departments as unknown as Named;
-  const navClass = "rounded-lg border border-line px-3 py-1.5 text-sm hover:bg-primary-soft";
+  const navClass = "inline-flex min-h-11 items-center rounded-full border border-line-strong bg-surface px-3 py-1 text-sm whitespace-nowrap hover:border-primary hover:bg-primary-soft sm:min-h-9";
 
   return (
     <div className="flex max-w-4xl flex-col gap-5">
-      <Link href="/records" className="text-sm text-primary hover:underline">
-        <span aria-hidden className="inline-block rtl:rotate-180">←</span> {t.back}
+      <Link href="/records" className="inline-flex items-center gap-1.5 self-start text-sm text-muted hover:text-primary">
+        <Icon name="back" /> {t.back}
       </Link>
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-2xl font-bold">{ar ? emp.full_name_ar : emp.full_name_en}</h1>
@@ -96,7 +96,7 @@ export default async function RecordPage({ params, searchParams }: PageProps<"/r
         <Link
           href={`/records/${id}/dashboard`}
           data-testid="open-dashboard"
-          className="ms-auto rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-on-primary hover:opacity-90"
+          className="ms-auto inline-flex min-h-9 items-center rounded-full bg-primary px-4 py-1 text-sm font-medium text-on-primary hover:bg-primary-hover"
         >
           {dashT(lang).open}
         </Link>
@@ -126,7 +126,7 @@ export default async function RecordPage({ params, searchParams }: PageProps<"/r
         <h2 className="mb-1 font-bold">{t.punchesTitle}</h2>
         {!canSeePhotos && <p className="mb-3 text-sm text-muted">{t.photosHidden}</p>}
         {(punches ?? []).length === 0 ? (
-          <p className="text-sm text-muted">{t.punchesNone}</p>
+          <Empty>{t.punchesNone}</Empty>
         ) : (
           <Table>
             <thead>
@@ -147,7 +147,7 @@ export default async function RecordPage({ params, searchParams }: PageProps<"/r
                     <td className="whitespace-nowrap">{dateTime.format(new Date(p.punched_at))}</td>
                     <td>
                       {t.punchTypes[p.punch_type as "check_in" | "check_out"]}
-                      {p.source === "correction" && <span className="block text-xs text-primary">{t.corrected}</span>}
+                      {p.source === "correction" && <span className="block text-xs text-info">{t.corrected}</span>}
                     </td>
                     <td className={p.result === "accepted" ? "" : "text-danger"}>
                       {p.result === "accepted" ? t.accepted : t.rejected}
@@ -166,7 +166,7 @@ export default async function RecordPage({ params, searchParams }: PageProps<"/r
                         {url ? (
                           <a href={url} target="_blank" rel="noreferrer">
                             {/* eslint-disable-next-line @next/next/no-img-element -- short-lived signed URL */}
-                            <img src={url} alt={t.photo} className="size-14 rounded object-cover" />
+                            <img src={url} alt={t.photo} className="size-14 rounded-lg border border-line object-cover" />
                           </a>
                         ) : (
                           "—"
@@ -184,7 +184,7 @@ export default async function RecordPage({ params, searchParams }: PageProps<"/r
       <Card>
         <h2 className="mb-3 font-bold">{t.requestsTitle}</h2>
         {(requests ?? []).length === 0 ? (
-          <p className="text-sm text-muted">{t.requestsNone}</p>
+          <Empty>{t.requestsNone}</Empty>
         ) : (
           <Table>
             <thead>
