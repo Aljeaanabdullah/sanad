@@ -3,11 +3,12 @@ import { emailFor, SMOKE } from "./local-env";
 
 type Db = SupabaseClient;
 
-const one = async <T>(p: PromiseLike<{ data: T | null; error: { message: string } | null }>, what: string): Promise<T> => {
+/** Awaits a query and returns its rows, or throws with the error. T is the row shape the caller expects. */
+async function one<T = unknown>(p: PromiseLike<{ data: unknown; error: { message: string } | null }>, what: string): Promise<T> {
   const { data, error } = await p;
   if (error || !data) throw new Error(`${what}: ${error?.message ?? "no data"}`);
-  return data;
-};
+  return data as T;
+}
 
 /** Removes everything the smoke tests create. Pass only the client from localServiceClient(). */
 export async function cleanUpSmoke(db: Db) {
@@ -40,11 +41,11 @@ export async function seedSmoke(db: Db, password: string) {
     users[n] = data.user.id;
   }
 
-  const site = await one(
+  const site = await one<{ id: string }>(
     db.from("sites").insert({ name_ar: "موقع الفحص", name_en: "Smoke site", latitude: 29.3759, longitude: 47.9774, radius_m: 200 }).select("id").single(),
     "site",
   );
-  const depts = await one(
+  const depts = await one<{ id: string; name_en: string }[]>(
     db.from("departments").insert([
       { name_ar: "عمليات الفحص", name_en: "Smoke Ops" },
       { name_ar: "تقنية الفحص", name_en: "Smoke IT" },
@@ -62,7 +63,7 @@ export async function seedSmoke(db: Db, password: string) {
     { n: SMOKE.itEmployee, role: "employee", ar: "موظف تقنية الفحص", en: "Smoke IT employee", dept: it },
     { n: SMOKE.itSupervisor, role: "supervisor", ar: "مشرف تقنية الفحص", en: "Smoke IT supervisor", dept: it },
   ];
-  const emps = await one(
+  const emps = await one<{ id: string; file_number: number }[]>(
     db.from("employees").insert(
       people.map((p) => ({
         file_number: p.n, user_id: users[p.n], full_name_ar: p.ar, full_name_en: p.en, role: p.role,
