@@ -1,6 +1,6 @@
-// Sanad brand pieces: the logo (a handshake, approved by the owner 2026-11-17, PRD 12), the wordmark,
-// and a language toggle for the teal band. The logo is a white glyph on rail teal here, in the side
-// menu and on the Sanad button. Sea glass, like the panel's sign-in brand side.
+// Sanad brand pieces: the logo (the Sanad bot's head, owner decision 2026-11-17, PRD 12), the
+// wordmark, and a language toggle for the teal band. The full-colour head sits on rail teal here and
+// in the side menu; the animated head on the Sanad button is components/nav/SanadMark.
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Image, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,22 +10,20 @@ import { Row, useDir } from '../ui';
 
 const MUTED_ON_RAIL = brand.railInk; // same as the Header subtitle
 
-const LOGO = require('../../../assets/brand/logo-mark.png');
-/** The glyph is 3:2 (wide). */
-const LOGO_RATIO = 2 / 3;
+const LOGO = require('../../../assets/bot/head.png');
+/** The head's box is a little wider than tall (tools/sanad-bot). */
+const LOGO_RATIO = 409 / 480;
 
 /**
- * The Sanad logo (handshake). `size` is its width; the height follows the glyph (3:2), never stretched.
- * White by default for the teal band; `color` tints it (e.g. the primary teal on a light surface).
- * `decorative` hides it from screen readers (inside a labelled button).
+ * The Sanad logo (the bot's head, full colour). `size` is its width; the height follows, never stretched.
+ * `decorative` hides it from screen readers (inside a labelled control).
  */
-export function BrandMark({ size = 56, color = brand.onRail, decorative }: { size?: number; color?: string; decorative?: boolean }) {
+export function BrandMark({ size = 56, decorative }: { size?: number; decorative?: boolean }) {
   const { t } = useSettings();
   return (
     <Image
       source={LOGO}
       resizeMode="contain"
-      tintColor={color}
       accessible={!decorative}
       accessibilityRole={decorative ? undefined : 'image'}
       accessibilityLabel={decorative ? undefined : t('auth_logo_label')}

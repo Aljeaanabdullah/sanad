@@ -1,14 +1,42 @@
 // Chat pieces for "Ask Sanad": a message bubble and the input bar. The kit's Field has a label above
 // it, which a chat bar does not want, so the bar is drawn here with the same tokens.
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useState, type ReactNode } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { Animated, Easing, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useSettings } from '../../lib/settings';
 import { fonts, radius, space, TOUCH, type } from '../../lib/theme';
-import { SanadMark } from '../nav/SanadMark';
+import { SanadMark, useReduceMotion } from '../nav/SanadMark';
 import { Row, Txt, useDir } from '../ui';
 
-/** One message. Sanad's replies carry the Sanad mark, which "thinks" (its discs light up in turn) while `thinking`. */
+/** Three dots that bounce one after another, like typing (static with reduce motion). */
+export function TypingDots() {
+  const reduce = useReduceMotion();
+  const dots = useRef([0, 1, 2].map(() => new Animated.Value(0))).current;
+  useEffect(() => {
+    if (reduce) return;
+    const hop = (v: Animated.Value) =>
+      Animated.sequence([
+        Animated.timing(v, { toValue: 1, duration: 220, easing: Easing.out(Easing.quad), useNativeDriver: true }),
+        Animated.timing(v, { toValue: 0, duration: 260, easing: Easing.in(Easing.quad), useNativeDriver: true }),
+      ]);
+    const loop = Animated.loop(Animated.sequence([Animated.stagger(140, dots.map(hop)), Animated.delay(220)]));
+    loop.start();
+    return () => loop.stop();
+  }, [reduce, dots]);
+  const hues = ['#1fa89c', '#5fd3c6', '#a8ece4'];
+  return (
+    <View testID="typing-dots" style={{ flexDirection: 'row', gap: 6, paddingVertical: 4 }}>
+      {dots.map((v, i) => (
+        <Animated.View
+          key={i}
+          style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: hues[i], transform: [{ translateY: v.interpolate({ inputRange: [0, 1], outputRange: [0, -6] }) }] }}
+        />
+      ))}
+    </View>
+  );
+}
+
+/** One message. Sanad's replies carry the Sanad bot; while `thinking` its antenna pulses and the bubble shows typing dots. */
 export function ChatBubble({ mine, text, children, testID, thinking }: { mine: boolean; text: string; children?: ReactNode; testID?: string; thinking?: boolean }) {
   const { c, t } = useSettings();
   const d = useDir();
@@ -32,7 +60,15 @@ export function ChatBubble({ mine, text, children, testID, thinking }: { mine: b
             gap: space.sm,
           }}
         >
-          <Txt tone={mine ? 'onPrimary' : 'default'}>{text}</Txt>
+          {/* While thinking: typing dots, with the words small under them. */}
+          {thinking ? (
+            <View style={{ gap: 2 }}>
+              <TypingDots />
+              <Txt variant="caption" tone="muted">{text}</Txt>
+            </View>
+          ) : (
+            <Txt tone={mine ? 'onPrimary' : 'default'}>{text}</Txt>
+          )}
           {children}
         </View>
       </Row>

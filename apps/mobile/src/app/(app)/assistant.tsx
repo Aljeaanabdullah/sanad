@@ -5,7 +5,7 @@
 // Optional param `month` (YYYY-MM) answers about that bonus period instead of the current one.
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
+import { FlatList, Image, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChatBubble, ChatInput } from '../../components/dash/Chat';
 import { Button, Chip, Header, Row, Screen, Txt } from '../../components/ui';
@@ -108,6 +108,19 @@ export default function AssistantScreen() {
           keyExtractor={(m) => String(m.id)}
           contentContainerStyle={{ padding: space.lg, gap: space.md }}
           keyboardShouldPersistTaps="handled"
+          // Welcome: the Sanad bot at its laptop, until the first question (the same art on light and dark).
+          ListHeaderComponent={
+            msgs.length === 1 ? (
+              <Image
+                testID="assistant-welcome"
+                source={require('../../../assets/bot/scene.png')}
+                accessible={false}
+                importantForAccessibility="no"
+                resizeMode="contain"
+                style={{ width: 200, height: 200, alignSelf: 'center' }}
+              />
+            ) : undefined
+          }
           onContentSizeChange={() => list.current?.scrollToEnd({ animated: true })}
           renderItem={({ item, index }) => (
             <View accessibilityLiveRegion={index === msgs.length - 1 && !item.mine ? 'polite' : 'none'}>

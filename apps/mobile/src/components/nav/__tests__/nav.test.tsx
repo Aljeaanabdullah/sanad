@@ -68,7 +68,7 @@ it('section roots show the menu button and the Sanad button', async () => {
   const sanad = screen.getByTestId('sanad-button');
   expect(sanad.props.accessibilityLabel).toBe('اسأل سَنَد');
   await fireEvent.press(sanad);
-  // The ring folds into the handshake first; the assistant opens within 400 ms.
+  // A quick ripple first; the assistant opens within 400 ms.
   expect(mockRouter.push).not.toHaveBeenCalled();
   await act(async () => {
     await new Promise((r) => setTimeout(r, 400));
@@ -95,6 +95,8 @@ it('the Sanad mark thinks in the chat while a reply is on its way', async () => 
   const { ChatBubble } = require('../../dash/Chat');
   await render(wrap(<ChatBubble mine={false} text="..." thinking />));
   expect(screen.getByTestId('sanad-thinking', { includeHiddenElements: true })).toBeTruthy();
+  // The bubble shows typing dots, with the words small under them.
+  expect(screen.getByTestId('typing-dots', { includeHiddenElements: true })).toBeTruthy();
 });
 
 it('pushed screens keep Back and hide the Sanad button', async () => {

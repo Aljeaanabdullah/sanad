@@ -1,7 +1,6 @@
 // The Sanad button (PRD 18.2, owner decision 2026-11-17): one round button at the bottom centre that
-// opens the assistant. It shows the animated Sanad mark (SanadMark): at rest its ring of enamel discs
-// orbits slowly and breathes; on press it ripples and folds into the handshake, then the assistant
-// opens (about 300 ms). A ring of the screen ground around it keeps it apart from the content.
+// opens the assistant. It shows the animated Sanad bot (SanadMark): at rest it blinks and its antenna
+// glows softly; on press a quick ripple, then the assistant opens (about 300 ms). A ring of the screen ground around it keeps it apart from the content.
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
