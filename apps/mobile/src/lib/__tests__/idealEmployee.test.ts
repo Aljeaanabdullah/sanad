@@ -16,7 +16,8 @@ describe('reason rule (same limits as the server)', () => {
   it('needs a written reason of at least 10 characters', () => {
     expect(reasonError('')).toBe('ie_reason_short');
     expect(reasonError('ممتاز')).toBe('ie_reason_short');
-    expect(reasonError('   ممتاز جداً   ')).toBe('ie_reason_short'); // spaces do not count
+    expect(reasonError('   جيد جداً   ')).toBe('ie_reason_short'); // spaces do not count
+    expect(reasonError('ممتاز جداً')).toBeNull(); // exactly 10
     expect(reasonError('a'.repeat(REASON_MIN))).toBeNull();
   });
   it('refuses more than 500 characters', () => {
@@ -89,7 +90,7 @@ describe('candidate search', () => {
 describe('texts', () => {
   it('month label in both languages', () => {
     expect(monthLabel('2026-11-01', 'en')).toMatch(/November 2026/);
-    expect(monthLabel('2026-11', 'ar')).toMatch(/2026/);
+    expect(monthLabel('2026-11', 'ar')).toMatch(/نوفمبر/);
   });
   it('every server refusal has a text; unknown ones fall back to the generic text', () => {
     for (const code of ['not_allowed', 'cannot_nominate_self', 'nominee_not_in_department', 'reason_too_short', 'reason_too_long', 'month_closed']) {
