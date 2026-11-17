@@ -125,10 +125,10 @@ export function PhotoViewer({ uri, caption, onClose }: { uri: string | null; cap
           <Image source={{ uri }} resizeMode="contain" style={StyleSheet.absoluteFill} accessibilityLabel={caption ?? t('req_photo')} />
         ) : null}
         <View style={{ position: 'absolute', top: insets.top + space.sm, left: space.sm, right: space.sm, flexDirection: d.row, alignItems: 'center', gap: space.sm }}>
-          <IconButton icon="close" label={t('close')} onPress={onClose} color="#F6F1E6" />
+          <IconButton icon="close" label={t('close')} onPress={onClose} color="#ffffff" />
           {caption ? (
             <View style={{ flex: 1 }}>
-              <Txt tone="onPrimary" numeric numberOfLines={2} style={{ color: '#F6F1E6' }}>{caption}</Txt>
+              <Txt tone="onPrimary" numeric numberOfLines={2} style={{ color: '#ffffff' }}>{caption}</Txt>
             </View>
           ) : null}
         </View>

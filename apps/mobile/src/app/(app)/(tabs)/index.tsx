@@ -16,6 +16,7 @@ import { longDate } from '../../../lib/dates';
 import { firstName, type PunchKind } from '../../../lib/punch';
 import { useSession } from '../../../lib/session';
 import { useSettings } from '../../../lib/settings';
+import { brand } from '../../../lib/theme';
 import type { DashboardData } from '../../../sanad/dashboard';
 
 /** Runs one block's load; a failed reload keeps what is already shown. */
@@ -80,7 +81,7 @@ export default function Home() {
           <IconButton
             icon="notifications-outline"
             label={t('notifications')}
-            color="#F6F1E6"
+            color={brand.onRail}
             badge={notices}
             onPress={() => router.push('/notifications')}
           />

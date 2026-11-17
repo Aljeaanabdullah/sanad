@@ -41,7 +41,7 @@ export function EmergencyBanner() {
 
   if (!emergency) return null;
   const site = lang === 'ar' ? emergency.site.name_ar : emergency.site.name_en;
-  const fg = c.dark ? '#0B1A33' : '#FFFFFF';
+  const fg = c.onDanger;
   return (
     <Pressable
       testID="emergency-banner"
