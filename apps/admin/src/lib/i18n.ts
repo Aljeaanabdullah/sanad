@@ -28,7 +28,6 @@ export const dictionaries = {
     notFoundTitle: "الصفحة غير موجودة",
     notFoundHint: "الرابط غير صحيح أو أن الصفحة حُذفت.",
     backHome: "العودة إلى الرئيسية",
-    dashboardIntro: "هذه لوحة التحكم. الشاشات ستُضاف في المراحل القادمة.",
     roles: { employee: "موظف", supervisor: "مشرف", hr: "موارد بشرية", admin: "مدير النظام" },
     nav: {
       dashboard: "الرئيسية",
@@ -83,7 +82,6 @@ export const dictionaries = {
     notFoundTitle: "Page not found",
     notFoundHint: "The link is wrong or the page was removed.",
     backHome: "Back to home",
-    dashboardIntro: "This is the admin panel. Screens are added in the next phases.",
     roles: { employee: "Employee", supervisor: "Supervisor", hr: "HR", admin: "System admin" },
     nav: {
       dashboard: "Home",
