@@ -1,5 +1,5 @@
 // First launch (PRD 12): choose language and light/dark, then the guard moves on to sign-in.
-// The one brand moment of the app: navy full-bleed with the gold wordmark. The choices sit on a
+// The one brand moment of the app: rail-teal full-bleed with the white wordmark and turquoise mark. The choices sit on a
 // panel in the chosen theme's background so the user sees the theme change at once.
 import { ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -14,7 +14,7 @@ export default function SetupScreen() {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={{ flex: 1, backgroundColor: brand.navy }}>
+    <View style={{ flex: 1, backgroundColor: brand.rail }}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} bounces={false}>
         <View style={{ flex: 1, minHeight: 260, alignItems: 'center', justifyContent: 'center', paddingTop: insets.top + space.xl, paddingBottom: space.xl, paddingHorizontal: space.xl, gap: space.sm }}>
           <BrandMark size={72} />
@@ -24,7 +24,7 @@ export default function SetupScreen() {
 
         <View
           style={{
-            // In dark mode the background is almost the hero navy; the raised surface keeps the panel visible.
+            // In dark mode the background is almost the hero teal; the raised surface keeps the panel visible.
             backgroundColor: c.dark ? c.surface : c.bg,
             borderTopLeftRadius: radius.lg,
             borderTopRightRadius: radius.lg,

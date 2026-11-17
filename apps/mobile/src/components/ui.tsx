@@ -19,8 +19,9 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useNav } from '../lib/nav';
 import { useSettings } from '../lib/settings';
-import { fonts, radius, space, TOUCH, type, type Palette } from '../lib/theme';
+import { fonts, radius, SANAD_BUTTON_ROOM, space, TOUCH, type, type Palette } from '../lib/theme';
 
 export type IconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -45,7 +46,7 @@ export function useDir() {
 // ---------------------------------------------------------------- text
 
 type Variant = 'display' | 'title' | 'heading' | 'body' | 'label' | 'caption';
-type Tone = 'default' | 'muted' | 'primary' | 'accent' | 'ok' | 'danger' | 'onPrimary';
+type Tone = 'default' | 'muted' | 'primary' | 'accent' | 'ok' | 'warn' | 'danger' | 'onPrimary';
 
 const weightOf: Record<Variant, string> = {
   display: fonts.black,
@@ -57,7 +58,7 @@ const weightOf: Record<Variant, string> = {
 };
 
 export function toneColor(c: Palette, tone: Tone) {
-  return { default: c.text, muted: c.muted, primary: c.primary, accent: c.accent, ok: c.ok, danger: c.danger, onPrimary: c.onPrimary }[tone];
+  return { default: c.text, muted: c.muted, primary: c.primary, accent: c.accent, ok: c.ok, warn: c.warn, danger: c.danger, onPrimary: c.onPrimary }[tone];
 }
 
 /** Text in the Sanad type scale. `numeric` keeps digits left-to-right inside Arabic text. */
@@ -74,7 +75,7 @@ export function Txt({
 }: {
   variant?: Variant;
   tone?: Tone;
-  weight?: 'regular' | 'medium' | 'bold' | 'black';
+  weight?: 'regular' | 'medium' | 'semibold' | 'bold' | 'black';
   center?: boolean;
   numeric?: boolean;
   numberOfLines?: number;
@@ -143,13 +144,16 @@ export function Screen({ children, scroll = true, padded = true, refreshControl,
   footer?: ReactNode;
 }) {
   const { c } = useSettings();
+  const nav = useNav();
   const insets = useSafeAreaInsets();
   const pad = padded ? { paddingHorizontal: space.lg, paddingTop: space.lg } : null;
+  // Leave room under the last card for the round Sanad button where it floats.
+  const bottom = footer ? space.lg : insets.bottom + (nav?.sanadButton ? SANAD_BUTTON_ROOM : space.xl);
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       {scroll ? (
         <ScrollView
-          contentContainerStyle={[pad, { paddingBottom: (footer ? space.lg : insets.bottom + space.xl), gap: space.lg }, contentStyle]}
+          contentContainerStyle={[pad, { paddingBottom: bottom, gap: space.lg }, contentStyle]}
           refreshControl={refreshControl}
           keyboardShouldPersistTaps="handled"
         >
@@ -168,8 +172,9 @@ export function Screen({ children, scroll = true, padded = true, refreshControl,
 }
 
 /**
- * Top app bar. Navy in both themes (the Sanad header). `back` shows a system-style back button;
- * `actions` go on the reading end. Pass `big` on tab roots for the large greeting header.
+ * Top app bar in rail teal (the web panel's rail colour), in both themes. `back` shows a system-style
+ * back button; without it, inside the app, the three-line button on the reading start opens the side
+ * menu. `actions` go on the reading end. Pass `big` on section roots for the large greeting header.
  */
 export function Header({ title, subtitle, back, actions, big, children }: {
   title: string;
@@ -177,28 +182,42 @@ export function Header({ title, subtitle, back, actions, big, children }: {
   back?: boolean;
   actions?: ReactNode;
   big?: boolean;
-  /** Extra content inside the navy band (e.g. the punch card on Home). */
+  /** Extra content inside the teal band (e.g. the punch card on Home). */
   children?: ReactNode;
 }) {
+  const { c, t } = useSettings();
+  const nav = useNav();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const d = useDir();
   return (
-    <View style={{ backgroundColor: '#0B1A33', paddingTop: insets.top + space.sm, paddingBottom: big ? space.xl : space.md, paddingHorizontal: space.lg }}>
+    <View
+      style={{
+        backgroundColor: c.bar,
+        paddingTop: insets.top + space.sm,
+        paddingBottom: big ? space.xl : space.md,
+        paddingHorizontal: space.lg,
+        // At night the bar is darker than the ground; a hairline keeps its edge.
+        borderBottomWidth: c.dark ? StyleSheet.hairlineWidth : 0,
+        borderBottomColor: c.line,
+      }}
+    >
       <Row gap={space.sm} style={{ minHeight: TOUCH }}>
         {back ? (
-          <IconButton icon={d.back} label="back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} color="#F6F1E6" />
+          <IconButton icon={d.back} label="back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} color={c.barInk} />
+        ) : nav ? (
+          <IconButton icon="menu" label={t('menu_open')} onPress={nav.openMenu} color={c.barInk} testID="menu-button" />
         ) : null}
         <View style={{ flex: 1 }}>
           <Text
             accessibilityRole="header"
             numberOfLines={1}
-            style={[big ? type.title : type.heading, { fontFamily: fonts.bold, color: '#F6F1E6', textAlign: d.align, writingDirection: d.writing }]}
+            style={[big ? type.title : type.heading, { fontFamily: fonts.bold, color: c.barInk, textAlign: d.align, writingDirection: d.writing }]}
           >
             {title}
           </Text>
           {subtitle ? (
-            <Text numberOfLines={1} style={[type.label, { fontFamily: fonts.regular, color: '#C9D3E3', textAlign: d.align, writingDirection: d.writing }]}>
+            <Text numberOfLines={1} style={[type.label, { fontFamily: fonts.regular, color: c.barMuted, textAlign: d.align, writingDirection: d.writing }]}>
               {subtitle}
             </Text>
           ) : null}
@@ -212,7 +231,7 @@ export function Header({ title, subtitle, back, actions, big, children }: {
 
 // ---------------------------------------------------------------- surfaces
 
-/** A flat white (or navy-mid in dark) card with a hairline border. Never nest cards. */
+/** A flat white (or deep sea in dark) card with a hairline border. Never nest cards. */
 export function Card({ children, onPress, style, padded = true, accessibilityLabel, testID }: {
   children: ReactNode;
   onPress?: () => void;
@@ -318,9 +337,10 @@ export function StatTile({ value, label, tone = 'default', icon, onPress }: { va
 
 // ---------------------------------------------------------------- actions
 
-type ButtonKind = 'primary' | 'secondary' | 'danger' | 'ghost' | 'gold';
+/** `gold` is the old name of `accent`, kept so older screens still build. */
+type ButtonKind = 'primary' | 'secondary' | 'danger' | 'ghost' | 'accent' | 'gold';
 
-/** Buttons: primary (navy, or gold-light in dark), gold (the punch-in hero), danger (punch out, reject), secondary (outlined), ghost (text). */
+/** Buttons: primary (deep teal, or turquoise in dark), accent (turquoise: the punch-in hero), danger (punch out, reject), secondary (outlined), ghost (text). */
 export function Button({ label, onPress, kind = 'primary', icon, loading, disabled, size = 'md', full = true, testID }: {
   label: string;
   onPress: () => void;
@@ -336,8 +356,9 @@ export function Button({ label, onPress, kind = 'primary', icon, loading, disabl
   const d = useDir();
   const colors: Record<ButtonKind, { bg: string; fg: string; border?: string }> = {
     primary: { bg: c.primary, fg: c.onPrimary },
-    gold: { bg: '#C9A24B', fg: '#0B1A33' },
-    danger: { bg: c.danger, fg: c.dark ? '#0B1A33' : '#FFFFFF' },
+    accent: { bg: c.accentFill, fg: c.onAccent },
+    gold: { bg: c.accentFill, fg: c.onAccent },
+    danger: { bg: c.danger, fg: c.onDanger },
     secondary: { bg: 'transparent', fg: c.primary, border: c.primary },
     ghost: { bg: 'transparent', fg: c.primary },
   };
@@ -370,7 +391,7 @@ export function Button({ label, onPress, kind = 'primary', icon, loading, disabl
       ) : (
         <View style={{ flexDirection: d.row, alignItems: 'center', gap: space.sm }}>
           {icon ? <Ionicons name={icon} size={size === 'lg' ? 24 : 20} color={k.fg} /> : null}
-          <Text style={[size === 'lg' ? type.heading : type.body, { fontFamily: fonts.bold, color: k.fg }]}>{label}</Text>
+          <Text style={[size === 'lg' ? type.heading : type.body, { fontFamily: fonts.semibold, color: k.fg }]}>{label}</Text>
         </View>
       )}
     </Pressable>
@@ -378,10 +399,11 @@ export function Button({ label, onPress, kind = 'primary', icon, loading, disabl
 }
 
 /** A 48dp icon-only button; `label` is a strings.json key or plain text for screen readers. */
-export function IconButton({ icon, label, onPress, color, badge }: { icon: IconName; label: string; onPress: () => void; color?: string; badge?: number }) {
+export function IconButton({ icon, label, onPress, color, badge, testID }: { icon: IconName; label: string; onPress: () => void; color?: string; badge?: number; testID?: string }) {
   const { c, t } = useSettings();
   return (
     <Pressable
+      testID={testID}
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={label === 'back' ? t('back') : label}
@@ -390,8 +412,8 @@ export function IconButton({ icon, label, onPress, color, badge }: { icon: IconN
     >
       <Ionicons name={icon} size={24} color={color ?? c.text} />
       {badge ? (
-        <View style={{ position: 'absolute', top: 6, right: 6, minWidth: 18, height: 18, borderRadius: 9, backgroundColor: '#C9A24B', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 }}>
-          <Text style={{ fontFamily: fonts.bold, fontSize: 11, color: '#0B1A33' }}>{badge > 9 ? '9+' : badge}</Text>
+        <View style={{ position: 'absolute', top: 6, right: 6, minWidth: 18, height: 18, borderRadius: 9, backgroundColor: c.accentFill, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 }}>
+          <Text style={{ fontFamily: fonts.bold, fontSize: 11, color: c.onAccent }}>{badge > 9 ? '9+' : badge}</Text>
         </View>
       ) : null}
     </Pressable>
@@ -458,9 +480,13 @@ type BadgeTone = 'ok' | 'danger' | 'warn' | 'info' | 'neutral';
 export function Badge({ label, tone = 'neutral', icon }: { label: string; tone?: BadgeTone; icon?: IconName }) {
   const { c } = useSettings();
   const d = useDir();
-  const map: Record<BadgeTone, { bg: string; fg: string }> = c.dark
-    ? { ok: { bg: '#163A2C', fg: '#7FD1A8' }, danger: { bg: '#3D1C22', fg: '#FF8A80' }, warn: { bg: '#3B3016', fg: '#F2C96B' }, info: { bg: '#16304F', fg: '#90C2F5' }, neutral: { bg: c.surfaceAlt, fg: c.muted } }
-    : { ok: { bg: '#E3F2EA', fg: '#1F6B4A' }, danger: { bg: '#FBE7E7', fg: '#A31F1F' }, warn: { bg: '#FBF0D6', fg: '#7A5600' }, info: { bg: '#E3EEFA', fg: '#0F4F99' }, neutral: { bg: c.surfaceAlt, fg: c.muted } };
+  const map: Record<BadgeTone, { bg: string; fg: string }> = {
+    ok: { bg: c.okSoft, fg: c.ok },
+    danger: { bg: c.dangerSoft, fg: c.danger },
+    warn: { bg: c.warnSoft, fg: c.warn },
+    info: { bg: c.infoSoft, fg: c.info },
+    neutral: { bg: c.surfaceAlt, fg: c.muted },
+  };
   const k = map[tone];
   return (
     <View style={{ flexDirection: d.row, alignItems: 'center', gap: 4, alignSelf: 'flex-start', backgroundColor: k.bg, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 3 }}>
@@ -523,9 +549,13 @@ export function ErrorState({ message, onRetry }: { message: string; onRetry?: ()
 /** An inline notice inside a form or card (warning, info, error). Full tinted background, no side stripe. */
 export function Notice({ tone = 'info', text, icon }: { tone?: BadgeTone; text: string; icon?: IconName }) {
   const { c } = useSettings();
-  const map: Record<BadgeTone, { bg: string; fg: string; icon: IconName }> = c.dark
-    ? { ok: { bg: '#163A2C', fg: '#BFE8D3', icon: 'checkmark-circle' }, danger: { bg: '#3D1C22', fg: '#FFC9C4', icon: 'alert-circle' }, warn: { bg: '#3B3016', fg: '#F7E0A6', icon: 'warning' }, info: { bg: '#16304F', fg: '#C7DFF8', icon: 'information-circle' }, neutral: { bg: c.surfaceAlt, fg: c.text, icon: 'information-circle' } }
-    : { ok: { bg: '#E3F2EA', fg: '#1F4F3A', icon: 'checkmark-circle' }, danger: { bg: '#FBE7E7', fg: '#7F1717', icon: 'alert-circle' }, warn: { bg: '#FBF0D6', fg: '#5C4100', icon: 'warning' }, info: { bg: '#E3EEFA', fg: '#0D3D75', icon: 'information-circle' }, neutral: { bg: c.surfaceAlt, fg: c.text, icon: 'information-circle' } };
+  const map: Record<BadgeTone, { bg: string; fg: string; icon: IconName }> = {
+    ok: { bg: c.okSoft, fg: c.ok, icon: 'checkmark-circle' },
+    danger: { bg: c.dangerSoft, fg: c.danger, icon: 'alert-circle' },
+    warn: { bg: c.warnSoft, fg: c.warn, icon: 'warning' },
+    info: { bg: c.infoSoft, fg: c.info, icon: 'information-circle' },
+    neutral: { bg: c.surfaceAlt, fg: c.text, icon: 'information-circle' },
+  };
   const k = map[tone];
   return (
     <Row gap={space.sm} align="flex-start" style={{ backgroundColor: k.bg, borderRadius: radius.sm, padding: space.md }}>
@@ -561,7 +591,7 @@ export function Field({ label, error, helper, ...input }: TextInputProps & { lab
             paddingVertical: input.multiline ? space.md : 0,
             borderRadius: radius.sm,
             borderWidth: focused ? 2 : 1,
-            borderColor: error ? c.danger : focused ? c.accent : c.line,
+            borderColor: error ? c.danger : focused ? c.accent : c.controlLine,
             backgroundColor: c.surface,
             textAlign: d.align,
             textAlignVertical: input.multiline ? 'top' : 'center',
@@ -585,7 +615,7 @@ export function PickerField({ label, value, placeholder, icon = 'calendar-outlin
         onPress={onPress}
         accessibilityRole="button"
         accessibilityLabel={`${label}: ${value ?? placeholder}`}
-        style={{ minHeight: TOUCH + 4, paddingHorizontal: space.md, borderRadius: radius.sm, borderWidth: 1, borderColor: error ? c.danger : c.line, backgroundColor: c.surface, justifyContent: 'center' }}
+        style={{ minHeight: TOUCH + 4, paddingHorizontal: space.md, borderRadius: radius.sm, borderWidth: 1, borderColor: error ? c.danger : c.controlLine, backgroundColor: c.surface, justifyContent: 'center' }}
       >
         <Row gap={space.sm}>
           <Icon name={icon} size={20} tone="muted" />
@@ -608,6 +638,7 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
   const anim = useRef(new Animated.Value(0)).current;
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const insets = useSafeAreaInsets();
+  const { c } = useSettings();
   const show = useCallback(
     (text: string, tone: Snack['tone'] = 'info') => {
       if (timer.current) clearTimeout(timer.current);
@@ -621,7 +652,7 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
   );
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
   const icon: Record<Snack['tone'], IconName> = { ok: 'checkmark-circle', danger: 'alert-circle', info: 'information-circle' };
-  const color: Record<Snack['tone'], string> = { ok: '#7FD1A8', danger: '#FF8A80', info: '#E6C878' };
+  const color: Record<Snack['tone'], string> = { ok: '#72d8b0', danger: '#ff9d91', info: '#5fd3c6' };
   return (
     <SnackCtx.Provider value={show}>
       {children}
@@ -630,23 +661,24 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
           accessibilityLiveRegion="polite"
           pointerEvents="none"
           style={{
-            position: 'absolute', left: space.lg, right: space.lg, bottom: insets.bottom + 72,
+            // Above form footers and above the round Sanad button.
+            position: 'absolute', left: space.lg, right: space.lg, bottom: insets.bottom + SANAD_BUTTON_ROOM + space.sm,
             opacity: anim, transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }],
           }}
         >
-          <SnackBody text={snack.text} icon={icon[snack.tone]} color={color[snack.tone]} />
+          <SnackBody text={snack.text} icon={icon[snack.tone]} color={color[snack.tone]} bg={c.snack} />
         </Animated.View>
       ) : null}
     </SnackCtx.Provider>
   );
 }
 
-function SnackBody({ text, icon, color }: { text: string; icon: IconName; color: string }) {
+function SnackBody({ text, icon, color, bg }: { text: string; icon: IconName; color: string; bg: string }) {
   const d = useDir();
   return (
-    <View style={{ flexDirection: d.row, alignItems: 'center', gap: space.sm, backgroundColor: '#13274A', borderRadius: radius.sm, paddingHorizontal: space.lg, paddingVertical: space.md, elevation: 6, shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 8, shadowOffset: { width: 0, height: 3 } }}>
+    <View style={{ flexDirection: d.row, alignItems: 'center', gap: space.sm, backgroundColor: bg, borderRadius: radius.sm, paddingHorizontal: space.lg, paddingVertical: space.md, elevation: 6, shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 8, shadowOffset: { width: 0, height: 3 } }}>
       <Ionicons name={icon} size={20} color={color} />
-      <Text style={[type.label, { flex: 1, fontFamily: fonts.medium, color: '#F6F1E6', textAlign: d.align }]}>{text}</Text>
+      <Text style={[type.label, { flex: 1, fontFamily: fonts.medium, color: '#ffffff', textAlign: d.align }]}>{text}</Text>
     </View>
   );
 }

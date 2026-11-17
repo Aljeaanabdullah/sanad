@@ -30,7 +30,7 @@ export async function setupChannels(): Promise<void> {
     importance: Notifications.AndroidImportance.HIGH,
     sound: 'default',
     vibrationPattern: [0, 250, 250, 250],
-    lightColor: '#C9A24B',
+    lightColor: '#1fa89c',
     lockscreenVisibility: Notifications.AndroidNotificationVisibility.PRIVATE,
   });
   await Notifications.setNotificationChannelAsync(CHANNEL_EMERGENCY, {

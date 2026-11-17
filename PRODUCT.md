@@ -47,7 +47,7 @@ One system that joins verified attendance (face + geofence + bound device), leav
 
 - Name: سَنَد (Sanad). The wordmark is the Arabic name set in type; the logo is temporary until a final one is approved (PRD section 12).
 - The navy + gold identity (owner decision 2026-11-16) is retired for the panel by the owner's decision of 2026-11-17: a new identity, professional and soft, at the level of global product companies.
-- The mobile app keeps navy + gold for now and will move to the new identity later, in a separate task (owner answer, 2026-11-17).
+- The mobile app moves to the same identity in phase S7 (owner decision 2026-11-17): the same colours and font, a side menu instead of the bottom tab bar, and a round Sanad button that opens the assistant.
 - Emergency map: red and green keep their safety meaning.
 - Voice: simple, direct words. No marketing language inside the panel.
 

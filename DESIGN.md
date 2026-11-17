@@ -185,7 +185,7 @@ components:
 
 # Design System: Sanad Panel
 
-Scope: this file covers the web panel (`apps/admin`) only. The mobile app (`apps/mobile`) keeps its older navy + gold identity for now and has its own `apps/mobile/DESIGN.md`. Everything here was read from the shipped panel code (`apps/admin/src/app/globals.css` and `apps/admin/src/components/ui.tsx`), not from a plan, and was refreshed after the review fixes of the same day. The owner chose this identity on 2026-11-17; it replaces navy + gold for the panel.
+Scope: this file covers the web panel (`apps/admin`) only. The mobile app (`apps/mobile`) uses the same identity since phase S7 (owner decision 2026-11-17: same colour tokens and Readex Pro) and has its own `apps/mobile/DESIGN.md` for its components and navigation. Everything here was read from the shipped panel code (`apps/admin/src/app/globals.css` and `apps/admin/src/components/ui.tsx`), not from a plan, and was refreshed after the review fixes of the same day. The owner chose this identity on 2026-11-17; it replaces navy + gold for the panel.
 
 ## Overview
 

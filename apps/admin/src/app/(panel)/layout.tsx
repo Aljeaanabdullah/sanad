@@ -8,12 +8,12 @@ import type { Dictionary } from "@/lib/i18n";
 
 type NavKey = keyof Dictionary["nav"];
 
-// Menu per role (docs/PRD.md section 2).
+// Menu per role (docs/PRD.md section 2). The ideas box and the ideal employee are for HR and the admin.
 const menu: Record<StaffRole, NavKey[]> = {
   supervisor: ["dashboard", "liveBoard", "approvals", "records", "reports", "emergencies"],
-  hr: ["dashboard", "liveBoard", "approvals", "records", "reports", "faceEnrollment"],
+  hr: ["dashboard", "liveBoard", "approvals", "records", "reports", "faceEnrollment", "ideas", "idealEmployee"],
   // The admin approves in two cases (PRD 7.2): no department supervisor, and HR employees' requests.
-  admin: ["dashboard", "liveBoard", "approvals", "records", "reports", "employees", "faceEnrollment", "organisation", "emergencies", "auditLog"],
+  admin: ["dashboard", "liveBoard", "approvals", "records", "reports", "employees", "faceEnrollment", "organisation", "emergencies", "ideas", "idealEmployee", "auditLog"],
 };
 
 // Screens built so far. The rest show "Soon".
@@ -28,6 +28,9 @@ const routes: Partial<Record<NavKey, string>> = {
   reports: "/reports",
   auditLog: "/audit-log",
   emergencies: "/emergencies",
+  // Pages of phases S8 and S9 (HR and the admin only).
+  ideas: "/ideas",
+  idealEmployee: "/ideal-employee",
 };
 
 const itemClass = "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm whitespace-nowrap md:py-2 md:text-[0.9375rem]";

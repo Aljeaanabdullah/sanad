@@ -1,4 +1,4 @@
-// Home hero (inside the navy header): the current shift, its status, and the punch button.
+// Home hero (inside the teal header): the current shift, its status, and the punch button.
 // The button is the app's best guess (in or out); the server decides in the end.
 import { View } from 'react-native';
 import type { PunchEntry, ShiftInfo } from '../../lib/api';
@@ -9,9 +9,9 @@ import { space } from '../../lib/theme';
 import { Button, Card, Icon, Row, Skeleton, Txt, type IconName } from '../ui';
 import type { Block } from './block';
 
-const TONE_ICON: Record<string, { icon: IconName; tone: 'ok' | 'danger' | 'accent' | 'muted' | 'primary' }> = {
+const TONE_ICON: Record<string, { icon: IconName; tone: 'ok' | 'danger' | 'warn' | 'muted' | 'primary' }> = {
   ok: { icon: 'checkmark-circle', tone: 'ok' },
-  warn: { icon: 'alert-circle', tone: 'accent' },
+  warn: { icon: 'alert-circle', tone: 'warn' },
   danger: { icon: 'close-circle', tone: 'danger' },
   info: { icon: 'time-outline', tone: 'primary' },
   neutral: { icon: 'time-outline', tone: 'muted' },
@@ -36,7 +36,7 @@ export function PunchCard({ shift, punches, onPunch }: { shift: Block<ShiftInfo 
     <Button
       testID="home-punch"
       size="lg"
-      kind={next === 'check_out' ? 'danger' : 'gold'}
+      kind={next === 'check_out' ? 'danger' : 'accent'}
       icon={next === 'check_out' ? 'log-out-outline' : 'finger-print'}
       label={t(next === 'check_out' ? 'home_check_out' : 'home_check_in')}
       disabled={disabled}

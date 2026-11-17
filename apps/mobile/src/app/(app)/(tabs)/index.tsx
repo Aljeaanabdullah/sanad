@@ -80,7 +80,7 @@ export default function Home() {
           <IconButton
             icon="notifications-outline"
             label={t('notifications')}
-            color="#F6F1E6"
+            color={c.barInk}
             badge={notices}
             onPress={() => router.push('/notifications')}
           />

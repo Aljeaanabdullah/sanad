@@ -16,8 +16,8 @@ export function ChatBubble({ mine, text, children, testID }: { mine: boolean; te
     <View testID={testID} style={{ alignSelf: side, maxWidth: '86%' }} accessible accessibilityLabel={mine ? `${t('asst_you')}: ${text}` : `${t('app_name')}: ${text}`}>
       <Row gap={space.sm} align="flex-end">
         {!mine ? (
-          <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#0B1A33', alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name="sparkles-outline" size={16} color="#E6C878" />
+          <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: c.bar, alignItems: 'center', justifyContent: 'center' }}>
+            <Icon name="sparkles-outline" size={16} color={c.barDot} />
           </View>
         ) : null}
         <View
@@ -75,7 +75,7 @@ export function ChatInput({ onSend, placeholder, sendLabel }: { onSend: (text: s
             paddingHorizontal: space.lg,
             borderRadius: radius.pill,
             borderWidth: focused ? 2 : 1,
-            borderColor: focused ? c.accent : c.line,
+            borderColor: focused ? c.accent : c.controlLine,
             backgroundColor: c.surface,
             color: c.text,
             fontFamily: fonts.regular,

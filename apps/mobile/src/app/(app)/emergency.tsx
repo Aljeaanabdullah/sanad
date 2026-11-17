@@ -193,7 +193,7 @@ export default function EmergencyScreen() {
             <Button
               label={t('emg_arrived')}
               icon="checkmark-circle"
-              kind="gold"
+              kind="accent"
               size="lg"
               loading={sending === 'arrived'}
               disabled={!!sending}

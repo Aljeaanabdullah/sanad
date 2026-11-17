@@ -32,7 +32,7 @@ export const PasswordField = forwardRef<TextInputInstance, Props>(function Passw
           minHeight: TOUCH + 4,
           borderRadius: radius.sm,
           borderWidth: focused ? 2 : 1,
-          borderColor: error ? c.danger : focused ? c.accent : c.line,
+          borderColor: error ? c.danger : focused ? c.accent : c.controlLine,
           backgroundColor: c.surface,
         }}
       >

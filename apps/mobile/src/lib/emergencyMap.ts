@@ -82,7 +82,7 @@ export function buildMapHtml(e: Pick<ActiveEmergency, 'buildings' | 'site'>, opt
     me: opts.me ? { lat: opts.me.lat, lng: opts.me.lng, accuracy: opts.me.accuracy ?? null } : null,
     blue: BLUE,
   };
-  const bg = opts.dark ? '#0B1628' : '#F6F1E6';
+  const bg = opts.dark ? '#0a1a1c' : '#eef4f3'; // the app ground (sea glass)
   // Dark mode: darken the OpenStreetMap tiles (the coloured circles are drawn above, unchanged).
   const tileFilter = opts.dark ? 'filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9);' : '';
   return `<!doctype html>
