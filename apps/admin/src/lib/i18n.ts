@@ -22,7 +22,6 @@ export const dictionaries = {
     themeDark: "الوضع الليلي",
     welcome: "مرحباً",
     comingSoon: "قريباً",
-    dashboardIntro: "هذه لوحة التحكم. الشاشات ستُضاف في المراحل القادمة.",
     roles: { employee: "موظف", supervisor: "مشرف", hr: "موارد بشرية", admin: "مدير النظام" },
     nav: {
       dashboard: "الرئيسية",
@@ -71,7 +70,6 @@ export const dictionaries = {
     themeDark: "Dark mode",
     welcome: "Welcome",
     comingSoon: "Soon",
-    dashboardIntro: "This is the admin panel. Screens are added in the next phases.",
     roles: { employee: "Employee", supervisor: "Supervisor", hr: "HR", admin: "System admin" },
     nav: {
       dashboard: "Home",
