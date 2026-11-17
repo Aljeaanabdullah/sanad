@@ -7,6 +7,8 @@ export const NOTIFICATION_KINDS = [
   'sup_not_in', 'sup_absent', 'sup_missing_checkout', 'sup_failed_verification',
   'request_decided', 'request_to_approve', 'leave_recorded', 'penalty_recorded', 'bonus_list',
   'late', 'emergency_alert',
+  // Phase S8 ideas box.
+  'idea_status', 'idea_awaiting', 'idea_overdue',
 ] as const;
 
 import { emergencyRouteFor } from './emergencyNotification';
@@ -32,6 +34,13 @@ export function routeFor(kind: string, data: Record<string, unknown> | null | un
     }
     case 'request_to_approve':
       return '/approvals';
+    // Phase S8: the idea (author, voters, HR at the threshold, admins when overdue).
+    case 'idea_status':
+    case 'idea_awaiting':
+    case 'idea_overdue': {
+      const i = id(d.idea_id);
+      return i ? `/ideas/${i}` : '/ideas';
+    }
     case 'late':
       return '/reports';
     case 'leave_recorded':

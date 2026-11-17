@@ -590,7 +590,7 @@ returns table (id uuid, title text, description text, category public.idea_categ
                vote_count integer, is_anonymous boolean, author_name_ar text, author_name_en text, author_file_number integer,
                has_photo boolean, created_at timestamptz, review_due_at timestamptz, published_at timestamptz,
                threshold_at timestamptz, response_due_at timestamptz, responded_at timestamptz, reject_reason text,
-               review_overdue boolean, response_overdue boolean)
+               review_overdue boolean, response_overdue boolean, photo_path text)
 language plpgsql
 stable
 security definer
@@ -609,7 +609,8 @@ begin
          i.photo_path is not null, i.created_at, i.review_due_at, i.published_at, i.threshold_at,
          i.response_due_at, i.responded_at, i.reject_reason,
          i.status = 'new' and i.review_due_at < now(),
-         i.status = 'awaiting_response' and i.response_due_at < now()
+         i.status = 'awaiting_response' and i.response_due_at < now(),
+         i.photo_path
   from public.ideas i
   left join public.employees e on e.id = i.author_id
   where case p_filter
