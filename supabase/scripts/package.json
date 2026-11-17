@@ -11,7 +11,8 @@
     "test:enroll": "node --test enroll.test.mjs",
     "test:punch": "node --test punch.test.mjs",
     "test:rules": "node --test rules.test.mjs",
-    "test:requests": "node --test requests.test.mjs"
+    "test:requests": "node --test requests.test.mjs",
+    "test:ideas": "node --test ideas.test.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0"

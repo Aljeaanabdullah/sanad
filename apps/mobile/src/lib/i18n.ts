@@ -5,14 +5,15 @@ import c from './strings-c.json';
 import d from './strings-d.json';
 import e from './strings-e.json';
 import f from './strings-f.json';
+import g from './strings-g.json';
 
 export type Lang = 'ar' | 'en';
 
 // strings.json holds the shared texts; strings-a..d.json hold texts added per screen group
 // (punch/home, requests, dashboard/reports/more, sign-in, e = notifications, f = emergency), merged here.
 const tables: Record<Lang, Record<string, string>> = {
-  ar: { ...base.ar, ...a.ar, ...b.ar, ...c.ar, ...d.ar, ...e.ar, ...f.ar },
-  en: { ...base.en, ...a.en, ...b.en, ...c.en, ...d.en, ...e.en, ...f.en },
+  ar: { ...base.ar, ...a.ar, ...b.ar, ...c.ar, ...d.ar, ...e.ar, ...f.ar, ...g.ar },
+  en: { ...base.en, ...a.en, ...b.en, ...c.en, ...d.en, ...e.en, ...f.en, ...g.en },
 };
 
 export type T = {
