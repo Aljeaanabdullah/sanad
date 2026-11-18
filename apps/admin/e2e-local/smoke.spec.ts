@@ -40,11 +40,12 @@ test.describe("sign-in page", () => {
   });
 });
 
-// The menu of each role (PRD 2; same list as docs/pilot/test-script-supervisor-hr.md step A3).
+// The menu of each role (PRD 2; apps/admin/src/app/(panel)/layout.tsx). S8/S9 added the ideas box and the
+// ideal employee for HR and the admin. Update this list whenever the menu changes on purpose.
 const MENUS: Record<SmokeRole, string[]> = {
   supervisor: ["الرئيسية", "اللوحة المباشرة", "الموافقات", "سجل موظف", "التقارير", "الطوارئ"],
-  hr: ["الرئيسية", "اللوحة المباشرة", "الموافقات", "سجل موظف", "التقارير", "تسجيل الوجه"],
-  admin: ["الرئيسية", "اللوحة المباشرة", "الموافقات", "سجل موظف", "التقارير", "الموظفون", "تسجيل الوجه", "الهيكل التنظيمي", "الطوارئ", "سجل العمليات"],
+  hr: ["الرئيسية", "اللوحة المباشرة", "الموافقات", "سجل موظف", "التقارير", "تسجيل الوجه", "صندوق الأفكار", "الموظف المثالي"],
+  admin: ["الرئيسية", "اللوحة المباشرة", "الموافقات", "سجل موظف", "التقارير", "الموظفون", "تسجيل الوجه", "الهيكل التنظيمي", "الطوارئ", "صندوق الأفكار", "الموظف المثالي", "سجل العمليات"],
 };
 
 for (const role of ["admin", "supervisor", "hr"] as SmokeRole[]) {
